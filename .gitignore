@@ -5,6 +5,10 @@
 # Node
 node_modules/
 
+# Prisma
+*.db
+*.db-journal
+
 # OS
 .DS_Store
 Thumbs.db
