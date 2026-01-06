@@ -1,87 +1,149 @@
-import { Box, Button, Heading, Text, SimpleGrid, Flex } from '@chakra-ui/react';
+import {Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, HStack } from '@chakra-ui/react';
+import { FaPlus, FaBoxOpen, FaStar, FaExchangeAlt, FaCoins } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { ServiceCard } from '../components/dashboard/ServiceCard';
+import type { ElementType } from 'react';
 
-const MOCK_SERVICES = [
-  {
-    id: 1,
-    title: "Tutoría de Cálculo Diferencial",
-    author: "María G.",
-    category: "Académico",
-    price: "2 Créditos",
-    colorPalette: "blue"
-  },
-  {
-    id: 2,
-    title: "Formateo de Laptops y Drivers",
-    author: "Juan P.",
-    category: "Tecnología",
-    price: "3 Créditos",
-    colorPalette: "purple"
-  },
-  {
-    id: 3,
-    title: "Diseño de Logos Vectoriales",
-    author: "Andrea L.",
-    category: "Diseño",
-    price: "Gratis",
-    colorPalette: "pink"
-  },
-  {
-    id: 4,
-    title: "Conversación en Inglés (B2)",
-    author: "Carlos M.",
-    category: "Idiomas",
-    price: "1 Crédito",
-    colorPalette: "green"
-  },
-  {
-    id: 5,
-    title: "Asesoría en Tesis (Normas APA)",
-    author: "Luis R.",
-    category: "Académico",
-    price: "5 Créditos",
-    colorPalette: "orange"
-  },
-  {
-    id: 6,
-    title: "Instalación de SQL Server",
-    author: "Axel J.",
-    category: "Tecnología",
-    price: "2 Créditos",
-    colorPalette: "cyan"
-  },
-];
+// 1. SOLUCIÓN TIPO: Definimos qué datos espera la tarjeta
+interface StatCardProps {
+  icon: ElementType;
+  label: string;
+  value: string;
+  color: string;
+}
+
+// 2. SOLUCIÓN RENDIMIENTO: El componente vive AFUERA del DashboardPage
+const StatCard = ({ icon, label, value, color }: StatCardProps) => (
+  <Box 
+    bg="white" 
+    p={4} 
+    borderRadius="xl" 
+    border="1px solid" 
+    borderColor="gray.100" 
+    shadow="sm"
+    display="flex"
+    alignItems="center"
+    gap={4}
+    transition="transform 0.2s"
+    _hover={{ transform: "translateY(-2px)", shadow: "md" }}
+  >
+    <Flex 
+      w={12} h={12} 
+      align="center" justify="center" 
+      borderRadius="lg" 
+      bg={`${color}.50`} 
+      color={`${color}.500`}
+    >
+      <Icon as={icon} boxSize={5} />
+    </Flex>
+    <Box>
+      <Text fontSize="xs" color="gray.500" fontWeight="bold" textTransform="uppercase">
+        {label}
+      </Text>
+      <Text fontSize="xl" fontWeight="bold" color="gray.700">
+        {value}
+      </Text>
+    </Box>
+  </Box>
+);
 
 export const DashboardPage = () => {
   const { user } = useAuth();
 
   return (
-    <Box>
-      <Flex justify="space-between" align="center" mb={8} wrap="wrap" gap={4}>
-        <Box>
-          <Heading size="2xl" mb={2}>Mercado de Talentos</Heading>
-          <Text color="gray.500" fontSize="lg">
-            Bienvenido, {user?.name}. Tienes <strong>10 Créditos</strong> disponibles.
-          </Text>
-        </Box>
-        <Button size="lg" colorPalette="blue">
-          + Nueva Publicación
-        </Button>
-      </Flex>
+    <Box bg="gray.50" minH="calc(100vh - 64px)">
+      
+      {/* 1. HERO HEADER */}
+      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" pb={10} pt={8}>
+        <Container maxW="container.xl">
+          <Flex 
+            justify="space-between" 
+            align="center" 
+            direction={{ base: 'column', md: 'row' }}
+            gap={6}
+            mb={8}
+          >
+            <Box maxW="2xl">
+              <HStack mb={2}>
+                <Heading 
+                  size="xl" 
+                  color="gray.800"
+                  letterSpacing="tight"
+                >
+                  Hola, <Box as="span" color="blue.600">{user?.name?.split(' ')[0]}</Box> 👋
+                </Heading>
+              </HStack>
+              <Text fontSize="lg" color="gray.500">
+                Bienvenido a tu panel de control. Aquí gestionas tus habilidades.
+              </Text>
+            </Box>
+            
+            <Button 
+              size="lg"
+              colorPalette="blue" 
+              bg="blue.600"
+              _hover={{ bg: "blue.700" }}
+              color="white"
+              borderRadius="full"
+              px={6}
+              shadow="md"
+            >
+              <Icon as={FaPlus} mr={2} />
+              Publicar Servicio
+            </Button>
+          </Flex>
 
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={6}>
-        {MOCK_SERVICES.map((service) => (
-          <ServiceCard 
-            key={service.id}
-            title={service.title}
-            author={service.author}
-            category={service.category}
-            price={service.price}
-            colorPalette={service.colorPalette}
-          />
-        ))}
-      </SimpleGrid>
+          {/* 2. BARRA DE ESTADÍSTICAS */}
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+            <StatCard icon={FaCoins} label="Mis Créditos" value="0" color="yellow" />
+            <StatCard icon={FaExchangeAlt} label="Intercambios" value="0" color="purple" />
+            <StatCard icon={FaStar} label="Reputación" value="Nueva" color="green" />
+          </SimpleGrid>
+
+        </Container>
+      </Box>
+
+      {/* 3. ÁREA DE SERVICIOS */}
+      <Container maxW="container.xl" py={10}>
+        <Flex justify="space-between" align="center" mb={6}>
+          <Heading size="md" color="gray.700">Explorar Mercado</Heading>
+          
+          <HStack gap={2}>
+            <Button size="xs" variant="solid" bg="gray.800" color="white" borderRadius="full">Todo</Button>
+            <Button size="xs" variant="ghost" color="gray.500" borderRadius="full">Tecnología</Button>
+            <Button size="xs" variant="ghost" color="gray.500" borderRadius="full">Idiomas</Button>
+          </HStack>
+        </Flex>
+
+        {/* EMPTY STATE */}
+        <Flex 
+          direction="column"
+          align="center"
+          justify="center"
+          py={16} 
+          bg="white"
+          borderRadius="2xl" 
+          border="1px dashed" 
+          borderColor="gray.300"
+          textAlign="center"
+        >
+          <Box 
+            bg="blue.50" p={6} borderRadius="full" mb={4}
+            color="blue.500"
+          >
+            <Icon as={FaBoxOpen} boxSize={10} />
+          </Box>
+          <Heading size="md" color="gray.800" mb={2}>
+            No hay servicios disponibles
+          </Heading>
+          <Text color="gray.500" maxW="md" mb={6}>
+            Parece que nadie ha publicado nada aún. ¡Sé el primero en ofrecer tu talento y gana créditos extra!
+          </Text>
+          <Button variant="outline" borderColor="blue.200" color="blue.600" size="sm">
+            Crear primera publicación
+          </Button>
+        </Flex>
+
+      </Container>
     </Box>
   );
 };
