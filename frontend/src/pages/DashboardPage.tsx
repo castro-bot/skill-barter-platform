@@ -1,9 +1,11 @@
-import {Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, HStack } from '@chakra-ui/react';
-import { FaPlus, FaBoxOpen, FaStar, FaExchangeAlt, FaCoins } from 'react-icons/fa';
+// frontend/src/pages/DashboardPage.tsx
+import { Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, HStack, useDisclosure } from '@chakra-ui/react';
+import { FaPlus, FaBoxOpen, FaStar, FaExchangeAlt, FaCoins } from 'react-icons/fa'; // <--- Aquí estaba el problema
 import { useAuth } from '../context/AuthContext';
+import { CreateServiceModal } from '../components/services/CreateServiceModal';
 import type { ElementType } from 'react';
 
-// 1. SOLUCIÓN TIPO: Definimos qué datos espera la tarjeta
+// Componente de Tarjeta de Estadísticas
 interface StatCardProps {
   icon: ElementType;
   label: string;
@@ -11,7 +13,6 @@ interface StatCardProps {
   color: string;
 }
 
-// 2. SOLUCIÓN RENDIMIENTO: El componente vive AFUERA del DashboardPage
 const StatCard = ({ icon, label, value, color }: StatCardProps) => (
   <Box 
     bg="white" 
@@ -48,10 +49,20 @@ const StatCard = ({ icon, label, value, color }: StatCardProps) => (
 
 export const DashboardPage = () => {
   const { user } = useAuth();
+  
+  // Hook para controlar el Modal (Abrir/Cerrar)
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box bg="gray.50" minH="calc(100vh - 64px)">
       
+      {/* EL MODAL QUE AGREGAMOS */}
+      <CreateServiceModal 
+        isOpen={isOpen} 
+        onClose={onClose} 
+        onSuccess={() => console.log("Servicio creado, recargando lista...")} 
+      />
+
       {/* 1. HERO HEADER */}
       <Box bg="white" borderBottom="1px solid" borderColor="gray.200" pb={10} pt={8}>
         <Container maxW="container.xl">
@@ -79,13 +90,14 @@ export const DashboardPage = () => {
             
             <Button 
               size="lg"
-              colorPalette="blue" 
+              colorScheme="blue" 
               bg="blue.600"
               _hover={{ bg: "blue.700" }}
               color="white"
               borderRadius="full"
               px={6}
               shadow="md"
+              onClick={onOpen} // <--- CONECTADO: Abre el modal
             >
               <Icon as={FaPlus} mr={2} />
               Publicar Servicio
@@ -114,7 +126,7 @@ export const DashboardPage = () => {
           </HStack>
         </Flex>
 
-        {/* EMPTY STATE */}
+        {/* EMPTY STATE - Aquí es donde usamos FaBoxOpen */}
         <Flex 
           direction="column"
           align="center"
@@ -130,15 +142,21 @@ export const DashboardPage = () => {
             bg="blue.50" p={6} borderRadius="full" mb={4}
             color="blue.500"
           >
-            <Icon as={FaBoxOpen} boxSize={10} />
+            <Icon as={FaBoxOpen} boxSize={10} /> {/* <--- AQUÍ SE USA */}
           </Box>
           <Heading size="md" color="gray.800" mb={2}>
             No hay servicios disponibles
           </Heading>
           <Text color="gray.500" maxW="md" mb={6}>
-            Parece que nadie ha publicado nada aún. ¡Sé el primero en ofrecer tu talento y gana créditos extra!
+            Parece que nadie ha publicado nada aún. ¡Sé el primero en ofrecer tu talento!
           </Text>
-          <Button variant="outline" borderColor="blue.200" color="blue.600" size="sm">
+          <Button 
+            variant="outline" 
+            borderColor="blue.200" 
+            color="blue.600" 
+            size="sm"
+            onClick={onOpen} // <--- TAMBIÉN CONECTADO AQUÍ
+          >
             Crear primera publicación
           </Button>
         </Flex>

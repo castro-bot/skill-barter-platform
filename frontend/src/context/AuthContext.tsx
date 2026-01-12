@@ -1,7 +1,8 @@
+// frontend/src/context/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User, LoginDTO, RegisterDTO } from '../types/auth';
-import { authApi } from '../api/mockClient';
+import { authApi } from '../api/authService'; // ✅ AÑADE ESTO
 
 interface AuthContextType {
   user: User | null;

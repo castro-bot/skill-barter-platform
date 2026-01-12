@@ -1,3 +1,4 @@
+// frontend/src/api/mockClient.ts
 import type { AuthResponse, LoginDTO, RegisterDTO, User } from '../types/auth';
 
 // Clave para guardar en el navegador

@@ -1,3 +1,4 @@
+// frontend/src/pages/RegisterPage.tsx
 import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { RegisterForm } from '../components/auth/RegisterForm';
@@ -8,18 +9,18 @@ export const RegisterPage = () => {
       
       {/* COLUMNA IZQUIERDA: Formulario */}
       <Flex 
-        p={{ base: 5, md: 8 }} // <--- AJUSTE: Optimizado para móvil
+        p={{ base: 5, md: 8 }} 
         flexDir="column" 
         align="center" 
         justify="center" 
         bg="white"
       >
         <Box w="full" maxW="md">
-          <VStack gap={6} align="stretch">
+          <VStack spacing={6} align="stretch"> {/* Cambié gap por spacing (más estándar en v2) */}
             
             <Box textAlign="center" mb={{ base: 2, md: 4 }}>
               <Heading 
-                size={{ base: "xl", md: "2xl" }} // <--- AJUSTE: Título responsivo
+                size={{ base: "xl", md: "2xl" }} 
                 color="green.600" 
                 letterSpacing="tight"
               >
@@ -34,8 +35,9 @@ export const RegisterPage = () => {
 
             <Text fontSize="sm" color="gray.600" textAlign="center" mt={4}>
               ¿Ya tienes cuenta?{' '}
-              <ChakraLink asChild color="blue.600" fontWeight="bold">
-                <Link to="/login">Inicia Sesión aquí</Link>
+              {/* CORRECCIÓN AQUÍ: Usamos 'as={Link}' en lugar de 'asChild' */}
+              <ChakraLink as={Link} to="/login" color="blue.600" fontWeight="bold">
+                Inicia Sesión aquí
               </ChakraLink>
             </Text>
           </VStack>
