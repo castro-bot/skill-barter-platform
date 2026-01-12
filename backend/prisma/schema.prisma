@@ -14,5 +14,88 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("users") 
+  // Relationship: A user can own many services
+  services  ServiceListing[]
+
+   // Relaciones inversas para Trueques
+  proposedTrades TradeProposal[] @relation("ProposerTrades")
+  receivedTrades TradeProposal[] @relation("ReceiverTrades")
+
+  // Relación para Notificaciones
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model ServiceListing {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign Key
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  // Relaciones inversas para asegurar integridad referencial
+  tradesAsProposer TradeProposal[] @relation("ProposerService")
+  tradesAsReceiver TradeProposal[] @relation("ReceiverService")
+
+
+  @@map("service_listings")
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+model TradeProposal {
+  id        String      @id @default(uuid())
+  status    TradeStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Quién propone
+  proposerId String
+  proposer   User   @relation("ProposerTrades", fields: [proposerId], references: [id])
+
+  // Quién recibe
+  receiverId String
+  receiver   User   @relation("ReceiverTrades", fields: [receiverId], references: [id])
+
+  // Qué ofrece el proponente
+  proposerServiceId String
+  proposerService   ServiceListing @relation("ProposerService", fields: [proposerServiceId], references: [id])
+
+  // Qué quiere a cambio
+  receiverServiceId String
+  receiverService   ServiceListing @relation("ReceiverService", fields: [receiverServiceId], references: [id])
+
+  // Contexto para notificaciones
+  notifications Notification[]
+
+  @@map("trade_proposals")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // e.g., 'TRADE_PROPOSAL', 'TRADE_ACCEPTED'
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Destinatario
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Referencia opcional al trueque
+  tradeId String?
+  trade   TradeProposal? @relation(fields: [tradeId], references: [id])
+
+  @@map("notifications")
 }

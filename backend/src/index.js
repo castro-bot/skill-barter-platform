@@ -6,13 +6,21 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const config = require('./config/env'); // Guideline #15
-const authRoutes = require('./api/authRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
+
+const authRoutes = require('./api/authRoutes');
+const serviceRoutes = require('./api/serviceRoutes');
+const tradeRoutes = require('./api/tradeRoutes');
+// Listeners
+const setupNotificationListeners = require('./listeners/notificationListener');
 
 const app = express();
 
-// --- 1. Global Middleware ---
+// --- 0. Init Listeners ---
+// Iniciar el "oído" del sistema antes de procesar peticiones
+setupNotificationListeners();
 
+// --- 1. Global Middleware ---
 // CORS: Allow Frontend to communicate with Backend
 // Vite usually runs on port 5173
 app.use(cors({
@@ -28,7 +36,11 @@ app.use(cookieParser()); // Parse Cookies
 
 // Mount Auth Routes
 // Maps to: POST /api/v1/auth/register, /login, etc.
+
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/services', serviceRoutes);
+app.use('/api/v1/trades', tradeRoutes); 
 
 // Health Check (Use this to verify server is running)
 app.get('/api/v1/health', (req, res) => {
