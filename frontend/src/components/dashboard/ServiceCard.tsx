@@ -1,14 +1,17 @@
-import { Box, Badge, Heading, Text, Flex, Button, Separator } from '@chakra-ui/react';
+// frontend/src/components/dashboard/ServiceCard.tsx
+import { Box, Badge, Heading, Text, Flex, Button, Divider } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
 export interface ServiceCardProps {
+  id: string;        // <--- AGREGADO: Necesitamos el ID para saber a dónde ir
   title: string;
   author: string;
   category: string;
-  price: string;
-  colorPalette: string;
+  price: string;     // O "credits"
+  colorPalette: string; // Lo usaremos como colorScheme
 }
 
-export const ServiceCard = ({ title, author, category, price, colorPalette }: ServiceCardProps) => {
+export const ServiceCard = ({ id, title, author, category, price, colorPalette }: ServiceCardProps) => {
   return (
     <Box 
       borderWidth="1px" 
@@ -21,7 +24,8 @@ export const ServiceCard = ({ title, author, category, price, colorPalette }: Se
     >
       <Box p={5}>
         <Flex justify="space-between" align="center" mb={3}>
-          <Badge colorPalette={colorPalette} variant="surface" px={2} py={1} borderRadius="full">
+          {/* CORRECCIÓN 1: colorScheme en vez de colorPalette */}
+          <Badge colorScheme={colorPalette} variant="subtle" px={2} py={1} borderRadius="full">
             {category}
           </Badge>
           <Text fontWeight="bold" color={`${colorPalette}.600`} fontSize="sm">
@@ -37,10 +41,19 @@ export const ServiceCard = ({ title, author, category, price, colorPalette }: Se
           Publicado por: {author}
         </Text>
 
-        <Separator mb={4} />
+        {/* CORRECCIÓN 2: Divider en vez de Separator */}
+        <Divider mb={4} />
 
-        <Button variant="surface" colorPalette={colorPalette} width="full" size="sm">
-          Intercambiar
+        {/* CORRECCIÓN 3: Botón convertido en Link para evitar el "Flash" */}
+        <Button 
+          as={Link}               // Comportamiento de Link (SPA)
+          to={`/services/${id}`}  // Ruta al detalle
+          variant="outline"       // Estilo V2
+          colorScheme={colorPalette} 
+          width="full" 
+          size="sm"
+        >
+          Ver / Intercambiar
         </Button>
       </Box>
     </Box>

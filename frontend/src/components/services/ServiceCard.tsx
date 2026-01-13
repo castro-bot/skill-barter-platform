@@ -1,72 +1,58 @@
 // frontend/src/components/services/ServiceCard.tsx
-import { Box, Heading, Text, Badge, HStack, Avatar, Button, Icon, Flex } from '@chakra-ui/react';
-import { FaExchangeAlt } from 'react-icons/fa';
+import { Box, Badge, Heading, Text, Flex, Button, Divider } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-interface ServiceProps {
+// 👇 AQUÍ ESTÁ LA SOLUCIÓN: Definimos la interfaz con 'author'
+export interface ServiceCardProps {
   id: string;
   title: string;
-  description: string;
+  author: string;      // <--- Esta es la línea que te faltaba o estaba mal nombrada
   category: string;
-  owner: {
-    name: string;
-  };
+  price: string;
+  colorPalette: string;
 }
 
-export const ServiceCard = ({ id, title, description, category, owner }: ServiceProps) => {
+export const ServiceCard = ({ id, title, author, category, price, colorPalette }: ServiceCardProps) => {
   return (
     <Box 
+      borderWidth="1px" 
+      borderRadius="2xl" 
+      overflow="hidden" 
       bg="white" 
-      border="1px solid" 
-      borderColor="gray.200" 
-      borderRadius="xl" 
-      overflow="hidden"
+      shadow="sm"
       transition="all 0.2s"
-      _hover={{ transform: "translateY(-4px)", shadow: "lg", borderColor: "blue.200" }}
-      display="flex"
-      flexDirection="column"
+      _hover={{ transform: 'translateY(-4px)', shadow: 'md', borderColor: `${colorPalette}.400` }}
     >
-      <Box p={5} flex="1">
-        <HStack justify="space-between" mb={3}>
-          <Badge colorScheme="blue" borderRadius="full" px={2}>
+      <Box p={5}>
+        <Flex justify="space-between" align="center" mb={3}>
+          <Badge colorScheme={colorPalette} variant="subtle" px={2} py={1} borderRadius="full">
             {category}
           </Badge>
-          <Text fontSize="xs" color="gray.400" fontWeight="bold">
-            OFERTA
+          <Text fontWeight="bold" color={`${colorPalette}.600`} fontSize="sm">
+            {price}
           </Text>
-        </HStack>
+        </Flex>
 
-        <Heading size="md" mb={2} color="gray.800" lineHeight="short">
+        <Heading size="md" mb={2} lineHeight="short">
           {title}
         </Heading>
-        
-        <Text color="gray.500" fontSize="sm" noOfLines={3} mb={4}>
-          {description}
+
+        <Text color="gray.500" fontSize="sm" mb={4}>
+          Publicado por: {author} 
         </Text>
-      </Box>
 
-      {/* Footer de la tarjeta */}
-      <Box p={4} bg="gray.50" borderTop="1px solid" borderColor="gray.100">
-        <Flex justify="space-between" align="center">
-          <HStack>
-            <Avatar size="xs" name={owner.name} />
-            <Text fontSize="xs" fontWeight="bold" color="gray.600">
-              {owner.name}
-            </Text>
-          </HStack>
+        <Divider mb={4} />
 
-          {/* ESTE BOTÓN ES CLAVE PARA EL SPRINT 3 */}
-          <Button 
-            as={Link} 
-            to={`/services/${id}`} 
-            size="sm" 
-            colorScheme="blue" 
-            variant="ghost"
-            rightIcon={<Icon as={FaExchangeAlt} />}
-          >
-            Ver
-          </Button>
-        </Flex>
+        <Button 
+          as={Link} 
+          to={`/services/${id}`} 
+          variant="outline" 
+          colorScheme={colorPalette} 
+          width="full" 
+          size="sm"
+        >
+          Ver / Intercambiar
+        </Button>
       </Box>
     </Box>
   );

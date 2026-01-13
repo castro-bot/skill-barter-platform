@@ -1,3 +1,4 @@
+// backend/src/index.js
 /**
  * Application Entry Point
  * Wires together Routes, Middleware, and Database.
@@ -5,7 +6,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const config = require('./config/env'); // Guideline #15
+const config = require('./config/env');
 const errorHandler = require('./middleware/errorMiddleware');
 
 const authRoutes = require('./api/authRoutes');
@@ -17,38 +18,35 @@ const setupNotificationListeners = require('./listeners/notificationListener');
 const app = express();
 
 // --- 0. Init Listeners ---
-// Iniciar el "oído" del sistema antes de procesar peticiones
 setupNotificationListeners();
 
 // --- 1. Global Middleware ---
-// CORS: Allow Frontend to communicate with Backend
-// Vite usually runs on port 5173
 app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
-  credentials: true, // Allow cookies (Critical for Refresh Token)
+  origin: 'http://localhost:5173', // Asegúrate que este sea el puerto de tu frontend
+  credentials: true, // Vital para que pasen las cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body Parsers
-app.use(express.json()); // Parse JSON bodies
-app.use(cookieParser()); // Parse Cookies
+app.use(express.json()); 
+app.use(cookieParser());
 
 // --- 2. Routes ---
 
-// Mount Auth Routes
-// Maps to: POST /api/v1/auth/register, /login, etc.
+// Auth Routes
+app.use('/api/v1/auth', authRoutes); // Una sola vez es suficiente
 
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/auth', authRoutes);
+// Service & Trade Routes
 app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/trades', tradeRoutes); 
 
-// Health Check (Use this to verify server is running)
+// Health Check
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'SkillBarter API' });
 });
 
 // --- 3. Error Handling ---
-// Must be placed AFTER all routes
 app.use(errorHandler);
 
 // --- 4. Start Server ---

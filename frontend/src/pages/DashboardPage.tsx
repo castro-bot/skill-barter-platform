@@ -1,14 +1,14 @@
 // frontend/src/pages/DashboardPage.tsx
-import { useEffect, useState } from 'react'; // <--- IMPORTANTE: Hooks para datos
+import { useEffect, useState } from 'react';
 import { Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, HStack, useDisclosure, Spinner } from '@chakra-ui/react';
 import { FaPlus, FaBoxOpen, FaStar, FaExchangeAlt, FaCoins } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { CreateServiceModal } from '../components/services/CreateServiceModal';
-import { ServiceCard } from '../components/services/ServiceCard'; // <--- Importamos la tarjeta
+import { ServiceCard } from '../components/services/ServiceCard';
 import { servicesApi, type ServiceListing } from '../api/services';
 import type { ElementType } from 'react';
 
-// Componente StatCard (Se mantiene igual)
+// Componente StatCard
 interface StatCardProps { icon: ElementType; label: string; value: string; color: string; }
 const StatCard = ({ icon, label, value, color }: StatCardProps) => (
   <Box bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm" display="flex" alignItems="center" gap={4} transition="transform 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "md" }}>
@@ -21,11 +21,9 @@ export const DashboardPage = () => {
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   
-  // 1. ESTADO: Aquí guardaremos los servicios que vengan del Backend
   const [services, setServices] = useState<ServiceListing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 2. FUNCIÓN: Pedir datos a la API
   const loadServices = async () => {
     setIsLoading(true);
     try {
@@ -38,7 +36,6 @@ export const DashboardPage = () => {
     }
   };
 
-  // 3. EFECTO: Ejecutar esto apenas entres a la página
   useEffect(() => {
     loadServices();
   }, []);
@@ -46,7 +43,6 @@ export const DashboardPage = () => {
   return (
     <Box bg="gray.50" minH="calc(100vh - 64px)">
       
-      {/* MODAL: Al terminar de crear (onSuccess), recargamos la lista */}
       <CreateServiceModal 
         isOpen={isOpen} 
         onClose={onClose} 
@@ -77,33 +73,33 @@ export const DashboardPage = () => {
         </Container>
       </Box>
 
-      {/* ÁREA DE SERVICIOS - ¡LÓGICA DINÁMICA! */}
+      {/* ÁREA DE SERVICIOS */}
       <Container maxW="container.xl" py={10}>
         <Flex justify="space-between" align="center" mb={6}>
           <Heading size="md" color="gray.700">Explorar Mercado</Heading>
         </Flex>
 
-        {/* CASO 1: CARGANDO */}
         {isLoading ? (
           <Flex justify="center" py={20}>
             <Spinner size="xl" color="blue.500" thickness="4px" />
           </Flex>
         ) : services.length > 0 ? (
-          // CASO 2: HAY DATOS -> Mostramos la cuadrícula
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
             {services.map((service) => (
+              // 👇 AQUÍ ESTÁ LA CORRECCIÓN CLAVE
               <ServiceCard 
                 key={service.id}
-                id={service.id}
+                id={service.id}                    // Pasamos el ID
                 title={service.title}
-                description={service.description}
+                author={service.owner.name}        // Mapeamos owner.name a author
                 category={service.category}
-                owner={service.owner}
+                price="Trueque"                    // Texto fijo o dinámico
+                colorPalette="blue"                // Color fijo o dinámico
               />
             ))}
           </SimpleGrid>
         ) : (
-          // CASO 3: NO HAY DATOS -> Mostramos el Empty State (Caja vacía)
+          // Empty State
           <Flex direction="column" align="center" justify="center" py={16} bg="white" borderRadius="2xl" border="1px dashed" borderColor="gray.300" textAlign="center">
             <Box bg="blue.50" p={6} borderRadius="full" mb={4} color="blue.500">
               <Icon as={FaBoxOpen} boxSize={10} />
