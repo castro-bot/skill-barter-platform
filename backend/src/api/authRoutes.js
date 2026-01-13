@@ -2,8 +2,8 @@
 const express = require('express');
 const AuthService = require('../services/authService');
 const { COOKIE_SETTINGS } = require('../config/constants');
-// Asegúrate de que esta ruta sea correcta según tu estructura de carpetas
-const authenticate = require('../middleware/authMiddleware'); 
+// CORRECCIÓN: Apuntamos a la carpeta 'middleware' (singular)
+const authenticate = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -67,11 +67,11 @@ router.post('/refresh', async (req, res) => {
 
 /**
  * GET /api/v1/auth/me
- * PROTEGIDA: Retorna el usuario actual usando la BD
+ * 👇 ESTA ES LA PARTE CRÍTICA QUE FALTABA 👇
  */
 router.get('/me', authenticate, async (req, res) => {
   try {
-    // req.user.id viene del middleware authenticate
+    // req.user.id viene del middleware
     const user = await AuthService.getUserById(req.user.id);
     res.status(200).json(user);
   } catch (error) {

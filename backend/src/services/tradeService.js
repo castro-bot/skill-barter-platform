@@ -1,3 +1,4 @@
+// backend/src/services/tradeService.js
 const prisma = require('../core/db');
 const { appEmitter, EVENTS } = require('../core/events');
 
