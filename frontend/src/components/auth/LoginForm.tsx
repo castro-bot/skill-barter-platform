@@ -1,3 +1,4 @@
+// frontend/src/components/auth/LoginForm.tsx
 import { useState } from 'react';
 import { 
   Box, 
@@ -37,9 +38,9 @@ export const LoginForm = () => {
 
   return (
     <Box as="form" onSubmit={handleSubmit} width="100%">
-      <VStack gap={5} align="stretch">
+      <VStack spacing={5} align="stretch"> {/* gap -> spacing */}
         
-        {/* INPUT CORREO - Estilo limpio y moderno */}
+        {/* INPUT CORREO */}
         <Box>
           <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={1}>
             Correo Institucional
@@ -58,12 +59,12 @@ export const LoginForm = () => {
             _focus={{ 
               bg: "white", 
               borderColor: "blue.500", 
-              boxShadow: "0 0 0 1px #3182ce" // Efecto de brillo azul sutil
+              boxShadow: "0 0 0 1px #3182ce"
             }}
           />
         </Box>
 
-        {/* INPUT CONTRASEÑA - Estilo limpio con icono integrado */}
+        {/* INPUT CONTRASEÑA */}
         <Box>
           <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={1}>
             Contraseña
@@ -99,13 +100,12 @@ export const LoginForm = () => {
               zIndex="5"
               color="gray.400"
               _hover={{ color: "blue.500", bg: "transparent" }}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </IconButton>
+              icon={showPassword ? <FaEyeSlash /> : <FaEye />} // En V2 se prefiere pasar el icono así o como children
+            />
           </Box>
         </Box>
 
-        {/* MENSAJE DE ERROR - Sutil y claro */}
+        {/* MENSAJE DE ERROR */}
         {error && (
           <Box 
             p={3} 
@@ -120,14 +120,15 @@ export const LoginForm = () => {
           </Box>
         )}
 
-        {/* BOTÓN PRINCIPAL - Con mejor presencia y feedback */}
+        {/* BOTÓN PRINCIPAL - CORREGIDO */}
         <Button 
           type="submit" 
-          colorPalette="blue"
+          colorScheme="blue" // colorPalette -> colorScheme
           size="lg"
-          height="3rem" // Un poco más alto para mejor click
+          height="3rem"
           fontSize="md"
-          loading={isLoading} 
+          isLoading={isLoading} // loading -> isLoading
+          loadingText="Ingresando..." // Texto opcional mientras carga
           width="full"
           mt={2}
           fontWeight="bold"
@@ -140,7 +141,7 @@ export const LoginForm = () => {
           }}
           transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
         >
-          {isLoading ? 'Ingresando...' : 'Iniciar Sesión'}
+          Iniciar Sesión
         </Button>
       </VStack>
     </Box>

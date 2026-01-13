@@ -1,3 +1,4 @@
+// frontend/src/components/auth/ProtectedRoute.tsx
 import { Navigate, Outlet } from 'react-router-dom';
 import { Box, Spinner, Center } from '@chakra-ui/react';
 import { useAuth } from '../../context/AuthContext';

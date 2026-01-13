@@ -1,6 +1,7 @@
+// frontend/src/pages/LoginPage.tsx
 import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex } from '@chakra-ui/react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // <--- OJO: Importamos Link de router
 import { useEffect } from 'react';
 import { LoginForm } from '../components/auth/LoginForm';
 
@@ -17,24 +18,13 @@ export const LoginPage = () => {
   return (
     <Grid minH="100vh" templateColumns={{ base: "1fr", md: "1fr 1fr" }}>
       
-      {/* COLUMNA IZQUIERDA: Formulario */}
-      <Flex 
-        p={{ base: 5, md: 8 }} // <--- AJUSTE: Menos padding en móvil (5) que en PC (8)
-        flexDir="column" 
-        align="center" 
-        justify="center" 
-        bg="white"
-      >
+      {/* COLUMNA IZQUIERDA */}
+      <Flex p={{ base: 5, md: 8 }} flexDir="column" align="center" justify="center" bg="white">
         <Box w="full" maxW="md">
-          <VStack gap={6} align="stretch">
+          <VStack spacing={6} align="stretch"> 
             
-            {/* CABECERA */}
             <Box textAlign="center" mb={{ base: 2, md: 4 }}>
-              <Heading 
-                size={{ base: "xl", md: "2xl" }} // <--- AJUSTE: Texto más pequeño en móvil
-                color="blue.600" 
-                letterSpacing="tight"
-              >
+              <Heading size={{ base: "xl", md: "2xl" }} color="blue.600" letterSpacing="tight">
                 SkillBarter
               </Heading>
               <Text color="gray.500" fontSize={{ base: "md", md: "lg" }} mt={2}>
@@ -46,27 +36,25 @@ export const LoginPage = () => {
 
             <Text fontSize="sm" color="gray.600" textAlign="center" mt={4}>
               ¿No tienes cuenta?{' '}
-              <ChakraLink asChild color="blue.600" fontWeight="bold">
-                <Link to="/register">Regístrate gratis</Link>
+              {/* --- AQUÍ ESTABA EL ERROR --- */}
+              {/* ANTES (Mal): <ChakraLink asChild ...><Link ...></Link></ChakraLink> */}
+              {/* AHORA (Bien): Usamos la prop 'as={Link}' */}
+              <ChakraLink as={Link} to="/register" color="blue.600" fontWeight="bold">
+                Regístrate gratis
               </ChakraLink>
+              {/* --------------------------- */}
             </Text>
           </VStack>
         </Box>
       </Flex>
 
-      {/* COLUMNA DERECHA: Imagen (Solo Desktop) */}
+      {/* COLUMNA DERECHA */}
       <Box display={{ base: "none", md: "block" }} position="relative">
         <Image 
           src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 
-          alt="Estudiantes"
-          objectFit="cover" 
-          h="100%" 
-          w="100%"
+          alt="Estudiantes" objectFit="cover" h="100%" w="100%"
         />
-        <Box 
-          position="absolute" top="0" left="0" w="full" h="full" 
-          bg="blackAlpha.300" mixBlendMode="multiply"
-        />
+        <Box position="absolute" top="0" left="0" w="full" h="full" bg="blackAlpha.300" mixBlendMode="multiply" />
       </Box>
     </Grid>
   );
