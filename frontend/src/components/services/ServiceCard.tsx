@@ -2,17 +2,23 @@
 import { Box, Badge, Heading, Text, Flex, Button, Divider } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-// 👇 AQUÍ ESTÁ LA SOLUCIÓN: Definimos la interfaz con 'author'
 export interface ServiceCardProps {
   id: string;
   title: string;
-  author: string;      // <--- Esta es la línea que te faltaba o estaba mal nombrada
+  author: string;
   category: string;
   price: string;
   colorPalette: string;
 }
 
 export const ServiceCard = ({ id, title, author, category, price, colorPalette }: ServiceCardProps) => {
+  
+  // Debug handler
+  const handleNavigationDebug = () => {
+    console.log(`[ServiceCard] Click en ver servicio. ID: ${id}`);
+    console.time(`Navegación-Servicio-${id}`); // Inicia cronómetro
+  };
+
   return (
     <Box 
       borderWidth="1px" 
@@ -46,6 +52,7 @@ export const ServiceCard = ({ id, title, author, category, price, colorPalette }
         <Button 
           as={Link} 
           to={`/services/${id}`} 
+          onClick={handleNavigationDebug} // <--- Hookeamos el evento para log
           variant="outline" 
           colorScheme={colorPalette} 
           width="full" 
