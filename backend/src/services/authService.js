@@ -1,35 +1,30 @@
+// backend/src/services/authService.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const prisma = require('../core/db'); // Singleton instance
+const prisma = require('../core/db'); // Instancia Singleton de Prisma
 const config = require('../config/env');
 const { TOKEN_EXPIRATION } = require('../config/constants');
 
 /**
- * Service responsible for User Authentication logic.
- * Adheres to Single Responsibility Principle.
+ * Servicio responsable de la lógica de autenticación.
  */
 class AuthService {
+  
   /**
-   * Register a new user
-   * @param {Object} userData - { name, email, password }
-   * @returns {Promise<Object>} - Created user (without password)
+   * Registrar un nuevo usuario
    */
   static async register({ name, email, password }) {
-    // 1. Validation (Guideline #1: DRY - could extract email check)
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
 
-    // 2. Check for duplicates
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       throw new Error('Email already in use');
     }
 
-    // 3. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 4. Create user
     const user = await prisma.user.create({
       data: {
         name,
@@ -42,25 +37,37 @@ class AuthService {
   }
 
   /**
-   * Authenticate a user
-   * @param {string} email
-   * @param {string} password
-   * @returns {Promise<Object>} - { user, accessToken, refreshToken }
+   * Obtener usuario por ID (Para la ruta /me)
+   * CORREGIDO PARA PRISMA
+   */
+  static async getUserById(userId) {
+    // Usamos Prisma para buscar por ID
+    const user = await prisma.user.findUnique({ 
+      where: { id: userId } 
+    });
+    
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    // Reutilizamos la función helper para quitar la contraseña
+    return this._sanitizeUser(user);
+  }
+
+  /**
+   * Iniciar sesión
    */
   static async login(email, password) {
-    // 1. Find user
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new Error('Invalid credentials');
     }
 
-    // 2. Verify password
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       throw new Error('Invalid credentials');
     }
 
-    // 3. Generate tokens
     const accessToken = this._generateAccessToken(user.id);
     const refreshToken = this._generateRefreshToken(user.id);
 
@@ -72,9 +79,7 @@ class AuthService {
   }
 
   /**
-   * Refresh a short-lived access token using a long-lived refresh token.
-   * @param {string} refreshToken
-   * @returns {Object} - { accessToken }
+   * Refrescar token
    */
   static async refresh(refreshToken) {
     if (!refreshToken) {
@@ -82,29 +87,31 @@ class AuthService {
     }
 
     try {
-      // 1. Verify the Refresh Token
-      // This throws an error if the token is expired or invalid
+      // 1. Verificar el token
       const decoded = jwt.verify(refreshToken, config.JWT_SECRET);
 
-      // 2. Check if user still exists (Security Best Practice)
-      // If the user was deleted/banned 5 mins ago, we shouldn't issue a new token.
+      // 2. Verificar que el usuario exista en Prisma
       const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
 
       if (!user) {
         throw new Error('User not found');
       }
 
-      // 3. Generate a NEW Access Token
+      // 3. Generar NUEVOS tokens (Rotación de tokens para seguridad)
       const accessToken = this._generateAccessToken(user.id);
+      const newRefreshToken = this._generateRefreshToken(user.id);
 
-      return { accessToken };
+      return { 
+        user: this._sanitizeUser(user),
+        accessToken,
+        newRefreshToken // Devolvemos esto para actualizar la cookie
+      };
     } catch (error) {
-      // Guideline #9: Handle specific errors
       throw new Error('Invalid refresh token');
     }
   }
 
-  // --- Private Helpers (Guideline #1: DRY) ---
+  // --- Private Helpers ---
 
   static _generateAccessToken(userId) {
     return jwt.sign({ userId }, config.JWT_SECRET, {
@@ -119,7 +126,7 @@ class AuthService {
   }
 
   static _sanitizeUser(user) {
-    // Return user without sensitive fields
+    // Retorna el usuario sin la contraseña
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }

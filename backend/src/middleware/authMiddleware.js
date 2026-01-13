@@ -1,3 +1,4 @@
+// backend/src/middleware/authMiddleware.js
 /**
  * Authentication Middleware
  * Guideline #6: Single Responsibility - Only validates tokens.

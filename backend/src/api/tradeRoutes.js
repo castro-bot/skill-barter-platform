@@ -1,3 +1,4 @@
+// backend/src/api/tradeRoutes.js
 const express = require('express');
 const router = express.Router();
 const TradeService = require('../services/tradeService');
