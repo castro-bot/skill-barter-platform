@@ -1,4 +1,4 @@
-// src/components/layout/Navbar.tsx
+// frontend/src/components/layout/Navbar.tsx
 import { 
   Box, 
   Flex, 
@@ -6,13 +6,16 @@ import {
   Button, 
   Container, 
   Heading,
-  Menu,           // <--- V2: Componente principal
-  MenuButton,     // <--- V2: El botón que abre el menú
-  MenuList,       // <--- V2: La lista desplegable
-  MenuItem,       // <--- V2: Cada opción
-  HStack 
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  HStack,
+  Icon
 } from '@chakra-ui/react';
-import { FaSignOutAlt, FaUser, FaChevronDown } from 'react-icons/fa';
+// IMPORTANTE: Agregamos Link de react-router-dom y el icono de intercambio
+import { Link } from 'react-router-dom';
+import { FaSignOutAlt, FaUser, FaChevronDown, FaExchangeAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = () => {
@@ -34,23 +37,23 @@ export const Navbar = () => {
       <Container maxW="container.xl">
         <Flex h={16} alignItems="center" justify="space-between">
           
-          {/* LADO IZQUIERDO: LOGO */}
-          <HStack spacing={2}>
-            <Heading size="md" color="blue.600" letterSpacing="tight" fontWeight="800">
-              SkillBarter
-            </Heading>
-            <Box 
-              // CORRECCIÓN V2: Sintaxis de gradiente lineal
-              bgGradient="linear(to-r, blue.500, purple.500)"
-              px={2} py={0.5} borderRadius="full"
-            >
-              <Text fontSize="10px" fontWeight="bold" color="white" letterSpacing="wider">BETA</Text>
-            </Box>
-          </HStack>
+          {/* LADO IZQUIERDO: LOGO (Ahora es un link al inicio) */}
+          <Link to="/services">
+            <HStack spacing={2} cursor="pointer">
+              <Heading size="md" color="blue.600" letterSpacing="tight" fontWeight="800">
+                SkillBarter
+              </Heading>
+              <Box 
+                bgGradient="linear(to-r, blue.500, purple.500)"
+                px={2} py={0.5} borderRadius="full"
+              >
+                <Text fontSize="10px" fontWeight="bold" color="white" letterSpacing="wider">BETA</Text>
+              </Box>
+            </HStack>
+          </Link>
 
           {/* LADO DERECHO: MENÚ */}
           <Box>
-            {/* CORRECCIÓN V2: Estructura clásica de Menú */}
             <Menu placement="bottom-end">
               <MenuButton 
                 as={Button} 
@@ -65,7 +68,6 @@ export const Navbar = () => {
                 <HStack spacing={2}>
                   <Flex 
                     align="center" justify="center" 
-                    // CORRECCIÓN V2: Gradiente lineal
                     bgGradient="linear(to-br, blue.500, blue.700)"
                     color="white" w={8} h={8} borderRadius="full" fontSize="xs" fontWeight="bold" shadow="md"
                   >
@@ -90,17 +92,31 @@ export const Navbar = () => {
               >
                 <Box px={3} py={3} mb={1} borderBottom="1px solid" borderColor="gray.100" bg="gray.50" borderRadius="md">
                   <Text fontSize="xs" color="gray.500" fontWeight="bold" textTransform="uppercase">Cuenta</Text>
-                  <Text fontSize="sm" fontWeight="semibold" color="gray.800" noOfLines={1}> {/* lineClamp -> noOfLines */}
+                  <Text fontSize="sm" fontWeight="semibold" color="gray.800" noOfLines={1}>
                     {user?.email}
                   </Text>
                 </Box>
                 
                 <MenuItem _hover={{ bg: "blue.50", color: "blue.600" }} borderRadius="md" transition="all 0.2s">
-                  <HStack><FaUser size={12} /><Text fontSize="sm">Mi Perfil</Text></HStack>
+                  <HStack><Icon as={FaUser} boxSize={3} /><Text fontSize="sm">Mi Perfil</Text></HStack>
+                </MenuItem>
+
+                {/* 👇 AQUÍ ESTÁ EL NUEVO BOTÓN AGREGADO 👇 */}
+                <MenuItem 
+                  as={Link} 
+                  to="/trades" 
+                  _hover={{ bg: "purple.50", color: "purple.600" }} 
+                  borderRadius="md" 
+                  transition="all 0.2s"
+                >
+                  <HStack>
+                    <Icon as={FaExchangeAlt} boxSize={3} />
+                    <Text fontSize="sm">Mis Trueques</Text>
+                  </HStack>
                 </MenuItem>
                 
                 <MenuItem _hover={{ bg: "red.50", color: "red.600" }} borderRadius="md" onClick={logout} transition="all 0.2s">
-                  <HStack><FaSignOutAlt size={12} /><Text fontSize="sm">Cerrar Sesión</Text></HStack>
+                  <HStack><Icon as={FaSignOutAlt} boxSize={3} /><Text fontSize="sm">Cerrar Sesión</Text></HStack>
                 </MenuItem>
               </MenuList>
             </Menu>
