@@ -10,12 +10,12 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  MenuDivider,
   HStack,
   Icon
 } from '@chakra-ui/react';
-// IMPORTANTE: Agregamos Link de react-router-dom y el icono de intercambio
 import { Link } from 'react-router-dom';
-import { FaSignOutAlt, FaUser, FaChevronDown, FaExchangeAlt } from 'react-icons/fa';
+import { FaSignOutAlt, FaUser, FaChevronDown, FaExchangeAlt, FaBell } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = () => {
@@ -28,99 +28,155 @@ export const Navbar = () => {
       position="sticky" 
       top="0" 
       zIndex="1000"
-      bg="rgba(255, 255, 255, 0.8)"
-      backdropFilter="blur(10px)"
+      bg="rgba(255, 255, 255, 0.85)" 
+      backdropFilter="blur(12px)"
       borderBottom="1px solid" 
-      borderColor="gray.200" 
-      shadow="sm"
+      borderColor="gray.100" 
+      transition="all 0.3s"
     >
       <Container maxW="container.xl">
         <Flex h={16} alignItems="center" justify="space-between">
           
-          {/* LADO IZQUIERDO: LOGO (Ahora es un link al inicio) */}
+          {/* LADO IZQUIERDO: LOGO PREMIUM */}
           <Link to="/services">
-            <HStack spacing={2} cursor="pointer">
-              <Heading size="md" color="blue.600" letterSpacing="tight" fontWeight="800">
+            {/* CORRECCIÓN: Cambiamos 'group' por 'role="group"' */}
+            <HStack spacing={2} cursor="pointer" role="group">
+              <Heading 
+                size="lg" 
+                letterSpacing="tighter" 
+                fontWeight="900"
+                bgGradient="linear(to-r, blue.600, purple.600)"
+                bgClip="text"
+                transition="all 0.3s"
+                _groupHover={{ bgGradient: "linear(to-r, blue.500, purple.500)", transform: "scale(1.02)" }}
+              >
                 SkillBarter
               </Heading>
               <Box 
                 bgGradient="linear(to-r, blue.500, purple.500)"
-                px={2} py={0.5} borderRadius="full"
+                px={2} py={0.5} borderRadius="full" shadow="sm"
               >
-                <Text fontSize="10px" fontWeight="bold" color="white" letterSpacing="wider">BETA</Text>
+                <Text fontSize="9px" fontWeight="800" color="white" letterSpacing="widest">BETA</Text>
               </Box>
             </HStack>
           </Link>
 
-          {/* LADO DERECHO: MENÚ */}
-          <Box>
-            <Menu placement="bottom-end">
+          {/* LADO DERECHO: ACCIONES */}
+          <HStack spacing={3}>
+            
+            {/* Botón de Notificaciones (Visual) */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              borderRadius="full" 
+              color="gray.400" 
+              _hover={{ color: "blue.500", bg: "blue.50" }}
+            >
+               <Icon as={FaBell} boxSize={4} />
+            </Button>
+
+            {/* MENÚ DE USUARIO */}
+            <Menu placement="bottom-end" autoSelect={false}>
               <MenuButton 
                 as={Button} 
                 variant="ghost" 
                 size="sm" 
-                p={1} 
+                p={1}
+                pr={3}
                 borderRadius="full" 
-                _hover={{ bg: "gray.100" }}
-                _active={{ bg: "gray.200", transform: "scale(0.98)" }}
-                sx={{ userSelect: "none" }}
+                _hover={{ bg: "gray.50" }}
+                _active={{ bg: "gray.100" }}
               >
-                <HStack spacing={2}>
+                <HStack spacing={3}>
+                  {/* Avatar con Gradiente */}
                   <Flex 
                     align="center" justify="center" 
-                    bgGradient="linear(to-br, blue.500, blue.700)"
-                    color="white" w={8} h={8} borderRadius="full" fontSize="xs" fontWeight="bold" shadow="md"
+                    bgGradient="linear(to-br, blue.500, purple.600)"
+                    color="white" w={9} h={9} borderRadius="full" fontSize="xs" fontWeight="bold" shadow="md"
+                    border="2px solid white"
                   >
                     {getInitials(user?.name)}
                   </Flex>
-                  <Text display={{ base: 'none', md: 'block' }} fontWeight="medium" fontSize="sm" color="gray.700">
-                    {user?.name}
-                  </Text>
-                  <Box as={FaChevronDown} fontSize="10px" color="gray.400" />
+                  
+                  {/* Nombre y Rol */}
+                  <Box textAlign="left" display={{ base: 'none', md: 'block' }}>
+                    <Text fontSize="sm" fontWeight="bold" color="gray.700" lineHeight="1">
+                        {user?.name?.split(' ')[0]}
+                    </Text>
+                    <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                        Mi Cuenta
+                    </Text>
+                  </Box>
+                  <Icon as={FaChevronDown} fontSize="10px" color="gray.400" ml={1} />
                 </HStack>
               </MenuButton>
               
+              {/* LISTA DESPLEGABLE ESTILIZADA */}
               <MenuList 
-                minW="220px" 
+                minW="260px" 
                 bg="white" 
                 p={2} 
-                shadow="xl" 
-                borderRadius="xl" 
+                shadow="2xl" 
+                borderRadius="2xl" 
                 border="1px solid" 
                 borderColor="gray.100"
-                zIndex="2000"
+                zIndex="popover"
               >
-                <Box px={3} py={3} mb={1} borderBottom="1px solid" borderColor="gray.100" bg="gray.50" borderRadius="md">
-                  <Text fontSize="xs" color="gray.500" fontWeight="bold" textTransform="uppercase">Cuenta</Text>
-                  <Text fontSize="sm" fontWeight="semibold" color="gray.800" noOfLines={1}>
+                <Box px={4} py={3} mb={2}>
+                  <Text fontSize="xx-small" color="gray.400" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb={1}>
+                    Conectado como
+                  </Text>
+                  <Text fontSize="sm" fontWeight="bold" color="gray.800" noOfLines={1}>
                     {user?.email}
                   </Text>
                 </Box>
                 
-                <MenuItem _hover={{ bg: "blue.50", color: "blue.600" }} borderRadius="md" transition="all 0.2s">
-                  <HStack><Icon as={FaUser} boxSize={3} /><Text fontSize="sm">Mi Perfil</Text></HStack>
+                <MenuDivider borderColor="gray.100" mb={2} />
+                
+                {/* Opción: Perfil */}
+                <MenuItem _hover={{ bg: "blue.50", color: "blue.700" }} borderRadius="lg" py={3} transition="all 0.2s">
+                  <HStack spacing={3}>
+                    <Flex w={8} h={8} bg="blue.100" borderRadius="md" align="center" justify="center" color="blue.600">
+                        <Icon as={FaUser} boxSize={4} />
+                    </Flex>
+                    <Text fontSize="sm" fontWeight="medium">Mi Perfil Público</Text>
+                  </HStack>
                 </MenuItem>
 
-                {/* 👇 AQUÍ ESTÁ EL NUEVO BOTÓN AGREGADO 👇 */}
+                {/* Opción: Mis Trueques */}
                 <MenuItem 
                   as={Link} 
                   to="/trades" 
-                  _hover={{ bg: "purple.50", color: "purple.600" }} 
-                  borderRadius="md" 
+                  _hover={{ bg: "purple.50", color: "purple.700" }} 
+                  borderRadius="lg" 
+                  py={3}
                   transition="all 0.2s"
                 >
-                  <HStack>
-                    <Icon as={FaExchangeAlt} boxSize={3} />
-                    <Text fontSize="sm">Mis Trueques</Text>
+                  <HStack spacing={3}>
+                    <Flex w={8} h={8} bg="purple.100" borderRadius="md" align="center" justify="center" color="purple.600">
+                        <Icon as={FaExchangeAlt} boxSize={4} />
+                    </Flex>
+                    <Box>
+                        <Text fontSize="sm" fontWeight="medium">Mis Trueques</Text>
+                        <Text fontSize="xs" color="gray.500">Bandeja de entrada</Text>
+                    </Box>
                   </HStack>
                 </MenuItem>
                 
-                <MenuItem _hover={{ bg: "red.50", color: "red.600" }} borderRadius="md" onClick={logout} transition="all 0.2s">
-                  <HStack><Icon as={FaSignOutAlt} boxSize={3} /><Text fontSize="sm">Cerrar Sesión</Text></HStack>
+                <MenuDivider borderColor="gray.100" my={2} />
+                
+                {/* Opción: Cerrar Sesión */}
+                <MenuItem _hover={{ bg: "red.50", color: "red.700" }} borderRadius="lg" onClick={logout} py={3} transition="all 0.2s">
+                  <HStack spacing={3}>
+                    <Flex w={8} h={8} bg="red.100" borderRadius="md" align="center" justify="center" color="red.600">
+                        <Icon as={FaSignOutAlt} boxSize={4} />
+                    </Flex>
+                    <Text fontSize="sm" fontWeight="medium">Cerrar Sesión</Text>
+                  </HStack>
                 </MenuItem>
               </MenuList>
             </Menu>
-          </Box>
+          </HStack>
 
         </Flex>
       </Container>
