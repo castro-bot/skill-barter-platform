@@ -3,12 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { ServiceDetailPage } from './pages/ServiceDetailPage'; // <--- Importación faltante
+import { ServiceDetailPage } from './pages/ServiceDetailPage';
+// 1. IMPORTAR LA NUEVA PÁGINA
+import { TradesPage } from './pages/TradesPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './layouts/MainLayout';
 import { useEffect } from 'react';
 
-// Componente auxiliar para debug de rutas
 const RouteLogger = () => {
   const location = useLocation();
   useEffect(() => {
@@ -20,7 +21,7 @@ const RouteLogger = () => {
 function App() {
   return (
     <BrowserRouter>
-      <RouteLogger /> {/* <--- Logger global insertado */}
+      <RouteLogger />
       <Routes>
         <Route path="/" element={<Navigate to="/services" replace />} />
         
@@ -31,14 +32,15 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/services" element={<DashboardPage />} />
-            
-            {/* 👇 SOLUCIÓN: Agregamos la ruta DENTRO del MainLayout */}
-            {/* Si esta ruta estaba fuera o no existía, causaba el flash/error */}
             <Route path="/services/:id" element={<ServiceDetailPage />} />
+            
+            {/* 2. AGREGAR LA NUEVA RUTA AQUÍ */}
+            {/* Esta ruta mostrará la bandeja de entrada de trueques */}
+            <Route path="/trades" element={<TradesPage />} />
+            
           </Route>
         </Route>
 
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
