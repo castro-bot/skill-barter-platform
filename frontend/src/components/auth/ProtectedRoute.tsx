@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Flex, Spinner, Text, VStack } from '@chakra-ui/react';
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   // 1. SI ESTÁ CARGANDO: Muestra un spinner, NO REDIRIJA AÚN
   if (isLoading) {
@@ -19,10 +19,11 @@ export const ProtectedRoute = () => {
   }
 
   // 2. SI TERMINÓ DE CARGAR Y NO HAY USUARIO: Ahora sí, al Login
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
   // 3. SI HAY USUARIO: Pasa adelante
   return <Outlet />;
 };
+export default ProtectedRoute;

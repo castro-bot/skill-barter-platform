@@ -45,7 +45,10 @@ export const servicesApi = {
   },
 
   // 4. Mis servicios (Para el Dashboard)
-  // Nota: A veces se filtra en el frontend o hay un endpoint específico. 
-  // Por ahora usaremos el general y filtraremos en el componente si es necesario,
-  // o si tu backend tiene endpoint de "/my-services", lo usamos.
+  getMyServices: async () => {
+    // Asumimos que el backend tiene este endpoint. 
+    // Si falla con 404, avísame y probamos con '/services?owner=me'
+    const { data } = await client.get<ServiceListing[]>('/services/my-services');
+    return data;
+  }
 };

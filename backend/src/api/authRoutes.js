@@ -21,7 +21,7 @@ const handleAuthError = (res, error) => {
  */
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body || {};
     const user = await AuthService.register({ name, email, password });
     res.status(201).json({ user });
   } catch (error) {

@@ -1,19 +1,61 @@
 // frontend/src/pages/DashboardPage.tsx
 import { useEffect, useState } from 'react';
-import { Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, HStack, useDisclosure, Spinner } from '@chakra-ui/react';
-import { FaPlus, FaBoxOpen, FaStar, FaExchangeAlt, FaCoins } from 'react-icons/fa';
+import { 
+  Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, 
+  HStack, useDisclosure, Spinner 
+} from '@chakra-ui/react';
+import { FaPlus, FaBoxOpen, FaExchangeAlt, FaCoins, FaChartLine } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { CreateServiceModal } from '../components/services/CreateServiceModal';
 import { ServiceCard } from '../components/services/ServiceCard';
 import { servicesApi, type ServiceListing } from '../api/services';
 import type { ElementType } from 'react';
 
-// Componente StatCard
-interface StatCardProps { icon: ElementType; label: string; value: string; color: string; }
+// --- COMPONENTE VISUAL: StatCard ---
+interface StatCardProps { 
+  icon: ElementType; 
+  label: string; 
+  value: string; 
+  color: string; 
+}
+
 const StatCard = ({ icon, label, value, color }: StatCardProps) => (
-  <Box bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm" display="flex" alignItems="center" gap={4} transition="transform 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "md" }}>
-    <Flex w={12} h={12} align="center" justify="center" borderRadius="lg" bg={`${color}.50`} color={`${color}.500`}><Icon as={icon} boxSize={5} /></Flex>
-    <Box><Text fontSize="xs" color="gray.500" fontWeight="bold" textTransform="uppercase">{label}</Text><Text fontSize="xl" fontWeight="bold" color="gray.700">{value}</Text></Box>
+  <Box 
+    bg="white" 
+    p={5} 
+    borderRadius="2xl" 
+    border="1px solid" 
+    borderColor="gray.100" 
+    shadow="sm" 
+    position="relative"
+    overflow="hidden"
+    transition="all 0.2s"
+    _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: `${color}.200` }}
+  >
+    <Box position="absolute" right="-10px" top="-10px" opacity={0.1} transform="rotate(15deg)">
+      <Icon as={icon} boxSize={24} color={color} />
+    </Box>
+
+    <Flex align="center" gap={4} position="relative" zIndex={1}>
+      <Flex 
+        w={12} h={12} 
+        align="center" justify="center" 
+        borderRadius="xl" 
+        bg={`${color}.50`} 
+        color={`${color}.500`}
+        shadow="sm"
+      >
+        <Icon as={icon} boxSize={6} />
+      </Flex>
+      <Box>
+        <Text fontSize="xs" color="gray.500" fontWeight="bold" textTransform="uppercase" letterSpacing="wider">
+          {label}
+        </Text>
+        <Text fontSize="2xl" fontWeight="800" color="gray.700" lineHeight="1">
+          {value}
+        </Text>
+      </Box>
+    </Flex>
   </Box>
 );
 
@@ -28,7 +70,13 @@ export const DashboardPage = () => {
     setIsLoading(true);
     try {
       const data = await servicesApi.getAll();
-      setServices(data);
+      
+      // 👇👇 AQUÍ ESTÁ EL TRUCO 👇👇
+      // Filtramos para mostrar SOLO los servicios que NO son míos.
+      // Si el dueño del servicio (owner.id) es diferente a mí (user.id), lo muestro.
+      const othersServices = data.filter(service => service.owner.id !== user?.id);
+      
+      setServices(othersServices);
     } catch (error) {
       console.error("Error cargando servicios:", error);
     } finally {
@@ -37,8 +85,11 @@ export const DashboardPage = () => {
   };
 
   useEffect(() => {
-    loadServices();
-  }, []);
+    // Recargamos servicios si el usuario cambia (ej. al hacer login)
+    if (user) {
+      loadServices();
+    }
+  }, [user]); // Agregamos 'user' como dependencia
 
   return (
     <Box bg="gray.50" minH="calc(100vh - 64px)">
@@ -50,64 +101,104 @@ export const DashboardPage = () => {
       />
 
       {/* HERO HEADER */}
-      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" pb={10} pt={8}>
+      <Box 
+        bg="white" 
+        borderBottom="1px solid" 
+        borderColor="gray.200" 
+        pb={12} pt={10}
+        bgGradient="linear(to-b, white, gray.50)"
+      >
         <Container maxW="container.xl">
-          <Flex justify="space-between" align="center" direction={{ base: 'column', md: 'row' }} gap={6} mb={8}>
+          <Flex justify="space-between" align="center" direction={{ base: 'column', md: 'row' }} gap={8} mb={10}>
             <Box maxW="2xl">
-              <HStack mb={2}>
-                <Heading size="xl" color="gray.800" letterSpacing="tight">
-                  Hola, <Box as="span" color="blue.600">{user?.name?.split(' ')[0]}</Box> 👋
-                </Heading>
-              </HStack>
-              <Text fontSize="lg" color="gray.500">Bienvenido a tu panel de control.</Text>
+              <Heading size="2xl" color="gray.800" letterSpacing="tight" mb={3}>
+                Hola, <Box as="span" bgGradient="linear(to-r, blue.400, purple.500)" bgClip="text">{user?.name?.split(' ')[0]}</Box> 👋
+              </Heading>
+              <Text fontSize="lg" color="gray.500">
+                Bienvenido a <b>SkillBarter</b>. Encuentra lo que necesitas intercambiando tus habilidades.
+              </Text>
             </Box>
-            <Button size="lg" colorScheme="blue" bg="blue.600" _hover={{ bg: "blue.700" }} color="white" borderRadius="full" px={6} shadow="md" onClick={onOpen}>
-              <Icon as={FaPlus} mr={2} /> Publicar Servicio
+            
+            <Button 
+              size="lg" 
+              colorScheme="blue" 
+              bgGradient="linear(to-r, blue.500, blue.600)"
+              _hover={{ bgGradient: "linear(to-r, blue.600, blue.700)", transform: "scale(1.02)" }}
+              color="white" 
+              borderRadius="xl" 
+              px={8} 
+              shadow="lg" 
+              onClick={onOpen}
+              leftIcon={<FaPlus />}
+            >
+              Publicar Servicio
             </Button>
           </Flex>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
             <StatCard icon={FaCoins} label="Mis Créditos" value="100" color="yellow" />
-            <StatCard icon={FaExchangeAlt} label="Intercambios" value="0" color="purple" />
-            <StatCard icon={FaStar} label="Reputación" value="Nueva" color="green" />
+            <StatCard icon={FaExchangeAlt} label="Intercambios Activos" value="0" color="purple" />
+            <StatCard icon={FaChartLine} label="Reputación" value="Nueva" color="green" />
           </SimpleGrid>
         </Container>
       </Box>
 
       {/* ÁREA DE SERVICIOS */}
-      <Container maxW="container.xl" py={10}>
-        <Flex justify="space-between" align="center" mb={6}>
-          <Heading size="md" color="gray.700">Explorar Mercado</Heading>
-        </Flex>
+      <Container maxW="container.xl" py={12}>
+        <HStack mb={8} justify="space-between" align="center">
+          <Heading size="lg" color="gray.700" letterSpacing="tight">Explorar Mercado</Heading>
+        </HStack>
 
         {isLoading ? (
-          <Flex justify="center" py={20}>
+          <Flex justify="center" py={20} direction="column" align="center" gap={4}>
             <Spinner size="xl" color="blue.500" thickness="4px" />
+            <Text color="gray.400" fontSize="sm">Cargando ofertas...</Text>
           </Flex>
         ) : services.length > 0 ? (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={8} pb={10}>
             {services.map((service) => (
-              // 👇 AQUÍ ESTÁ LA CORRECCIÓN CLAVE
               <ServiceCard 
                 key={service.id}
-                id={service.id}                    // Pasamos el ID
+                id={service.id}
                 title={service.title}
-                author={service.owner.name}        // Mapeamos owner.name a author
+                author={service.owner.name}
                 category={service.category}
-                price="Trueque"                    // Texto fijo o dinámico
-                colorPalette="blue"                // Color fijo o dinámico
+                price="Trueque" 
+                colorPalette="blue"
               />
             ))}
           </SimpleGrid>
         ) : (
-          // Empty State
-          <Flex direction="column" align="center" justify="center" py={16} bg="white" borderRadius="2xl" border="1px dashed" borderColor="gray.300" textAlign="center">
-            <Box bg="blue.50" p={6} borderRadius="full" mb={4} color="blue.500">
-              <Icon as={FaBoxOpen} boxSize={10} />
-            </Box>
-            <Heading size="md" color="gray.800" mb={2}>No hay servicios disponibles</Heading>
-            <Text color="gray.500" maxW="md" mb={6}>¡Sé el primero en publicar!</Text>
-            <Button variant="outline" borderColor="blue.200" color="blue.600" size="sm" onClick={onOpen}>
-              Crear primera publicación
+          // Empty State mejorado
+          <Flex 
+            direction="column" 
+            align="center" 
+            justify="center" 
+            py={20} 
+            bg="white" 
+            borderRadius="3xl" 
+            border="2px dashed" 
+            borderColor="gray.200" 
+            textAlign="center"
+            mx="auto"
+            maxW="3xl"
+          >
+            <Flex 
+              bg="blue.50" 
+              w={20} h={20} 
+              borderRadius="full" 
+              align="center" justify="center" 
+              mb={6} 
+              color="blue.500"
+            >
+              <Icon as={FaBoxOpen} boxSize={8} />
+            </Flex>
+            <Heading size="md" color="gray.800" mb={2}>No hay otros servicios disponibles</Heading>
+            <Text color="gray.500" maxW="md" mb={8}>
+              Parece que eres el único aquí o ya has visto todo. ¡Invita a más amigos!
+            </Text>
+            <Button variant="outline" borderColor="blue.300" color="blue.600" onClick={onOpen} _hover={{ bg: "blue.50" }}>
+              Publicar otro servicio
             </Button>
           </Flex>
         )}
