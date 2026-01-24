@@ -127,12 +127,13 @@ export const RegisterForm = () => {
         )}
 
         <Button 
-          type="submit" 
-          colorPalette="green" 
+          type="submit"
+          colorScheme="green"
           size="lg"
           height="3rem"
-          loading={isLoading} 
-          width="full" 
+          isLoading={isLoading}
+          loadingText="Creando cuenta..."
+          width="full"
           mt={2}
           fontWeight="bold"
           borderRadius="md"
@@ -140,7 +141,7 @@ export const RegisterForm = () => {
           _hover={{ transform: 'translateY(-1px)', shadow: 'md', bg: 'green.600' }}
           transition="all 0.2s"
         >
-          {isLoading ? 'Creando cuenta...' : 'Registrarse'}
+          Registrarse
         </Button>
       </VStack>
     </Box>
