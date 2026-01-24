@@ -8,6 +8,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const config = require('./config/env');
 const errorHandler = require('./middleware/errorMiddleware');
+const notificationRoutes = require("./api/notificationRoutes");
 
 const authRoutes = require('./api/authRoutes');
 const serviceRoutes = require('./api/serviceRoutes');
@@ -48,6 +49,8 @@ app.get('/api/v1/health', (req, res) => {
 
 // --- 3. Error Handling ---
 app.use(errorHandler);
+
+app.use("/api/v1/notifications", notificationRoutes);
 
 // --- 4. Start Server ---
 app.listen(config.PORT, () => {
