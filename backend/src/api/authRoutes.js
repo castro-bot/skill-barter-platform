@@ -83,6 +83,43 @@ router.get('/me', authenticate, async (req, res) => {
 });
 
 /**
+ * PUT /api/v1/auth/me
+ * Update profile (name, email)
+ */
+router.put('/me', authenticate, async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const updatedUser = await AuthService.updateProfile(req.user.id, { name, email });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    if (error.message === 'Email already in use' || error.message === 'No valid fields to update') {
+      return res.status(400).json({ error: error.message });
+    }
+    handleAuthError(res, error);
+  }
+});
+
+/**
+ * PUT /api/v1/auth/me/password
+ * Change password
+ */
+router.put('/me/password', authenticate, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const result = await AuthService.changePassword(req.user.id, { currentPassword, newPassword });
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.message === 'Current password is incorrect') {
+      return res.status(401).json({ error: error.message });
+    }
+    if (error.message.includes('required') || error.message.includes('at least')) {
+      return res.status(400).json({ error: error.message });
+    }
+    handleAuthError(res, error);
+  }
+});
+
+/**
  * POST /api/v1/auth/logout
  */
 router.post('/logout', (req, res) => {

@@ -48,4 +48,44 @@ router.post('/', authenticate, async (req, res, next) => {
   }
 });
 
+/**
+ * PUT /api/v1/services/:id
+ * Protected - Update a service (owner only)
+ */
+router.put('/:id', authenticate, async (req, res, next) => {
+  try {
+    const { title, description, category } = req.body;
+    const updatedService = await ServiceListingService.updateService(
+      req.user.id,
+      req.params.id,
+      { title, description, category }
+    );
+    res.json(updatedService);
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    if (error.message === 'No valid fields to update') {
+      return res.status(400).json({ error: error.message });
+    }
+    next(error);
+  }
+});
+
+/**
+ * DELETE /api/v1/services/:id
+ * Protected - Delete a service (owner only)
+ */
+router.delete('/:id', authenticate, async (req, res, next) => {
+  try {
+    const result = await ServiceListingService.deleteService(req.user.id, req.params.id);
+    res.json(result);
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    next(error);
+  }
+});
+
 module.exports = router;

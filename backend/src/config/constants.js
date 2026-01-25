@@ -14,7 +14,36 @@ const COOKIE_SETTINGS = {
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
 };
 
+// User roles (Clean Code: avoid magic strings)
+const USER_ROLES = {
+  REGULAR: 'USER',
+  MODERATOR: 'MODERATOR',
+};
+
+// Centralized error messages (DRY principle)
+const ERROR_MESSAGES = {
+  // Auth
+  INVALID_CREDENTIALS: 'Invalid credentials',
+  EMAIL_IN_USE: 'Email already in use',
+  USER_NOT_FOUND: 'User not found',
+  REFRESH_TOKEN_REQUIRED: 'Refresh token is required',
+  INVALID_REFRESH_TOKEN: 'Invalid refresh token',
+  PASSWORD_INCORRECT: 'Current password is incorrect',
+  PASSWORD_TOO_SHORT: 'New password must be at least 6 characters',
+
+  // Services
+  SERVICE_NOT_FOUND: 'Service not found',
+  NOT_AUTHORIZED: 'Not authorized',
+  NO_FIELDS_TO_UPDATE: 'No valid fields to update',
+
+  // Trades
+  TRADE_NOT_FOUND: 'Trade not found',
+  CANNOT_TRADE_SELF: 'Cannot trade with yourself',
+};
+
 module.exports = {
   TOKEN_EXPIRATION,
   COOKIE_SETTINGS,
+  USER_ROLES,
+  ERROR_MESSAGES,
 };

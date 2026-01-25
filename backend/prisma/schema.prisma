@@ -11,6 +11,7 @@ model User {
   email     String   @unique
   name      String
   password  String   // Hashed
+  role      String   @default("USER") // 'USER' | 'MODERATOR'
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

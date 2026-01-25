@@ -23,14 +23,14 @@ setupNotificationListeners();
 
 // --- 1. Global Middleware ---
 app.use(cors({
-  origin: 'http://localhost:5173', // Asegúrate que este sea el puerto de tu frontend
+  origin: ['http://localhost:5173', 'http://localhost:5174'], // Permitir ambos puertos del frontend
   credentials: true, // Vital para que pasen las cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body Parsers
-app.use(express.json()); 
+app.use(express.json());
 app.use(cookieParser());
 
 // --- 2. Routes ---
@@ -40,7 +40,7 @@ app.use('/api/v1/auth', authRoutes); // Una sola vez es suficiente
 
 // Service & Trade Routes
 app.use('/api/v1/services', serviceRoutes);
-app.use('/api/v1/trades', tradeRoutes); 
+app.use('/api/v1/trades', tradeRoutes);
 
 // Health Check
 app.get('/api/v1/health', (req, res) => {
