@@ -1,2 +1,3 @@
 schema.prisma-journal
 /generated/prisma
+.env
