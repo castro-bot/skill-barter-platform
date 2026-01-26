@@ -21,11 +21,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // ✅ Evita doble ejecución en React 18 StrictMode (DEV)
+  // Evita doble ejecución en StrictMode DEV
   const didInitRef = useRef(false)
 
   useEffect(() => {
-    // En dev StrictMode se ejecuta dos veces: bloqueamos la segunda
     if (didInitRef.current) return
     didInitRef.current = true
 
@@ -33,31 +32,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true)
 
       try {
-        // ✅ Si no hay token, NO llames /me ni /refresh
         const token = localStorage.getItem(TOKEN_KEY)
+
+        // Si no hay token, no intentamos /me
         if (!token) {
           setUser(null)
           return
         }
 
-        // 1) Intentar /me con token actual
+        /**
+         * Importante:
+         * - NO hacemos refresh manual aquí.
+         * - Si /auth/me da 401, el interceptor de axios intentará refresh
+         *   (cookie httpOnly) y reintentará automáticamente.
+         * - Si aún así falla, limpiamos token y estado.
+         */
         const profile = await authApi.getProfile()
         setUser(profile)
       } catch (error) {
-        console.warn("Sesión inicial fallida o expirada:", error)
-
-        // 2) Solo si había token, intentar refresh (cookie)
-        try {
-          console.log("Intentando refrescar sesión...")
-          await authApi.refreshSession()
-
-          const profileRetry = await authApi.getProfile()
-          setUser(profileRetry)
-        } catch (refreshError) {
-          console.error("No se pudo restaurar la sesión, es necesario loguearse:", refreshError)
-          localStorage.removeItem(TOKEN_KEY)
-          setUser(null)
-        }
+        console.warn("Sesión inválida o expirada, limpiando token:", error)
+        localStorage.removeItem(TOKEN_KEY)
+        setUser(null)
       } finally {
         setIsLoading(false)
       }
