@@ -3,15 +3,24 @@ const express = require('express');
 const router = express.Router();
 const ServiceListingService = require('../services/serviceListingService');
 const authenticate = require('../middleware/authMiddleware'); // The Gatekeeper
+const optionalAuthenticate = require('../middleware/optionalAuthMiddleware');
 
 /**
  * GET /api/v1/services
  * Public - Get all services (with search)
+ * Sprint 4: excluye servicios usados en trades COMPLETED
+ * + si hay token válido, excluye servicios del usuario actual (hardening)
  */
-router.get('/', async (req, res, next) => {
+router.get('/', optionalAuthenticate, async (req, res, next) => {
   try {
     const { q, category } = req.query;
-    const services = await ServiceListingService.getAllServices({ q, category });
+
+    const services = await ServiceListingService.getAllServices({
+      q,
+      category,
+      excludeOwnerId: req.user?.id
+    });
+
     res.json(services);
   } catch (error) {
     next(error); // Pass to global error handler
@@ -37,7 +46,6 @@ router.get('/:id', async (req, res, next) => {
  */
 router.post('/', authenticate, async (req, res, next) => {
   try {
-    // req.user.id comes from the authenticate middleware
     const newService = await ServiceListingService.createService(req.user.id, req.body);
     res.status(201).json(newService);
   } catch (error) {
@@ -55,11 +63,13 @@ router.post('/', authenticate, async (req, res, next) => {
 router.put('/:id', authenticate, async (req, res, next) => {
   try {
     const { title, description, category } = req.body;
+
     const updatedService = await ServiceListingService.updateService(
       req.user.id,
       req.params.id,
       { title, description, category }
     );
+
     res.json(updatedService);
   } catch (error) {
     if (error.statusCode) {

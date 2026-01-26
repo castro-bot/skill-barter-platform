@@ -1,12 +1,10 @@
 // backend/src/services/serviceListingService.js
 const prisma = require('../core/db');
 
-
 /**
  * Service for managing ServiceListings.
  */
 class ServiceListingService {
-
   /**
    * Create a new service listing
    * @param {string} userId - ID of the owner
@@ -24,7 +22,7 @@ class ServiceListingService {
         title,
         description,
         category,
-        ownerId: userId,
+        ownerId: userId
       },
       // Include owner info to match API Contract return shape immediately
       include: {
@@ -39,23 +37,52 @@ class ServiceListingService {
 
   /**
    * Get all services with optional filters
-   * @param {Object} filters - { q, category }
+   * Sprint 4 (SIN Prisma migration):
+   * - Excluye servicios involucrados en trades COMPLETED
+   * - Opcional: excluye servicios del usuario actual si se provee excludeOwnerId
+   *
+   * @param {Object} filters - { q, category, excludeOwnerId? }
    */
-  static async getAllServices({ q, category }) {
-    // Build the query object dynamically
+  static async getAllServices({ q, category, excludeOwnerId } = {}) {
     const where = {};
 
-    // Guideline #1: DRY - Build complex queries cleanly
+    // Filtro por categoría
     if (category) {
       where.category = category;
     }
 
+    // Búsqueda por texto
     if (q) {
-      // Search in title OR description (case insensitive)
       where.OR = [
         { title: { contains: q, mode: 'insensitive' } },
-        { description: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } }
       ];
+    }
+
+    // ✅ Sprint 4: excluir servicios usados en trades COMPLETED
+    const completedTrades = await prisma.tradeProposal.findMany({
+      where: { status: 'COMPLETED' },
+      select: {
+        proposerServiceId: true,
+        receiverServiceId: true
+      }
+    });
+
+    const usedServiceIds = Array.from(
+      new Set(
+        completedTrades
+          .flatMap((t) => [t.proposerServiceId, t.receiverServiceId])
+          .filter(Boolean)
+      )
+    );
+
+    if (usedServiceIds.length > 0) {
+      where.id = { notIn: usedServiceIds };
+    }
+
+    // Hardening: excluir servicios propios si se conoce al usuario
+    if (excludeOwnerId) {
+      where.ownerId = { not: excludeOwnerId };
     }
 
     const services = await prisma.serviceListing.findMany({
@@ -86,9 +113,8 @@ class ServiceListingService {
     });
 
     if (!service) {
-      // Guideline #9: Use specific errors
       const error = new Error('Service not found');
-      error.statusCode = 404; // Used by our Error Middleware
+      error.statusCode = 404;
       throw error;
     }
 

@@ -35,9 +35,12 @@ model ServiceListing {
   description String
   category    String
 
-
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // 🔵 Sprint 4 — Visibilidad en Marketplace (soft delete)
+  isActive       Boolean  @default(true)
+  deactivatedAt  DateTime?
 
   // Foreign Key
   ownerId     String
