@@ -15,6 +15,9 @@ const serviceRoutes = require("./api/serviceRoutes")
 const tradeRoutes = require("./api/tradeRoutes")
 const notificationRoutes = require("./api/notificationRoutes")
 
+// 👉 NUEVO: User Routes (Perfil Público)
+const userRoutes = require("./api/userRoutes")
+
 // Listeners (Observer)
 const setupNotificationListeners = require("./listeners/notificationListener")
 
@@ -44,6 +47,9 @@ app.use("/api/v1/auth", authRoutes)
 // Service & Trade Routes
 app.use("/api/v1/services", serviceRoutes)
 app.use("/api/v1/trades", tradeRoutes)
+
+// 👉 NUEVO: Perfil público de usuario
+app.use("/api/v1/users", userRoutes)
 
 // Notifications Routes (IMPORTANTE: antes del errorHandler)
 app.use("/api/v1/notifications", notificationRoutes)
