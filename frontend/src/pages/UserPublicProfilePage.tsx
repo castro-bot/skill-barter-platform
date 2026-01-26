@@ -1,3 +1,4 @@
+// frontend/src/pages/UserPublicProfilePage.tsx
 import { useEffect, useMemo, useState } from "react"
 import {
   Box,
