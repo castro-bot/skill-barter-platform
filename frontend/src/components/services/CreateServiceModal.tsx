@@ -126,9 +126,66 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                   _focus={{ bg: 'white' }}
                 >
                   <option value="Tecnología">Tecnología</option>
+                  <option value="Programación">Programación</option>
+                  <option value="Desarrollo Web">Desarrollo Web</option>
+                  <option value="Desarrollo Móvil">Desarrollo Móvil</option>
+                  <option value="Bases de Datos">Bases de Datos</option>
+                  <option value="Redes y Sistemas">Redes y Sistemas</option>
+                  <option value="Ciberseguridad">Ciberseguridad</option>
+                  <option value="Inteligencia Artificial">Inteligencia Artificial</option>
+
+                  <option value="Matemáticas">Matemáticas</option>
+                  <option value="Estadística">Estadística</option>
+                  <option value="Física">Física</option>
+                  <option value="Química">Química</option>
+
                   <option value="Idiomas">Idiomas</option>
-                  <option value="Asesoría">Asesoría</option>
+                  <option value="Inglés">Inglés</option>
+                  <option value="Francés">Francés</option>
+                  <option value="Portugués">Portugués</option>
+                  <option value="Preparación TOEFL / IELTS">Preparación TOEFL / IELTS</option>
+
+                  <option value="Asesoría Académica">Asesoría Académica</option>
+                  <option value="Tutorías">Tutorías</option>
+                  <option value="Refuerzo Universitario">Refuerzo Universitario</option>
+                  <option value="Preparación de Exámenes">Preparación de Exámenes</option>
+
                   <option value="Diseño">Diseño</option>
+                  <option value="Diseño Gráfico">Diseño Gráfico</option>
+                  <option value="UX/UI">UX / UI</option>
+                  <option value="Edición de Video">Edición de Video</option>
+                  <option value="Fotografía">Fotografía</option>
+
+                  <option value="Negocios y Economía">Negocios y Economía</option>
+                  <option value="Contabilidad">Contabilidad</option>
+                  <option value="Finanzas">Finanzas</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Emprendimiento">Emprendimiento</option>
+
+                  <option value="Ingeniería">Ingeniería</option>
+                  <option value="Ingeniería Civil">Ingeniería Civil</option>
+                  <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                  <option value="Ingeniería de Software">Ingeniería de Software</option>
+
+                  <option value="Ciencias Sociales">Ciencias Sociales</option>
+                  <option value="Derecho">Derecho</option>
+                  <option value="Psicología">Psicología</option>
+                  <option value="Educación">Educación</option>
+
+                  <option value="Salud">Salud</option>
+                  <option value="Primeros Auxilios">Primeros Auxilios</option>
+                  <option value="Nutrición">Nutrición</option>
+
+                  <option value="Arte y Cultura">Arte y Cultura</option>
+                  <option value="Música">Música</option>
+                  <option value="Artes Plásticas">Artes Plásticas</option>
+                  <option value="Teatro">Teatro</option>
+
+                  <option value="Habilidades Blandas">Habilidades Blandas</option>
+                  <option value="Oratoria">Oratoria</option>
+                  <option value="Liderazgo">Liderazgo</option>
+                  <option value="Gestión del Tiempo">Gestión del Tiempo</option>
+
                   <option value="Otros">Otros</option>
                 </Select>
               </InputGroup>
