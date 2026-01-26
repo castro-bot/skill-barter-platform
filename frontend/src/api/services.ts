@@ -1,54 +1,71 @@
 // frontend/src/api/services.ts
-import client from './client';
+import client from "./client"
 
-// Definimos la forma de los datos según tu PDF (Página 6)
+// Modelo según tu contrato/API
 export interface ServiceListing {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
+  id: string
+  title: string
+  description: string
+  category: string
   owner: {
-    id: string;
-    name: string;
-  };
-  createdAt: string;
+    id: string
+    name: string
+  }
+  createdAt: string
 }
 
 export interface CreateServiceDTO {
-  title: string;
-  description: string;
-  category: string;
+  title: string
+  description: string
+  category: string
+}
+
+export interface UpdateServiceDTO {
+  title?: string
+  description?: string
+  category?: string
 }
 
 export const servicesApi = {
-  // 1. Obtener todos los servicios (Marketplace)
+  // 1) Marketplace (otros servicios)
   getAll: async (query?: string, category?: string) => {
-    // Si hay filtros, los añadimos a la URL
-    const params = new URLSearchParams();
-    if (query) params.append('q', query);
-    if (category) params.append('category', category);
+    const params = new URLSearchParams()
+    if (query) params.append("q", query)
+    if (category) params.append("category", category)
 
-    const { data } = await client.get<ServiceListing[]>(`/services?${params.toString()}`);
-    return data;
+    const qs = params.toString()
+    const url = qs ? `/services?${qs}` : "/services"
+
+    const { data } = await client.get<ServiceListing[]>(url)
+    return data
   },
 
-  // 2. Obtener un servicio por ID (Detalle)
+  // 2) Detalle
   getById: async (id: string) => {
-    const { data } = await client.get<ServiceListing>(`/services/${id}`);
-    return data;
+    const { data } = await client.get<ServiceListing>(`/services/${id}`)
+    return data
   },
 
-  // 3. Crear un servicio nuevo (Lo que necesitamos arreglar ahora)
+  // 3) Crear
   create: async (serviceData: CreateServiceDTO) => {
-    const { data } = await client.post<ServiceListing>('/services', serviceData);
-    return data;
+    const { data } = await client.post<ServiceListing>("/services", serviceData)
+    return data
   },
 
-  // 4. Mis servicios (Para el Dashboard)
-  getMyServices: async () => {
-    // Asumimos que el backend tiene este endpoint. 
-    // Si falla con 404, avísame y probamos con '/services?owner=me'
-    const { data } = await client.get<ServiceListing[]>('/services/my-services');
-    return data;
+  // 4) Mis servicios (Sprint 4)
+  getMine: async () => {
+    const { data } = await client.get<ServiceListing[]>("/services/mine")
+    return data
+  },
+
+  // 5) Editar (owner-only)
+  update: async (id: string, payload: UpdateServiceDTO) => {
+    const { data } = await client.put<ServiceListing>(`/services/${id}`, payload)
+    return data
+  },
+
+  // 6) Eliminar (owner-only)
+  remove: async (id: string) => {
+    await client.delete(`/services/${id}`)
   }
-};
+}

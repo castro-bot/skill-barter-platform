@@ -30,6 +30,22 @@ router.get("/", optionalAuthenticate, async (req, res, next) => {
 })
 
 /**
+ * GET /api/v1/services/mine
+ * Protected - Get services owned by current user
+ * Sprint 4 / ERS:
+ * - Lista solo servicios del usuario autenticado
+ * - Mantiene consistencia con el marketplace: excluye servicios involucrados en trades COMPLETED
+ */
+router.get("/mine", authenticate, async (req, res, next) => {
+  try {
+    const services = await ServiceListingService.getMyServices(req.user.id)
+    res.json(services)
+  } catch (error) {
+    next(error)
+  }
+})
+
+/**
  * GET /api/v1/services/:id
  * Public - Get one service
  * Sprint 4 / ERS:
@@ -88,7 +104,7 @@ router.put("/:id", authenticate, async (req, res, next) => {
 
 /**
  * DELETE /api/v1/services/:id
- * Protected - Delete (Soft delete) a service (owner only)
+ * Protected - Delete (Hard delete) a service (owner only)
  */
 router.delete("/:id", authenticate, async (req, res, next) => {
   try {

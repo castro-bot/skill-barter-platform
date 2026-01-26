@@ -94,6 +94,51 @@ class ServiceListingService {
   }
 
   /**
+   * Get services owned by a user (Sprint 4: "Mis Servicios")
+   * - Lista solo servicios del owner (userId)
+   * - Mantiene consistencia con marketplace: excluye servicios involucrados en trades COMPLETED
+   *
+   * @param {string} userId
+   */
+  static async getMyServices(userId) {
+    if (!userId) {
+      const err = new Error("User ID is required")
+      err.statusCode = 400
+      throw err
+    }
+
+    // Excluir servicios usados en trades COMPLETED
+    const completedTrades = await prisma.tradeProposal.findMany({
+      where: { status: "COMPLETED" },
+      select: { proposerServiceId: true, receiverServiceId: true }
+    })
+
+    const usedServiceIds = Array.from(
+      new Set(
+        completedTrades
+          .flatMap((t) => [t.proposerServiceId, t.receiverServiceId])
+          .filter(Boolean)
+      )
+    )
+
+    const where = { ownerId: userId }
+
+    if (usedServiceIds.length > 0) {
+      where.NOT = { id: { in: usedServiceIds } }
+    }
+
+    const services = await prisma.serviceListing.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: {
+        owner: { select: { id: true, name: true, createdAt: true } }
+      }
+    })
+
+    return services
+  }
+
+  /**
    * Get a single service by ID
    * @param {string} id
    */

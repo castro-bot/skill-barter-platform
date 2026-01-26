@@ -20,6 +20,7 @@ import { ServiceCard } from "../components/services/ServiceCard"
 import { servicesApi, type ServiceListing } from "../api/services"
 import type { ElementType } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import { MyServicesSection } from "../components/services/MyServicesSection"
 
 // --- COMPONENTE VISUAL: StatCard ---
 interface StatCardProps {
@@ -40,7 +41,8 @@ const StatCard = ({ icon, label, value, color }: StatCardProps) => (
     position="relative"
     overflow="hidden"
     transition="all 0.2s"
-    _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: `${color}.200` }}>
+    _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: `${color}.200` }}
+  >
     <Box position="absolute" right="-10px" top="-10px" opacity={0.1} transform="rotate(15deg)">
       <Icon as={icon} boxSize={24} color={color} />
     </Box>
@@ -54,7 +56,8 @@ const StatCard = ({ icon, label, value, color }: StatCardProps) => (
         borderRadius="xl"
         bg={`${color}.50`}
         color={`${color}.500`}
-        shadow="sm">
+        shadow="sm"
+      >
         <Icon as={icon} boxSize={6} />
       </Flex>
       <Box>
@@ -63,7 +66,8 @@ const StatCard = ({ icon, label, value, color }: StatCardProps) => (
           color="gray.500"
           fontWeight="bold"
           textTransform="uppercase"
-          letterSpacing="wider">
+          letterSpacing="wider"
+        >
           {label}
         </Text>
         <Text fontSize="2xl" fontWeight="800" color="gray.700" lineHeight="1">
@@ -151,14 +155,16 @@ export const DashboardPage = () => {
         borderColor="gray.200"
         pb={12}
         pt={10}
-        bgGradient="linear(to-b, white, gray.50)">
+        bgGradient="linear(to-b, white, gray.50)"
+      >
         <Container maxW="container.xl">
           <Flex
             justify="space-between"
             align="center"
             direction={{ base: "column", md: "row" }}
             gap={8}
-            mb={10}>
+            mb={10}
+          >
             <Box maxW="2xl">
               <Heading size="2xl" color="gray.800" letterSpacing="tight" mb={3}>
                 Hola,{" "}
@@ -183,7 +189,8 @@ export const DashboardPage = () => {
               px={8}
               shadow="lg"
               onClick={onOpen}
-              leftIcon={<FaPlus />}>
+              leftIcon={<FaPlus />}
+            >
               Publicar Servicio
             </Button>
           </Flex>
@@ -237,7 +244,8 @@ export const DashboardPage = () => {
             borderColor="gray.200"
             textAlign="center"
             mx="auto"
-            maxW="3xl">
+            maxW="3xl"
+          >
             <Flex
               bg="blue.50"
               w={20}
@@ -246,7 +254,8 @@ export const DashboardPage = () => {
               align="center"
               justify="center"
               mb={6}
-              color="blue.500">
+              color="blue.500"
+            >
               <Icon as={FaBoxOpen} boxSize={8} />
             </Flex>
             <Heading size="md" color="gray.800" mb={2}>
@@ -260,11 +269,15 @@ export const DashboardPage = () => {
               borderColor="blue.300"
               color="blue.600"
               onClick={onOpen}
-              _hover={{ bg: "blue.50" }}>
+              _hover={{ bg: "blue.50" }}
+            >
               Publicar otro servicio
             </Button>
           </Flex>
         )}
+
+        {/* SPRINT 4: MIS SERVICIOS + EDITAR/ELIMINAR */}
+        <MyServicesSection />
       </Container>
     </Box>
   )
