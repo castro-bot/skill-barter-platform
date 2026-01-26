@@ -19,7 +19,7 @@ class UserService {
       select: {
         id: true,
         name: true,
-        email: true, // si no quieres exponer email, ponlo en false
+        email: true,
         createdAt: true
       }
     })
@@ -30,9 +30,9 @@ class UserService {
       throw err
     }
 
-    // ✅ Sprint 4: solo servicios activos del usuario
+    // Opción A: NO filtramos por isActive (campo no existe en schema actual)
     const services = await prisma.serviceListing.findMany({
-      where: { ownerId: userId, isActive: true },
+      where: { ownerId: userId },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

@@ -3,6 +3,11 @@ const prisma = require("../core/db")
 
 /**
  * Service for managing ServiceListings.
+ * Opción A (sin migración Prisma):
+ * - NO usamos isActive / deactivatedAt porque el schema actual no los tiene.
+ * - Mantenemos:
+ *   - excluir servicios involucrados en trades COMPLETED
+ *   - opcional: excluir servicios del usuario actual (marketplace de "otros")
  */
 class ServiceListingService {
   /**
@@ -21,7 +26,6 @@ class ServiceListingService {
         description,
         category,
         ownerId: userId
-        // isActive tiene default true en el schema, no hace falta setearlo aquí
       },
       include: {
         owner: {
@@ -35,17 +39,13 @@ class ServiceListingService {
 
   /**
    * Get all services with optional filters
-   * Sprint 4 / ERS:
-   * - SOLO isActive: true (catálogo público)
    * - Excluye servicios involucrados en trades COMPLETED
    * - Opcional: excluye servicios del usuario actual (marketplace de "otros")
    *
    * @param {Object} filters - { q, category, excludeOwnerId? }
    */
   static async getAllServices({ q, category, excludeOwnerId } = {}) {
-    const where = {
-      isActive: true
-    }
+    const where = {}
 
     if (category) {
       where.category = category
@@ -58,7 +58,7 @@ class ServiceListingService {
       ]
     }
 
-    // Excluir servicios usados en trades COMPLETED
+    // ✅ Sprint 4: excluir servicios usados en trades COMPLETED (sin migración extra)
     const completedTrades = await prisma.tradeProposal.findMany({
       where: { status: "COMPLETED" },
       select: { proposerServiceId: true, receiverServiceId: true }
@@ -73,10 +73,11 @@ class ServiceListingService {
     )
 
     if (usedServiceIds.length > 0) {
-      // NOT es más limpio que AND para este caso
+      // NOT es limpio y evita pisar otros filtros
       where.NOT = { id: { in: usedServiceIds } }
     }
 
+    // Hardening: si está autenticado, no le muestres sus propios servicios en marketplace
     if (excludeOwnerId) {
       where.ownerId = { not: excludeOwnerId }
     }
@@ -93,13 +94,12 @@ class ServiceListingService {
   }
 
   /**
-   * Get a single active service by ID
+   * Get a single service by ID
    * @param {string} id
    */
   static async getServiceById(id) {
-    // Importante: findFirst permite filtrar por isActive junto con id
-    const service = await prisma.serviceListing.findFirst({
-      where: { id, isActive: true },
+    const service = await prisma.serviceListing.findUnique({
+      where: { id },
       include: {
         owner: { select: { id: true, name: true, createdAt: true } }
       }
@@ -122,7 +122,7 @@ class ServiceListingService {
       where: { id: serviceId }
     })
 
-    if (!service || service.isActive === false) {
+    if (!service) {
       const error = new Error("Service not found")
       error.statusCode = 404
       throw error
@@ -157,16 +157,14 @@ class ServiceListingService {
   }
 
   /**
-   * Soft delete a service listing (owner only)
-   * - isActive = false
-   * - deactivatedAt = now
+   * Delete a service listing (owner only) — HARD DELETE (Opción A)
    */
   static async deleteService(userId, serviceId) {
     const service = await prisma.serviceListing.findUnique({
       where: { id: serviceId }
     })
 
-    if (!service || service.isActive === false) {
+    if (!service) {
       const error = new Error("Service not found")
       error.statusCode = 404
       throw error
@@ -178,12 +176,8 @@ class ServiceListingService {
       throw error
     }
 
-    await prisma.serviceListing.update({
-      where: { id: serviceId },
-      data: {
-        isActive: false,
-        deactivatedAt: new Date()
-      }
+    await prisma.serviceListing.delete({
+      where: { id: serviceId }
     })
 
     return { success: true, message: "Service deleted successfully" }
