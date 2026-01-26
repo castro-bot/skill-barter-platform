@@ -309,6 +309,8 @@ export const Navbar = () => {
                 <MenuDivider borderColor="gray.100" mb={2} />
 
                 <MenuItem
+                  as={Link}
+                  to={user?.id ? `/users/${user.id}` : "/services"}
                   _hover={{ bg: "blue.50", color: "blue.700" }}
                   borderRadius="lg"
                   py={3}
@@ -360,7 +362,38 @@ export const Navbar = () => {
                 </MenuItem>
 
                 <MenuDivider borderColor="gray.100" my={2} />
-
+                
+                <MenuItem
+                  as={Link}
+                  to="/profile/settings"
+                  _hover={{ bg: "blue.50", color: "blue.700" }}
+                  borderRadius="lg"
+                  py={3}
+                  transition="all 0.2s"
+                >
+                  <HStack spacing={3}>
+                    <Flex
+                      w={8}
+                      h={8}
+                      bg="blue.100"
+                      borderRadius="md"
+                      align="center"
+                      justify="center"
+                      color="blue.600"
+                    >
+                      <Icon as={FaUser} boxSize={4} />
+                    </Flex>
+                    <Box>
+                      <Text fontSize="sm" fontWeight="medium">
+                        Ajustes de Perfil
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        Datos y contraseña
+                      </Text>
+                    </Box>
+                  </HStack>
+                </MenuItem>
+                
                 <MenuItem
                   _hover={{ bg: "red.50", color: "red.700" }}
                   borderRadius="lg"
@@ -383,6 +416,8 @@ export const Navbar = () => {
                     </Text>
                   </HStack>
                 </MenuItem>
+
+                
               </MenuList>
             </Menu>
           </HStack>
