@@ -1,3 +1,4 @@
+// backend/src/core/events.js
 /**
  * Event Emitter Singleton
  * Centraliza el manejo de eventos del sistema (Patrón Observer).

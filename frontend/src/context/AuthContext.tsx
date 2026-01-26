@@ -1,105 +1,120 @@
 // frontend/src/context/AuthContext.tsx
-import { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import type { User, LoginDTO, RegisterDTO } from '../types/auth';
-import { authApi } from '../api/authService';
+import { createContext, useContext, useEffect, useRef, useState } from "react"
+import type { ReactNode } from "react"
+import type { User, LoginDTO, RegisterDTO } from "../types/auth"
+import { authApi } from "../api/authService"
 
 interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (data: LoginDTO) => Promise<void>;
-  register: (data: RegisterDTO) => Promise<void>;
-  logout: () => void;
+  user: User | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  login: (data: LoginDTO) => Promise<void>
+  register: (data: RegisterDTO) => Promise<void>
+  logout: () => void
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+const TOKEN_KEY = "sb_auth_token"
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Lógica de inicio: Recuperar sesión
+  // ✅ Evita doble ejecución en React 18 StrictMode (DEV)
+  const didInitRef = useRef(false)
+
   useEffect(() => {
+    // En dev StrictMode se ejecuta dos veces: bloqueamos la segunda
+    if (didInitRef.current) return
+    didInitRef.current = true
+
     const initAuth = async () => {
+      setIsLoading(true)
+
       try {
-        // 1. Intentamos obtener el perfil directamente
-        const userProfile = await authApi.getProfile();
-        setUser(userProfile);
+        // ✅ Si no hay token, NO llames /me ni /refresh
+        const token = localStorage.getItem(TOKEN_KEY)
+        if (!token) {
+          setUser(null)
+          return
+        }
+
+        // 1) Intentar /me con token actual
+        const profile = await authApi.getProfile()
+        setUser(profile)
       } catch (error) {
-        // CORRECCIÓN 1: Usamos la variable 'error' imprimiéndola
-        console.warn("Sesión inicial fallida o expirada:", error);
-        
-        // 2. Si falla, intentamos REFRESCAR el token
+        console.warn("Sesión inicial fallida o expirada:", error)
+
+        // 2) Solo si había token, intentar refresh (cookie)
         try {
-          console.log("Intentando refrescar sesión...");
-          await authApi.refreshSession(); 
-          
-          // 3. Si el refresh funciona, pedimos el perfil de nuevo
-          const userProfileRetry = await authApi.getProfile();
-          setUser(userProfileRetry);
+          console.log("Intentando refrescar sesión...")
+          await authApi.refreshSession()
+
+          const profileRetry = await authApi.getProfile()
+          setUser(profileRetry)
         } catch (refreshError) {
-          // CORRECCIÓN 2: Usamos la variable 'refreshError'
-          console.error("No se pudo restaurar la sesión, es necesario loguearse:", refreshError);
-          setUser(null);
+          console.error("No se pudo restaurar la sesión, es necesario loguearse:", refreshError)
+          localStorage.removeItem(TOKEN_KEY)
+          setUser(null)
         }
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    initAuth();
-  }, []);
+    initAuth()
+  }, [])
 
   const login = async (data: LoginDTO) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await authApi.login(data);
-      setUser(response.user);
+      const resp = await authApi.login(data)
+      setUser(resp.user)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const register = async (data: RegisterDTO) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await authApi.register(data);
-      setUser(response.user);
+      const resp = await authApi.register(data)
+      setUser(resp.user)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const logout = async () => {
     try {
-      await authApi.logout();
+      await authApi.logout()
     } catch (e) {
-      console.error("Error al salir:", e);
+      console.error("Error al logout:", e)
     }
-    setUser(null);
-  };
+    localStorage.removeItem(TOKEN_KEY)
+    setUser(null)
+  }
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      isLoading, 
-      login, 
-      register, 
-      logout 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
-// CORRECCIÓN 3: Fast Refresh
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe usarse dentro de un AuthProvider');
-  }
-  return context;
-};
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error("useAuth debe usarse dentro de un AuthProvider")
+  return ctx
+}

@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -18,7 +19,7 @@ model User {
   // Relationship: A user can own many services
   services  ServiceListing[]
 
-   // Relaciones inversas para Trueques
+  // Relaciones inversas para Trueques
   proposedTrades TradeProposal[] @relation("ProposerTrades")
   receivedTrades TradeProposal[] @relation("ReceiverTrades")
 
@@ -33,6 +34,8 @@ model ServiceListing {
   title       String
   description String
   category    String
+
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -43,7 +46,6 @@ model ServiceListing {
   // Relaciones inversas para asegurar integridad referencial
   tradesAsProposer TradeProposal[] @relation("ProposerService")
   tradesAsReceiver TradeProposal[] @relation("ReceiverService")
-
 
   @@map("service_listings")
 }

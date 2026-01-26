@@ -1,46 +1,53 @@
 // backend/src/services/tradeService.js
-const prisma = require('../core/db');
-const { appEmitter, EVENTS } = require('../core/events');
+const prisma = require("../core/db")
+const { appEmitter, EVENTS } = require("../core/events")
+const AppError = require("../utils/AppError")
 
 class TradeService {
-
   /**
    * Crear una propuesta de trueque
    */
   static async createTrade(proposerId, { proposerServiceId, receiverServiceId }) {
-    // 1. Validaciones previas (Evitar auto-trueque)
+    // 1) Validaciones previas (Evitar auto-trueque)
     const receiverService = await prisma.serviceListing.findUnique({
       where: { id: receiverServiceId },
-      include: { owner: true } // Necesitamos saber quién es el dueño
-    });
+      include: { owner: true }
+    })
 
-    if (!receiverService) throw new Error('Servicio solicitado no encontrado');
-    if (receiverService.ownerId === proposerId) throw new Error('No puedes comerciar contigo mismo');
+    // 404: servicio destino no existe
+    if (!receiverService) throw new AppError("Servicio solicitado no encontrado", 404)
+
+    // 400: regla de negocio
+    if (receiverService.ownerId === proposerId) throw new AppError("No puedes comerciar contigo mismo", 400)
 
     const proposerService = await prisma.serviceListing.findUnique({
       where: { id: proposerServiceId }
-    });
+    })
 
-    if (!proposerService) throw new Error('Tu servicio ofertado no existe');
-    if (proposerService.ownerId !== proposerId) throw new Error('No eres dueño del servicio que ofreces');
+    // 404: servicio ofertado no existe
+    if (!proposerService) throw new AppError("Tu servicio ofertado no encontrado", 404)
 
-    // 2. Crear el trueque
+    // 403: no es dueño del servicio ofertado
+    if (proposerService.ownerId !== proposerId) {
+      throw new AppError("No eres dueño del servicio que ofreces", 403)
+    }
+
+    // 2) Crear el trueque
     const trade = await prisma.tradeProposal.create({
       data: {
         proposerId,
         receiverId: receiverService.ownerId,
         proposerServiceId,
         receiverServiceId,
-        status: 'PENDING'
+        status: "PENDING"
       }
-    });
+    })
 
-    // 3. PATRÓN OBSERVER: Emitir evento
-    // Obtenemos el nombre del proponente para el mensaje
-    const proposer = await prisma.user.findUnique({ where: { id: proposerId } });
-    appEmitter.emit(EVENTS.TRADE_CREATED, { trade, proposerName: proposer.name });
+    // 3) OBSERVER: Emitir evento (notificación)
+    const proposer = await prisma.user.findUnique({ where: { id: proposerId } })
+    appEmitter.emit(EVENTS.TRADE_CREATED, { trade, proposerName: proposer?.name ?? "Usuario" })
 
-    return trade;
+    return trade
   }
 
   /**
@@ -54,8 +61,8 @@ class TradeService {
         proposerService: { select: { title: true } },
         receiverService: { select: { title: true } }
       },
-      orderBy: { createdAt: 'desc' }
-    });
+      orderBy: { createdAt: "desc" }
+    })
 
     const outgoing = await prisma.tradeProposal.findMany({
       where: { proposerId: userId },
@@ -64,65 +71,79 @@ class TradeService {
         proposerService: { select: { title: true } },
         receiverService: { select: { title: true } }
       },
-      orderBy: { createdAt: 'desc' }
-    });
+      orderBy: { createdAt: "desc" }
+    })
 
-    return { incoming, outgoing };
+    return { incoming, outgoing }
   }
 
   /**
    * Responder a un trueque (Aceptar/Rechazar)
    */
   static async respondTrade(userId, tradeId, action) {
-    const trade = await prisma.tradeProposal.findUnique({ where: { id: tradeId } });
-    if (!trade) throw new Error('Trueque no encontrado');
+    // 400: action inválida
+    if (!["accept", "reject"].includes(action)) {
+      throw new AppError("Acción inválida. Usa 'accept' o 'reject'.", 400)
+    }
+
+    const trade = await prisma.tradeProposal.findUnique({ where: { id: tradeId } })
+    if (!trade) throw new AppError("Trueque no encontrado", 404)
 
     // Solo el receptor puede responder
-    if (trade.receiverId !== userId) throw new Error('No tienes permiso para responder este trueque');
-    if (trade.status !== 'PENDING') throw new Error('El trueque ya ha sido procesado');
+    if (trade.receiverId !== userId) {
+      throw new AppError("No tienes permiso para responder este trueque", 403)
+    }
 
-    const newStatus = action === 'accept' ? 'ACCEPTED' : 'REJECTED';
+    // 409: conflicto de estado (respondido previamente)
+    if (trade.status !== "PENDING") {
+      throw new AppError("El trueque ya ha sido procesado", 409)
+    }
+
+    const newStatus = action === "accept" ? "ACCEPTED" : "REJECTED"
 
     const updatedTrade = await prisma.tradeProposal.update({
       where: { id: tradeId },
       data: { status: newStatus }
-    });
+    })
 
-    // PATRÓN OBSERVER
-    if (newStatus === 'ACCEPTED') {
-      const receiver = await prisma.user.findUnique({ where: { id: userId } });
-      appEmitter.emit(EVENTS.TRADE_ACCEPTED, { trade: updatedTrade, receiverName: receiver.name });
+    // OBSERVER
+    if (newStatus === "ACCEPTED") {
+      const receiver = await prisma.user.findUnique({ where: { id: userId } })
+      appEmitter.emit(EVENTS.TRADE_ACCEPTED, { trade: updatedTrade, receiverName: receiver?.name ?? "Usuario" })
     } else {
-      appEmitter.emit(EVENTS.TRADE_REJECTED, { trade: updatedTrade });
+      appEmitter.emit(EVENTS.TRADE_REJECTED, { trade: updatedTrade })
     }
 
-    return updatedTrade;
+    return updatedTrade
   }
 
   /**
    * Completar un trueque
    */
   static async completeTrade(userId, tradeId) {
-    const trade = await prisma.tradeProposal.findUnique({ where: { id: tradeId } });
-    if (!trade) throw new Error('Trueque no encontrado');
+    const trade = await prisma.tradeProposal.findUnique({ where: { id: tradeId } })
+    if (!trade) throw new AppError("Trueque no encontrado", 404)
 
     // Solo participantes pueden completar
     if (trade.proposerId !== userId && trade.receiverId !== userId) {
-      throw new Error('No eres participante de este trueque');
+      throw new AppError("No eres participante de este trueque", 403)
     }
 
-    if (trade.status !== 'ACCEPTED') throw new Error('Solo trueques aceptados pueden completarse');
+    // 409: conflicto de estado
+    if (trade.status !== "ACCEPTED") {
+      throw new AppError("Solo trueques aceptados pueden completarse", 409)
+    }
 
     const updatedTrade = await prisma.tradeProposal.update({
       where: { id: tradeId },
-      data: { status: 'COMPLETED' }
-    });
+      data: { status: "COMPLETED" }
+    })
 
-    // PATRÓN OBSERVER
-    appEmitter.emit(EVENTS.TRADE_COMPLETED, { trade: updatedTrade, completerId: userId });
+    // OBSERVER
+    appEmitter.emit(EVENTS.TRADE_COMPLETED, { trade: updatedTrade, completerId: userId })
 
-    return updatedTrade;
+    return updatedTrade
   }
 }
 
-module.exports = TradeService;
+module.exports = TradeService
