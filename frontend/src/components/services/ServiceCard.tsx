@@ -1,80 +1,104 @@
 // frontend/src/components/services/ServiceCard.tsx
-import { Box, Badge, Heading, Text, Button, Avatar, HStack, Icon, Spacer } from '@chakra-ui/react';
-// CORRECCIÓN: Eliminamos 'Flex' de arriba porque no lo estamos usando
-import { Link } from 'react-router-dom';
-import { FaArrowRight, FaTag } from 'react-icons/fa';
+import {
+  Box,
+  Badge,
+  Heading,
+  Text,
+  Button,
+  Avatar,
+  HStack,
+  Icon,
+  Spacer
+} from "@chakra-ui/react"
+import { Link } from "react-router-dom"
+import { FaArrowRight, FaTag } from "react-icons/fa"
 
 export interface ServiceCardProps {
-  id: string;
-  title: string;
-  author: string;
-  category: string;
-  price: string;
-  colorPalette: string; 
+  id: string
+  title: string
+  author: string
+  category: string
+  price: string
+  colorPalette: string
 }
 
-export const ServiceCard = ({ id, title, author, category, price, colorPalette }: ServiceCardProps) => {
-  
-  // Debug handler (Mantenemos tu lógica original)
+export const ServiceCard = ({
+  id,
+  title,
+  author,
+  category,
+  price,
+  colorPalette
+}: ServiceCardProps) => {
+  // Debug handler (solo DEV)
   const handleNavigationDebug = () => {
-    console.log(`[ServiceCard] Click en ver servicio. ID: ${id}`);
-    console.time(`Navegación-Servicio-${id}`); 
-  };
+    if (!import.meta.env.DEV) return
 
-  // Función estética: Elegir color según la categoría
+    console.log(`[ServiceCard] Click en ver servicio. ID: ${id}`)
+    try {
+      console.time(`Navegación-Servicio-${id}`)
+    } catch {
+      // no-op
+    }
+  }
+
+  // Función estética: color según categoría
   const getCategoryColor = (cat: string) => {
     const colors: Record<string, string> = {
-      'Tecnología': 'blue.500',
-      'Idiomas': 'purple.500',
-      'Asesoría': 'teal.500',
-      'Otros': 'orange.500'
-    };
-    return colors[cat] || `${colorPalette}.500`;
-  };
+      Tecnología: "blue.500",
+      Idiomas: "purple.500",
+      Asesoría: "teal.500",
+      Otros: "orange.500",
+      Diseño: "pink.500"
+    }
+    return colors[cat] || `${colorPalette}.500`
+  }
 
-  const bgHeader = getCategoryColor(category);
+  const bgHeader = getCategoryColor(category)
+
+  // Blindaje: si por error llega id vacío o "new", no debería navegar al detalle
+  // (En tu arquitectura, "new" se maneja con modal en DashboardPage)
+  const isInvalidId = !id || id === "new"
+  const targetHref = isInvalidId ? "/services" : `/services/${id}`
 
   return (
-    <Box 
+    <Box
       position="relative"
-      bg="white" 
-      borderRadius="2xl" 
-      overflow="hidden" 
+      bg="white"
+      borderRadius="2xl"
+      overflow="hidden"
       shadow="md"
       border="1px solid"
       borderColor="gray.100"
       transition="all 0.3s ease"
       display="flex"
       flexDirection="column"
-      h="100%" 
-      _hover={{ 
-        transform: 'translateY(-5px)', 
-        shadow: 'xl',
-        borderColor: 'blue.200'
-      }}
-    >
-      {/* 1. Header decorativo */}
+      h="100%"
+      _hover={{
+        transform: "translateY(-5px)",
+        shadow: "xl",
+        borderColor: "blue.200"
+      }}>
+      {/* Header decorativo */}
       <Box h="80px" bgGradient={`linear(to-r, ${bgHeader}, gray.300)`} position="relative">
-        <Badge 
-          position="absolute" 
-          top={3} 
-          right={3} 
-          bg="white" 
+        <Badge
+          position="absolute"
+          top={3}
+          right={3}
+          bg="white"
           color="gray.800"
-          px={3} 
-          py={1} 
+          px={3}
+          py={1}
           borderRadius="full"
           shadow="sm"
           fontSize="xs"
-          fontWeight="bold"
-        >
+          fontWeight="bold">
           {price}
         </Badge>
       </Box>
 
-      {/* 2. Contenido */}
+      {/* Contenido */}
       <Box p={5} flex="1" display="flex" flexDirection="column">
-        
         {/* Categoría */}
         <HStack spacing={1} mb={2} color="gray.500">
           <Icon as={FaTag} boxSize={3} />
@@ -94,26 +118,35 @@ export const ServiceCard = ({ id, title, author, category, price, colorPalette }
         <HStack mt={4} mb={6}>
           <Avatar size="xs" name={author} bg={bgHeader} color="white" />
           <Text fontSize="sm" color="gray.600">
-            por <Text as="span" fontWeight="semibold" color="gray.800">{author}</Text>
+            por{" "}
+            <Text as="span" fontWeight="semibold" color="gray.800">
+              {author}
+            </Text>
           </Text>
         </HStack>
 
         {/* Botón */}
-        <Button 
-          as={Link} 
-          to={`/services/${id}`} 
-          onClick={handleNavigationDebug} 
-          colorScheme={colorPalette} 
+        <Button
+          as={Link}
+          to={targetHref}
+          onClick={handleNavigationDebug}
+          colorScheme={colorPalette}
           variant="outline"
-          width="full" 
+          width="full"
           borderRadius="xl"
           size="sm"
           _hover={{ bg: `${colorPalette}.50` }}
-          rightIcon={<FaArrowRight />}
-        >
+          rightIcon={<FaArrowRight />}>
           Ver / Intercambiar
         </Button>
+
+        {/* Debug opcional (solo DEV) */}
+        {import.meta.env.DEV && isInvalidId && (
+          <Text mt={2} fontSize="xs" color="orange.500">
+            Warning: ServiceCard recibió id inválido ({String(id)}). Redirigiendo a /services.
+          </Text>
+        )}
       </Box>
     </Box>
-  );
-};
+  )
+}
