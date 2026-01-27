@@ -64,14 +64,9 @@ export const CreateTradeModal = ({
   const fetchMyServices = async () => {
     setIsLoadingServices(true);
     try {
-      // CORRECCIÓN CLAVE:
-      // En lugar de llamar al endpoint que falla (/my-services),
-      // traemos todos los servicios (que sabemos que funciona) y filtramos.
-      const allServices = await servicesApi.getAll();
-      
-      // Filtramos solo los que pertenecen al usuario logueado (axel2)
-      const mine = allServices.filter(service => service.owner.id === user?.id);
-      
+      // Usa el endpoint protegido que devuelve solo mis servicios.
+      // getAll excluye al owner autenticado en el backend, por eso devolvía 0.
+      const mine = await servicesApi.getMine();
       setMyServices(mine);
     } catch (error) {
       console.error('Error cargando mis servicios', error);

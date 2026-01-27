@@ -38,7 +38,15 @@ class AuthService {
       data: userData,
     });
 
-    return this._sanitizeUser(user);
+    // Genera tokens para iniciar sesión inmediatamente después de registrar
+    const accessToken = this._generateAccessToken(user.id);
+    const refreshToken = this._generateRefreshToken(user.id);
+
+    return {
+      user: this._sanitizeUser(user),
+      accessToken,
+      refreshToken,
+    };
   }
 
   /**

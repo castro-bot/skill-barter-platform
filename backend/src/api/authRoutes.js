@@ -22,8 +22,11 @@ const handleAuthError = (res, error) => {
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body || {};
-    const user = await AuthService.register({ name, email, password });
-    res.status(201).json({ user });
+    const { user, accessToken, refreshToken } = await AuthService.register({ name, email, password });
+
+    // ðŸ”— Alineamos la respuesta con /login: guardamos refresh en cookie httpOnly
+    res.cookie('refreshToken', refreshToken, COOKIE_SETTINGS);
+    res.status(201).json({ user, accessToken });
   } catch (error) {
     handleAuthError(res, error);
   }
