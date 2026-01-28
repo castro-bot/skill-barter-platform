@@ -12,6 +12,7 @@ export interface Trade {
   status: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
   note?: string;
   createdAt: string;
+  hasRated?: boolean;
 
   // Nota: en GET /trades tu backend devuelve solo { name } (sin id),
   // por eso dejamos id como opcional para evitar inconsistencias.

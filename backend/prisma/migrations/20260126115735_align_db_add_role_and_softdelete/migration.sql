@@ -1,4 +1,4 @@
-﻿-- Align DB with Prisma schema (Sprint)
+-- Align DB with Prisma schema (Sprint)
 -- Adds missing columns that were present in schema but not in DB.
 
 -- 1) users.role

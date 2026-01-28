@@ -16,6 +16,7 @@ const EVENTS = {
   TRADE_ACCEPTED: 'trade.accepted',
   TRADE_REJECTED: 'trade.rejected',
   TRADE_COMPLETED: 'trade.completed',
+  RATING_CREATED: 'rating.created',
 };
 
 module.exports = {

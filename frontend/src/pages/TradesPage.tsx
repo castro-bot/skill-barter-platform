@@ -21,16 +21,33 @@ import {
   Spinner,
   Alert,
   AlertIcon,
-  useToast
+  useToast,
+  useDisclosure
 } from "@chakra-ui/react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { tradesApi, type Trade, type TradesResponse } from "../api/trades";
+import { RatingModal } from "../components/ratings/RatingModal";
 
 export const TradesPage = () => {
   const toast = useToast();
   const [trades, setTrades] = useState<TradesResponse>({ incoming: [], outgoing: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const ratingDisclosure = useDisclosure();
+  const [ratingTarget, setRatingTarget] = useState<{ tradeId: string; counterpartyName: string } | null>(null);
+
+  const openRating = (trade: Trade, isIncoming: boolean) => {
+    const counterpartyName = isIncoming
+      ? trade.proposer?.name || "Usuario"
+      : trade.receiver?.name || "Usuario";
+    setRatingTarget({ tradeId: trade.id, counterpartyName });
+    ratingDisclosure.onOpen();
+  };
+
+  const closeRating = () => {
+    ratingDisclosure.onClose();
+    setRatingTarget(null);
+  };
 
   const fetchTrades = async () => {
     setIsLoading(true);
@@ -268,10 +285,19 @@ export const TradesPage = () => {
 
           {/* Estado COMPLETED */}
           {trade.status === "COMPLETED" && (
-            <Flex mt={4} justify={{ base: "center", md: "flex-end" }}>
+            <Flex mt={4} gap={3} justify={{ base: "center", md: "flex-end" }} align="center" wrap="wrap">
               <Badge colorScheme="purple" variant="solid" px={3} py={1} borderRadius="full">
                 🎉 Trueque Completado
               </Badge>
+              {trade.hasRated ? (
+                <Badge colorScheme="green" variant="subtle" px={3} py={1} borderRadius="full">
+                  Calificado
+                </Badge>
+              ) : (
+                <Button size="sm" colorScheme="blue" onClick={() => openRating(trade, isIncoming)}>
+                  Calificar
+                </Button>
+              )}
             </Flex>
           )}
         </Box>
@@ -289,6 +315,15 @@ export const TradesPage = () => {
 
   return (
     <Box bg="gray.50" minH="calc(100vh - 64px)" py={8}>
+      {ratingTarget && (
+        <RatingModal
+          isOpen={ratingDisclosure.isOpen}
+          onClose={closeRating}
+          tradeId={ratingTarget.tradeId}
+          counterpartyName={ratingTarget.counterpartyName}
+          onSuccess={fetchTrades}
+        />
+      )}
       <Container maxW="container.md">
         <Heading mb={8} size="xl" color="gray.700" letterSpacing="tight">
           Mis Trueques

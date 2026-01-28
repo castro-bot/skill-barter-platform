@@ -229,6 +229,8 @@ export const DashboardPage = () => {
                 category={service.category}
                 price="Trueque"
                 colorPalette="blue"
+                ratingAverage={service.owner.ratingAverage}
+                ratingCount={service.owner.ratingCount}
               />
             ))}
           </SimpleGrid>

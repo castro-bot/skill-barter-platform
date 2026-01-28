@@ -4,16 +4,12 @@ const prisma = require("../core/db")
 
 /**
  * Notification Listener (Observer)
- * Responsabilidad: Reaccionar a eventos de negocio y persistir notificaciones.
- * - Robusto ante payloads incompletos
- * - No rompe el flujo del negocio si falla la notificación
+ * Responsibility: react to business events and persist notifications.
  */
 const setupNotificationListeners = () => {
   console.log("[Observer] Notification listeners registered")
 
-  /**
-   * 1) Nueva propuesta -> Notificar al receptor
-   */
+  // 1) New proposal -> notify receiver
   appEmitter.on(EVENTS.TRADE_CREATED, async ({ trade, proposerName }) => {
     try {
       if (!trade?.id || !trade?.receiverId) return
@@ -27,16 +23,13 @@ const setupNotificationListeners = () => {
         }
       })
 
-      // Log opcional (útil en demo / debugging)
       console.log(`[Observer] TRADE_CREATED -> Notification for user ${trade.receiverId} (trade ${trade.id})`)
     } catch (error) {
       console.error("[Observer Error][TRADE_CREATED]", error)
     }
   })
 
-  /**
-   * 2) Propuesta aceptada -> Notificar al proponente original
-   */
+  // 2) Proposal accepted -> notify proposer
   appEmitter.on(EVENTS.TRADE_ACCEPTED, async ({ trade, receiverName }) => {
     try {
       if (!trade?.id || !trade?.proposerId) return
@@ -45,7 +38,7 @@ const setupNotificationListeners = () => {
         data: {
           userId: trade.proposerId,
           type: "TRADE_ACCEPTED",
-          message: `${receiverName ?? "Usuario"} aceptó tu propuesta de trueque!`,
+          message: `${receiverName ?? "Usuario"} acepto tu propuesta de trueque!`,
           tradeId: trade.id
         }
       })
@@ -56,21 +49,16 @@ const setupNotificationListeners = () => {
     }
   })
 
-  /**
-   * 3) Propuesta rechazada -> (Opcional según requisitos)
-   * Tu servicio emite TRADE_REJECTED. Si quieres notificar al proponente,
-   * descomenta y deja este handler. Si NO lo necesitas para Sprint 3, puedes omitirlo.
-   */
+  // 3) Proposal rejected -> notify proposer (optional)
   appEmitter.on(EVENTS.TRADE_REJECTED, async ({ trade }) => {
     try {
-      // Si no quieres notificar rechazo, puedes dejar esto vacío o removerlo.
       if (!trade?.id || !trade?.proposerId) return
 
       await prisma.notification.create({
         data: {
           userId: trade.proposerId,
           type: "TRADE_REJECTED",
-          message: `Tu propuesta de trueque fue rechazada.`,
+          message: "Tu propuesta de trueque fue rechazada.",
           tradeId: trade.id
         }
       })
@@ -81,27 +69,49 @@ const setupNotificationListeners = () => {
     }
   })
 
-  /**
-   * 4) Trueque completado -> Notificar a la contraparte
-   */
-  appEmitter.on(EVENTS.TRADE_COMPLETED, async ({ trade, completerId }) => {
+  // 4) Trade completed -> notify both participants to rate
+  appEmitter.on(EVENTS.TRADE_COMPLETED, async ({ trade }) => {
     try {
-      if (!trade?.id || !trade?.proposerId || !trade?.receiverId || !completerId) return
+      if (!trade?.id || !trade?.proposerId || !trade?.receiverId) return
 
-      const targetUserId = completerId === trade.proposerId ? trade.receiverId : trade.proposerId
+      const targets = [trade.proposerId, trade.receiverId]
+
+      await Promise.all(
+        targets.map((userId) =>
+          prisma.notification.create({
+            data: {
+              userId,
+              type: "TRADE_COMPLETED",
+              message: "El trueque fue marcado como completado. Califica a tu contraparte.",
+              tradeId: trade.id
+            }
+          })
+        )
+      )
+
+      console.log(`[Observer] TRADE_COMPLETED -> Notifications for trade ${trade.id}`)
+    } catch (error) {
+      console.error("[Observer Error][TRADE_COMPLETED]", error)
+    }
+  })
+
+  // 5) Rating created -> notify ratee
+  appEmitter.on(EVENTS.RATING_CREATED, async ({ rating }) => {
+    try {
+      if (!rating?.id || !rating?.rateeId) return
 
       await prisma.notification.create({
         data: {
-          userId: targetUserId,
-          type: "TRADE_COMPLETED",
-          message: `El trueque ha sido marcado como completado.`,
-          tradeId: trade.id
+          userId: rating.rateeId,
+          type: "RATING_RECEIVED",
+          message: "Recibiste una nueva calificacion.",
+          tradeId: rating.tradeId
         }
       })
 
-      console.log(`[Observer] TRADE_COMPLETED -> Notification for user ${targetUserId} (trade ${trade.id})`)
+      console.log(`[Observer] RATING_CREATED -> Notification for user ${rating.rateeId} (rating ${rating.id})`)
     } catch (error) {
-      console.error("[Observer Error][TRADE_COMPLETED]", error)
+      console.error("[Observer Error][RATING_CREATED]", error)
     }
   })
 }

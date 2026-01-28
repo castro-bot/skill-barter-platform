@@ -5,34 +5,28 @@ const AppError = require("../utils/AppError")
 
 class TradeService {
   /**
-   * Crear una propuesta de trueque
+   * Create a trade proposal
    */
   static async createTrade(proposerId, { proposerServiceId, receiverServiceId }) {
-    // 1) Validaciones previas (Evitar auto-trueque)
     const receiverService = await prisma.serviceListing.findUnique({
       where: { id: receiverServiceId },
       include: { owner: true }
     })
 
-    // 404: servicio destino no existe
     if (!receiverService) throw new AppError("Servicio solicitado no encontrado", 404)
 
-    // 400: regla de negocio
     if (receiverService.ownerId === proposerId) throw new AppError("No puedes comerciar contigo mismo", 400)
 
     const proposerService = await prisma.serviceListing.findUnique({
       where: { id: proposerServiceId }
     })
 
-    // 404: servicio ofertado no existe
     if (!proposerService) throw new AppError("Tu servicio ofertado no encontrado", 404)
 
-    // 403: no es dueño del servicio ofertado
     if (proposerService.ownerId !== proposerId) {
-      throw new AppError("No eres dueño del servicio que ofreces", 403)
+      throw new AppError("No eres duenio del servicio que ofreces", 403)
     }
 
-    // 2) Crear el trueque
     const trade = await prisma.tradeProposal.create({
       data: {
         proposerId,
@@ -43,7 +37,6 @@ class TradeService {
       }
     })
 
-    // 3) OBSERVER: Emitir evento (notificación)
     const proposer = await prisma.user.findUnique({ where: { id: proposerId } })
     appEmitter.emit(EVENTS.TRADE_CREATED, { trade, proposerName: proposer?.name ?? "Usuario" })
 
@@ -51,7 +44,7 @@ class TradeService {
   }
 
   /**
-   * Obtener trueques (entrantes y salientes)
+   * Get trades (incoming and outgoing)
    */
   static async getTrades(userId) {
     const incoming = await prisma.tradeProposal.findMany({
@@ -59,7 +52,8 @@ class TradeService {
       include: {
         proposer: { select: { name: true } },
         proposerService: { select: { title: true } },
-        receiverService: { select: { title: true } }
+        receiverService: { select: { title: true } },
+        ratings: { where: { raterId: userId }, select: { id: true } }
       },
       orderBy: { createdAt: "desc" }
     })
@@ -69,32 +63,39 @@ class TradeService {
       include: {
         receiver: { select: { name: true } },
         proposerService: { select: { title: true } },
-        receiverService: { select: { title: true } }
+        receiverService: { select: { title: true } },
+        ratings: { where: { raterId: userId }, select: { id: true } }
       },
       orderBy: { createdAt: "desc" }
     })
 
-    return { incoming, outgoing }
+    const mapTrade = (trade) => {
+      const hasRated = Array.isArray(trade.ratings) && trade.ratings.length > 0
+      const { ratings, ...rest } = trade
+      return { ...rest, hasRated }
+    }
+
+    return {
+      incoming: incoming.map(mapTrade),
+      outgoing: outgoing.map(mapTrade)
+    }
   }
 
   /**
-   * Responder a un trueque (Aceptar/Rechazar)
+   * Respond to a trade (accept/reject)
    */
   static async respondTrade(userId, tradeId, action) {
-    // 400: action inválida
     if (!["accept", "reject"].includes(action)) {
-      throw new AppError("Acción inválida. Usa 'accept' o 'reject'.", 400)
+      throw new AppError("Accion invalida. Usa 'accept' o 'reject'.", 400)
     }
 
     const trade = await prisma.tradeProposal.findUnique({ where: { id: tradeId } })
     if (!trade) throw new AppError("Trueque no encontrado", 404)
 
-    // Solo el receptor puede responder
     if (trade.receiverId !== userId) {
       throw new AppError("No tienes permiso para responder este trueque", 403)
     }
 
-    // 409: conflicto de estado (respondido previamente)
     if (trade.status !== "PENDING") {
       throw new AppError("El trueque ya ha sido procesado", 409)
     }
@@ -106,7 +107,6 @@ class TradeService {
       data: { status: newStatus }
     })
 
-    // OBSERVER
     if (newStatus === "ACCEPTED") {
       const receiver = await prisma.user.findUnique({ where: { id: userId } })
       appEmitter.emit(EVENTS.TRADE_ACCEPTED, { trade: updatedTrade, receiverName: receiver?.name ?? "Usuario" })
@@ -118,18 +118,16 @@ class TradeService {
   }
 
   /**
-   * Completar un trueque
+   * Complete a trade
    */
   static async completeTrade(userId, tradeId) {
     const trade = await prisma.tradeProposal.findUnique({ where: { id: tradeId } })
     if (!trade) throw new AppError("Trueque no encontrado", 404)
 
-    // Solo participantes pueden completar
     if (trade.proposerId !== userId && trade.receiverId !== userId) {
       throw new AppError("No eres participante de este trueque", 403)
     }
 
-    // 409: conflicto de estado
     if (trade.status !== "ACCEPTED") {
       throw new AppError("Solo trueques aceptados pueden completarse", 409)
     }
@@ -139,7 +137,6 @@ class TradeService {
       data: { status: "COMPLETED" }
     })
 
-    // OBSERVER
     appEmitter.emit(EVENTS.TRADE_COMPLETED, { trade: updatedTrade, completerId: userId })
 
     return updatedTrade

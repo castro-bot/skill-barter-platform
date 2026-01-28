@@ -8,23 +8,29 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String   // Hashed
-  role      String   @default("USER") // 'USER' | 'MODERATOR'
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String
+  password      String   // Hashed
+  role          String   @default("USER") // 'USER' | 'MODERATOR'
+  ratingAverage Float    @default(0)
+  ratingCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relationship: A user can own many services
   services  ServiceListing[]
 
-  // Relaciones inversas para Trueques
+  // Inverse relations for trades
   proposedTrades TradeProposal[] @relation("ProposerTrades")
   receivedTrades TradeProposal[] @relation("ReceiverTrades")
 
-  // Relación para Notificaciones
+  // Notifications
   notifications Notification[]
+
+  // Ratings
+  ratingsGiven    Rating[] @relation("RatingsGiven")
+  ratingsReceived Rating[] @relation("RatingsReceived")
 
   @@map("users")
 }
@@ -38,7 +44,7 @@ model ServiceListing {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // 🔵 Sprint 4 — Visibilidad en Marketplace (soft delete)
+  // Sprint 4 - Marketplace visibility (soft delete)
   isActive       Boolean  @default(true)
   deactivatedAt  DateTime?
 
@@ -46,7 +52,7 @@ model ServiceListing {
   ownerId     String
   owner       User     @relation(fields: [ownerId], references: [id])
 
-  // Relaciones inversas para asegurar integridad referencial
+  // Inverse relations for referential integrity
   tradesAsProposer TradeProposal[] @relation("ProposerService")
   tradesAsReceiver TradeProposal[] @relation("ReceiverService")
 
@@ -66,26 +72,50 @@ model TradeProposal {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  // Quién propone
+  // Who proposes
   proposerId String
   proposer   User   @relation("ProposerTrades", fields: [proposerId], references: [id])
 
-  // Quién recibe
+  // Who receives
   receiverId String
   receiver   User   @relation("ReceiverTrades", fields: [receiverId], references: [id])
 
-  // Qué ofrece el proponente
+  // What proposer offers
   proposerServiceId String
   proposerService   ServiceListing @relation("ProposerService", fields: [proposerServiceId], references: [id])
 
-  // Qué quiere a cambio
+  // What receiver offers
   receiverServiceId String
   receiverService   ServiceListing @relation("ReceiverService", fields: [receiverServiceId], references: [id])
 
-  // Contexto para notificaciones
+  // Notifications context
   notifications Notification[]
 
+  // Ratings
+  ratings Rating[]
+
   @@map("trade_proposals")
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  score     Int
+  comment   String?
+  tags      String[]
+  createdAt DateTime @default(now())
+
+  tradeId   String
+  trade     TradeProposal @relation(fields: [tradeId], references: [id])
+
+  raterId   String
+  rater     User @relation("RatingsGiven", fields: [raterId], references: [id])
+
+  rateeId   String
+  ratee     User @relation("RatingsReceived", fields: [rateeId], references: [id])
+
+  @@unique([tradeId, raterId])
+  @@index([rateeId])
+  @@map("ratings")
 }
 
 model Notification {
@@ -95,11 +125,11 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  // Destinatario
+  // Recipient
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  // Referencia opcional al trueque
+  // Optional reference to trade
   tradeId String?
   trade   TradeProposal? @relation(fields: [tradeId], references: [id])
 

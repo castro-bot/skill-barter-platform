@@ -14,6 +14,7 @@ const authRoutes = require("./api/authRoutes")
 const serviceRoutes = require("./api/serviceRoutes")
 const tradeRoutes = require("./api/tradeRoutes")
 const notificationRoutes = require("./api/notificationRoutes")
+const ratingRoutes = require("./api/ratingRoutes")
 
 // 👉 NUEVO: User Routes (Perfil Público)
 const userRoutes = require("./api/userRoutes")
@@ -47,6 +48,7 @@ app.use("/api/v1/auth", authRoutes)
 // Service & Trade Routes
 app.use("/api/v1/services", serviceRoutes)
 app.use("/api/v1/trades", tradeRoutes)
+app.use("/api/v1/ratings", ratingRoutes)
 
 // 👉 NUEVO: Perfil público de usuario
 app.use("/api/v1/users", userRoutes)

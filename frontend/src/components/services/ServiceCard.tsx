@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { FaArrowRight, FaTag } from "react-icons/fa"
+import { StarRating } from "../ratings/StarRating"
 
 export interface ServiceCardProps {
   id: string
@@ -20,6 +21,8 @@ export interface ServiceCardProps {
   category: string
   price: string
   colorPalette: string
+  ratingAverage?: number
+  ratingCount?: number
 }
 
 export const ServiceCard = ({
@@ -28,7 +31,9 @@ export const ServiceCard = ({
   author,
   category,
   price,
-  colorPalette
+  colorPalette,
+  ratingAverage,
+  ratingCount
 }: ServiceCardProps) => {
   // Debug handler (solo DEV)
   const handleNavigationDebug = () => {
@@ -124,6 +129,10 @@ export const ServiceCard = ({
             </Text>
           </Text>
         </HStack>
+
+        {typeof ratingAverage === "number" && typeof ratingCount === "number" && (
+          <StarRating value={ratingAverage} count={ratingCount} size="xs" showValue={false} />
+        )}
 
         {/* Botón */}
         <Button

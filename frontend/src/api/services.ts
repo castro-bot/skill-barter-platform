@@ -10,6 +10,8 @@ export interface ServiceListing {
   owner: {
     id: string
     name: string
+    ratingAverage?: number
+    ratingCount?: number
   }
   createdAt: string
 }

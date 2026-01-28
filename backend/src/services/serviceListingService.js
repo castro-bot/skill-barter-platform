@@ -3,17 +3,12 @@ const prisma = require("../core/db")
 
 /**
  * Service for managing ServiceListings.
- * Opción A (sin migración Prisma):
- * - NO usamos isActive / deactivatedAt porque el schema actual no los tiene.
- * - Mantenemos:
- *   - excluir servicios involucrados en trades COMPLETED
- *   - opcional: excluir servicios del usuario actual (marketplace de "otros")
+ * - Excludes services involved in COMPLETED trades
+ * - Optionally excludes current user's own services
  */
 class ServiceListingService {
   /**
    * Create a new service listing
-   * @param {string} userId - ID of the owner
-   * @param {Object} data - { title, description, category }
    */
   static async createService(userId, { title, description, category }) {
     if (!title || !description || !category) {
@@ -29,7 +24,7 @@ class ServiceListingService {
       },
       include: {
         owner: {
-          select: { id: true, name: true }
+          select: { id: true, name: true, ratingAverage: true, ratingCount: true }
         }
       }
     })
@@ -39,10 +34,6 @@ class ServiceListingService {
 
   /**
    * Get all services with optional filters
-   * - Excluye servicios involucrados en trades COMPLETED
-   * - Opcional: excluye servicios del usuario actual (marketplace de "otros")
-   *
-   * @param {Object} filters - { q, category, excludeOwnerId? }
    */
   static async getAllServices({ q, category, excludeOwnerId } = {}) {
     const where = {}
@@ -58,7 +49,7 @@ class ServiceListingService {
       ]
     }
 
-    // ✅ Sprint 4: excluir servicios usados en trades COMPLETED (sin migración extra)
+    // Exclude services used in COMPLETED trades
     const completedTrades = await prisma.tradeProposal.findMany({
       where: { status: "COMPLETED" },
       select: { proposerServiceId: true, receiverServiceId: true }
@@ -73,11 +64,9 @@ class ServiceListingService {
     )
 
     if (usedServiceIds.length > 0) {
-      // NOT es limpio y evita pisar otros filtros
       where.NOT = { id: { in: usedServiceIds } }
     }
 
-    // Hardening: si está autenticado, no le muestres sus propios servicios en marketplace
     if (excludeOwnerId) {
       where.ownerId = { not: excludeOwnerId }
     }
@@ -86,7 +75,7 @@ class ServiceListingService {
       where,
       orderBy: { createdAt: "desc" },
       include: {
-        owner: { select: { id: true, name: true, createdAt: true } }
+        owner: { select: { id: true, name: true, createdAt: true, ratingAverage: true, ratingCount: true } }
       }
     })
 
@@ -94,11 +83,7 @@ class ServiceListingService {
   }
 
   /**
-   * Get services owned by a user (Sprint 4: "Mis Servicios")
-   * - Lista solo servicios del owner (userId)
-   * - Mantiene consistencia con marketplace: excluye servicios involucrados en trades COMPLETED
-   *
-   * @param {string} userId
+   * Get services owned by a user
    */
   static async getMyServices(userId) {
     if (!userId) {
@@ -107,7 +92,6 @@ class ServiceListingService {
       throw err
     }
 
-    // Excluir servicios usados en trades COMPLETED
     const completedTrades = await prisma.tradeProposal.findMany({
       where: { status: "COMPLETED" },
       select: { proposerServiceId: true, receiverServiceId: true }
@@ -131,7 +115,7 @@ class ServiceListingService {
       where,
       orderBy: { createdAt: "desc" },
       include: {
-        owner: { select: { id: true, name: true, createdAt: true } }
+        owner: { select: { id: true, name: true, createdAt: true, ratingAverage: true, ratingCount: true } }
       }
     })
 
@@ -140,13 +124,12 @@ class ServiceListingService {
 
   /**
    * Get a single service by ID
-   * @param {string} id
    */
   static async getServiceById(id) {
     const service = await prisma.serviceListing.findUnique({
       where: { id },
       include: {
-        owner: { select: { id: true, name: true, createdAt: true } }
+        owner: { select: { id: true, name: true, createdAt: true, ratingAverage: true, ratingCount: true } }
       }
     })
 
@@ -194,7 +177,7 @@ class ServiceListingService {
       where: { id: serviceId },
       data: updateData,
       include: {
-        owner: { select: { id: true, name: true } }
+        owner: { select: { id: true, name: true, ratingAverage: true, ratingCount: true } }
       }
     })
 
@@ -202,7 +185,7 @@ class ServiceListingService {
   }
 
   /**
-   * Delete a service listing (owner only) — HARD DELETE (Opción A)
+   * Delete a service listing (owner only) - hard delete
    */
   static async deleteService(userId, serviceId) {
     const service = await prisma.serviceListing.findUnique({

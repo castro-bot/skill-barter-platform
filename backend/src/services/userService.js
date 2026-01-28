@@ -3,15 +3,14 @@ const prisma = require("../core/db")
 const bcrypt = require("bcrypt")
 
 /**
- * Servicio de usuarios:
- * - Perfil público: GET /users/:id
- * - Ajustes de perfil (privado): PUT /users/me
- * - Cambio de contraseña (privado): PUT /users/me/password
+ * User service:
+ * - Public profile: GET /users/:id
+ * - Profile settings: PUT /users/me
+ * - Password change: PUT /users/me/password
  */
 class UserService {
   /**
-   * Perfil público de usuario (sin password) y sus servicios.
-   * Devuelve datos del usuario y sus servicios.
+   * Public user profile (no password) and services.
    */
   static async getPublicProfile(userId) {
     const user = await prisma.user.findUnique({
@@ -20,7 +19,9 @@ class UserService {
         id: true,
         name: true,
         email: true,
-        createdAt: true
+        createdAt: true,
+        ratingAverage: true,
+        ratingCount: true
       }
     })
 
@@ -30,7 +31,6 @@ class UserService {
       throw err
     }
 
-    // Opción A: NO filtramos por isActive (campo no existe en schema actual)
     const services = await prisma.serviceListing.findMany({
       where: { ownerId: userId },
       orderBy: { createdAt: "desc" },
@@ -41,7 +41,12 @@ class UserService {
         category: true,
         createdAt: true,
         owner: {
-          select: { id: true, name: true }
+          select: {
+            id: true,
+            name: true,
+            ratingAverage: true,
+            ratingCount: true
+          }
         }
       }
     })
@@ -50,9 +55,7 @@ class UserService {
   }
 
   /**
-   * Actualiza perfil del usuario autenticado (name/email).
-   * @param {string} userId
-   * @param {Object} data { name?, email? }
+   * Update authenticated user profile (name/email).
    */
   static async updateProfile(userId, { name, email }) {
     const updateData = {}
@@ -103,9 +106,7 @@ class UserService {
   }
 
   /**
-   * Cambia la contraseña del usuario autenticado.
-   * @param {string} userId
-   * @param {Object} data { currentPassword, newPassword }
+   * Change authenticated user's password.
    */
   static async changePassword(userId, { currentPassword, newPassword }) {
     if (!currentPassword || !newPassword) {

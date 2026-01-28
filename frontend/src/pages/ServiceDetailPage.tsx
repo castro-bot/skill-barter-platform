@@ -23,11 +23,14 @@ import { FaArrowLeft, FaExchangeAlt } from "react-icons/fa"
 import { servicesApi, type ServiceListing } from "../api/services"
 import { useAuth } from "../context/AuthContext"
 import { CreateTradeModal } from "../components/trades/CreateTradeModal"
+import { StarRating } from "../components/ratings/StarRating"
 
 type ServiceWithExtras = ServiceListing & {
   price?: string
   owner: {
     avatarUrl?: string
+    ratingAverage?: number
+    ratingCount?: number
   }
 }
 
@@ -197,6 +200,12 @@ export const ServiceDetailPage = () => {
                   <Text fontWeight="bold" fontSize="md">
                     {service.owner.name}
                   </Text>
+                  <StarRating
+                    value={serviceExtended.owner.ratingAverage ?? 0}
+                    count={serviceExtended.owner.ratingCount ?? 0}
+                    size="xs"
+                    showValue={false}
+                  />
                   <Text fontSize="sm" color="gray.500">
                     Propietario
                   </Text>
