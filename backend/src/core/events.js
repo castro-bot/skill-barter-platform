@@ -1,3 +1,4 @@
+// backend/src/core/events.js
 /**
  * Event Emitter Singleton
  * Centraliza el manejo de eventos del sistema (Patrón Observer).
@@ -15,6 +16,7 @@ const EVENTS = {
   TRADE_ACCEPTED: 'trade.accepted',
   TRADE_REJECTED: 'trade.rejected',
   TRADE_COMPLETED: 'trade.completed',
+  RATING_CREATED: 'rating.created',
 };
 
 module.exports = {

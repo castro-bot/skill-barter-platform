@@ -1,149 +1,286 @@
-import {Box, Container, Heading, Text, Button, Flex, Icon, SimpleGrid, HStack } from '@chakra-ui/react';
-import { FaPlus, FaBoxOpen, FaStar, FaExchangeAlt, FaCoins } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
-import type { ElementType } from 'react';
+// frontend/src/pages/DashboardPage.tsx
+import { useEffect, useRef, useState } from "react"
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Button,
+  Flex,
+  Icon,
+  SimpleGrid,
+  HStack,
+  useDisclosure,
+  Spinner
+} from "@chakra-ui/react"
+import { FaPlus, FaBoxOpen, FaExchangeAlt, FaCoins, FaChartLine } from "react-icons/fa"
+import { useAuth } from "../context/AuthContext"
+import { CreateServiceModal } from "../components/services/CreateServiceModal"
+import { ServiceCard } from "../components/services/ServiceCard"
+import { servicesApi, type ServiceListing } from "../api/services"
+import type { ElementType } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { MyServicesSection } from "../components/services/MyServicesSection"
 
-// 1. SOLUCIÓN TIPO: Definimos qué datos espera la tarjeta
+// --- COMPONENTE VISUAL: StatCard ---
 interface StatCardProps {
-  icon: ElementType;
-  label: string;
-  value: string;
-  color: string;
+  icon: ElementType
+  label: string
+  value: string
+  color: string
 }
 
-// 2. SOLUCIÓN RENDIMIENTO: El componente vive AFUERA del DashboardPage
 const StatCard = ({ icon, label, value, color }: StatCardProps) => (
-  <Box 
-    bg="white" 
-    p={4} 
-    borderRadius="xl" 
-    border="1px solid" 
-    borderColor="gray.100" 
+  <Box
+    bg="white"
+    p={5}
+    borderRadius="2xl"
+    border="1px solid"
+    borderColor="gray.100"
     shadow="sm"
-    display="flex"
-    alignItems="center"
-    gap={4}
-    transition="transform 0.2s"
-    _hover={{ transform: "translateY(-2px)", shadow: "md" }}
+    position="relative"
+    overflow="hidden"
+    transition="all 0.2s"
+    _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: `${color}.200` }}
   >
-    <Flex 
-      w={12} h={12} 
-      align="center" justify="center" 
-      borderRadius="lg" 
-      bg={`${color}.50`} 
-      color={`${color}.500`}
-    >
-      <Icon as={icon} boxSize={5} />
-    </Flex>
-    <Box>
-      <Text fontSize="xs" color="gray.500" fontWeight="bold" textTransform="uppercase">
-        {label}
-      </Text>
-      <Text fontSize="xl" fontWeight="bold" color="gray.700">
-        {value}
-      </Text>
+    <Box position="absolute" right="-10px" top="-10px" opacity={0.1} transform="rotate(15deg)">
+      <Icon as={icon} boxSize={24} color={color} />
     </Box>
+
+    <Flex align="center" gap={4} position="relative" zIndex={1}>
+      <Flex
+        w={12}
+        h={12}
+        align="center"
+        justify="center"
+        borderRadius="xl"
+        bg={`${color}.50`}
+        color={`${color}.500`}
+        shadow="sm"
+      >
+        <Icon as={icon} boxSize={6} />
+      </Flex>
+      <Box>
+        <Text
+          fontSize="xs"
+          color="gray.500"
+          fontWeight="bold"
+          textTransform="uppercase"
+          letterSpacing="wider"
+        >
+          {label}
+        </Text>
+        <Text fontSize="2xl" fontWeight="800" color="gray.700" lineHeight="1">
+          {value}
+        </Text>
+      </Box>
+    </Flex>
   </Box>
-);
+)
 
 export const DashboardPage = () => {
-  const { user } = useAuth();
+  const { user } = useAuth()
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const [services, setServices] = useState<ServiceListing[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Evita re-abrir el modal dos veces en dev (React StrictMode monta/desmonta doble)
+  const handledNewRouteRef = useRef(false)
+
+  const loadServices = async () => {
+    setIsLoading(true)
+    try {
+      const data = await servicesApi.getAll()
+
+      // Mostrar SOLO servicios que NO son del usuario actual
+      const othersServices = data.filter((service) => service.owner.id !== user?.id)
+
+      setServices(othersServices)
+    } catch (error) {
+      console.error("Error cargando servicios:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      loadServices()
+    } else {
+      // si no hay user (por ejemplo, en transición), evita estado inconsistente
+      setServices([])
+      setIsLoading(false)
+    }
+  }, [user])
+
+  /**
+   * ✅ Manejo correcto de /services/new (crear servicio es MODAL, no página)
+   * - Si el usuario llega a /services/new, abrimos modal
+   * - Normalizamos URL a /services para evitar que quede "new" como un "id"
+   */
+  useEffect(() => {
+    const isNewRoute = location.pathname === "/services/new"
+    if (!isNewRoute) {
+      handledNewRouteRef.current = false
+      return
+    }
+
+    // No hagas nada si todavía no hay usuario (rutas protegidas deberían evitarlo, pero por seguridad)
+    if (!user) return
+
+    // Guard para StrictMode / doble ejecución en dev
+    if (handledNewRouteRef.current) return
+    handledNewRouteRef.current = true
+
+    // 1) Abrir modal
+    onOpen()
+
+    // 2) Normalizar URL para que no choque con /services/:id
+    // replace = true para que Back no vuelva a /services/new
+    navigate("/services", { replace: true })
+  }, [location.pathname, navigate, onOpen, user])
 
   return (
     <Box bg="gray.50" minH="calc(100vh - 64px)">
-      
-      {/* 1. HERO HEADER */}
-      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" pb={10} pt={8}>
+      <CreateServiceModal isOpen={isOpen} onClose={onClose} onSuccess={loadServices} />
+
+      {/* HERO HEADER */}
+      <Box
+        bg="white"
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        pb={12}
+        pt={10}
+        bgGradient="linear(to-b, white, gray.50)"
+      >
         <Container maxW="container.xl">
-          <Flex 
-            justify="space-between" 
-            align="center" 
-            direction={{ base: 'column', md: 'row' }}
-            gap={6}
-            mb={8}
+          <Flex
+            justify="space-between"
+            align="center"
+            direction={{ base: "column", md: "row" }}
+            gap={8}
+            mb={10}
           >
             <Box maxW="2xl">
-              <HStack mb={2}>
-                <Heading 
-                  size="xl" 
-                  color="gray.800"
-                  letterSpacing="tight"
-                >
-                  Hola, <Box as="span" color="blue.600">{user?.name?.split(' ')[0]}</Box> 👋
-                </Heading>
-              </HStack>
+              <Heading size="2xl" color="gray.800" letterSpacing="tight" mb={3}>
+                Hola,{" "}
+                <Box as="span" bgGradient="linear(to-r, blue.400, purple.500)" bgClip="text">
+                  {user?.name?.split(" ")[0]}
+                </Box>{" "}
+                👋
+              </Heading>
               <Text fontSize="lg" color="gray.500">
-                Bienvenido a tu panel de control. Aquí gestionas tus habilidades.
+                Bienvenido a <b>SkillBarter</b>. Encuentra lo que necesitas intercambiando tus
+                habilidades.
               </Text>
             </Box>
-            
-            <Button 
+
+            <Button
               size="lg"
-              colorPalette="blue" 
-              bg="blue.600"
-              _hover={{ bg: "blue.700" }}
+              colorScheme="blue"
+              bgGradient="linear(to-r, blue.500, blue.600)"
+              _hover={{ bgGradient: "linear(to-r, blue.600, blue.700)", transform: "scale(1.02)" }}
               color="white"
-              borderRadius="full"
-              px={6}
-              shadow="md"
+              borderRadius="xl"
+              px={8}
+              shadow="lg"
+              onClick={onOpen}
+              leftIcon={<FaPlus />}
             >
-              <Icon as={FaPlus} mr={2} />
               Publicar Servicio
             </Button>
           </Flex>
 
-          {/* 2. BARRA DE ESTADÍSTICAS */}
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-            <StatCard icon={FaCoins} label="Mis Créditos" value="0" color="yellow" />
-            <StatCard icon={FaExchangeAlt} label="Intercambios" value="0" color="purple" />
-            <StatCard icon={FaStar} label="Reputación" value="Nueva" color="green" />
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
+            <StatCard icon={FaCoins} label="Mis Créditos" value="100" color="yellow" />
+            <StatCard icon={FaExchangeAlt} label="Intercambios Activos" value="0" color="purple" />
+            <StatCard icon={FaChartLine} label="Reputación" value="Nueva" color="green" />
           </SimpleGrid>
-
         </Container>
       </Box>
 
-      {/* 3. ÁREA DE SERVICIOS */}
-      <Container maxW="container.xl" py={10}>
-        <Flex justify="space-between" align="center" mb={6}>
-          <Heading size="md" color="gray.700">Explorar Mercado</Heading>
-          
-          <HStack gap={2}>
-            <Button size="xs" variant="solid" bg="gray.800" color="white" borderRadius="full">Todo</Button>
-            <Button size="xs" variant="ghost" color="gray.500" borderRadius="full">Tecnología</Button>
-            <Button size="xs" variant="ghost" color="gray.500" borderRadius="full">Idiomas</Button>
-          </HStack>
-        </Flex>
-
-        {/* EMPTY STATE */}
-        <Flex 
-          direction="column"
-          align="center"
-          justify="center"
-          py={16} 
-          bg="white"
-          borderRadius="2xl" 
-          border="1px dashed" 
-          borderColor="gray.300"
-          textAlign="center"
-        >
-          <Box 
-            bg="blue.50" p={6} borderRadius="full" mb={4}
-            color="blue.500"
-          >
-            <Icon as={FaBoxOpen} boxSize={10} />
-          </Box>
-          <Heading size="md" color="gray.800" mb={2}>
-            No hay servicios disponibles
+      {/* ÁREA DE SERVICIOS */}
+      <Container maxW="container.xl" py={12}>
+        <HStack mb={8} justify="space-between" align="center">
+          <Heading size="lg" color="gray.700" letterSpacing="tight">
+            Explorar Mercado
           </Heading>
-          <Text color="gray.500" maxW="md" mb={6}>
-            Parece que nadie ha publicado nada aún. ¡Sé el primero en ofrecer tu talento y gana créditos extra!
-          </Text>
-          <Button variant="outline" borderColor="blue.200" color="blue.600" size="sm">
-            Crear primera publicación
-          </Button>
-        </Flex>
+        </HStack>
 
+        {isLoading ? (
+          <Flex justify="center" py={20} direction="column" align="center" gap={4}>
+            <Spinner size="xl" color="blue.500" thickness="4px" />
+            <Text color="gray.400" fontSize="sm">
+              Cargando ofertas...
+            </Text>
+          </Flex>
+        ) : services.length > 0 ? (
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={8} pb={10}>
+            {services.map((service) => (
+              <ServiceCard
+                key={service.id}
+                id={service.id}
+                title={service.title}
+                author={service.owner.name}
+                category={service.category}
+                price="Trueque"
+                colorPalette="blue"
+                ratingAverage={service.owner.ratingAverage}
+                ratingCount={service.owner.ratingCount}
+              />
+            ))}
+          </SimpleGrid>
+        ) : (
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            py={20}
+            bg="white"
+            borderRadius="3xl"
+            border="2px dashed"
+            borderColor="gray.200"
+            textAlign="center"
+            mx="auto"
+            maxW="3xl"
+          >
+            <Flex
+              bg="blue.50"
+              w={20}
+              h={20}
+              borderRadius="full"
+              align="center"
+              justify="center"
+              mb={6}
+              color="blue.500"
+            >
+              <Icon as={FaBoxOpen} boxSize={8} />
+            </Flex>
+            <Heading size="md" color="gray.800" mb={2}>
+              No hay otros servicios disponibles
+            </Heading>
+            <Text color="gray.500" maxW="md" mb={8}>
+              Parece que eres el único aquí o ya has visto todo. ¡Invita a más amigos!
+            </Text>
+            <Button
+              variant="outline"
+              borderColor="blue.300"
+              color="blue.600"
+              onClick={onOpen}
+              _hover={{ bg: "blue.50" }}
+            >
+              Publicar otro servicio
+            </Button>
+          </Flex>
+        )}
+
+        {/* SPRINT 4: MIS SERVICIOS + EDITAR/ELIMINAR */}
+        <MyServicesSection />
       </Container>
     </Box>
-  );
-};
+  )
+}

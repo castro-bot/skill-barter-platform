@@ -1,113 +1,98 @@
 # SkillBarter Platform - Developer Setup
 
-## 🚀 Project Overview
+## ?? Project Overview
 
-This is the monorepo for the SkillBarter application, a platform for university students to trade services. This project is the final deliverable for our "Análisis de Requerimientos" and "Análisis y Modelado de Software" courses.
+Monorepo for the SkillBarter application. A backend driven with Node.js/Express/Prisma and a React/Vite frontend targeting service trueques.
 
-Our architecture is **decoupled**:
-1.  A headless `backend` API (Node.js, Express, Prisma)
-2.  A `frontend` client (React, Vite)
+## ?? Project Structure
 
-This structure is non-negotiable and allows us to work in parallel.
+- `/backend/`: Node/Express API, Prisma schema, listeners, and services.
+- `/frontend/`: Vite + React client consuming the backend APIs.
+- `/docs/`: Requirements, API contract, and supporting artifacts.
 
-## 📁 Project Structure
+## ???? Prerequisites
 
-* `/backend/`: The Node.js API. **This is my domain (Backend Lead).**
-* `/frontend/`: The React client. **This is your domain (Frontend Dev).**
-* `/docs/`: Our **Single Source of Truth (SSOT)**. All requirements (SRS), UML diagrams, and *especially* the API contract live here.
+1. Node.js (LTS)
+2. PostgreSQL (matches `DATABASE_URL` / `DIRECT_URL` in `backend/.env`)
+3. Git
+4. VS Code (recommended) with formatting extensions if desired
 
-## 🛠️ Prerequisites
+## ?? Quickstart (Full-stack)
 
-Before you begin, ensure you have the following installed:
-* Node.js (LTS version)
-* Git
-* VS Code (recommended, with `Prettier` and `ESLint` extensions)
+### 1. Clone & bootstrap
 
-## 🏁 Getting Started (Frontend Developer)
+```bash
+git clone https://github.com/YOUR-ORG/skill-barter-platform.git
+cd skill-barter-platform
+```
 
-Your first task is to set up your `frontend` environment. You do not need to run the backend; you will build your UI against a mock API first.
+### 2. Backend
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/YOUR-USERNAME/skill-barter-platform.git](https://github.com/YOUR-USERNAME/skill-barter-platform.git)
-    cd skill-barter-platform
-    ```
+```bash
+cd backend
+npm install
+```
 
-2.  **Navigate to your sandbox:**
-    ```bash
-    cd frontend
-    ```
-    (This directory is *yours*. Do not work in the `backend` or root folders.)
+Copy `.env.example` to `.env` (or edit `backend/.env`) and ensure `DATABASE_URL` / `DIRECT_URL` point to a running Postgres instance with database `skillbarter_db`.
 
-3.  **Initialize the React project using Vite.**
-    * This command will scaffold React, TypeScript, and SWC *inside* the current `frontend` directory.
-    ```bash
-    npm create vite@latest . -- --template react-ts
-    ```
+Generate/align the schema:
 
-4.  **Install all dependencies:**
-    ```bash
-    npm install
-    ```
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
 
-5.  **Install core frontend libraries:**
-    * We will use `axios` for API calls, `react-router-dom` for navigation, and a UI library for speed.
-    ```bash
-    # For API calls and routing
-    npm install axios react-router-dom
+Run the server (auto-reloads on file changes):
 
-    # For UI components (using Chakra UI as an example, replace if we pick another)
-    npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion
-    ```
+```bash
+npm run dev
+```
 
-6.  **Install our shared dev tooling:**
-    ```bash
-    npm install --save-dev prettier eslint
-    ```
+The API listens on `http://localhost:3001/api/v1` and exposes routes such as `/users`, `/trades`, `/ratings`, `/notifications`.
 
-7.  **Run the dev server:**
-    ```bash
-    npm run dev
-    ```
-    Your environment is now 100% operational.
+### 3. Frontend
 
-## 📖 The "Bible": Our API Contract
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
 
-Your entire development process relies on the contract defined in:
-**`docs/api-contract.md`**
+Vite runs on `http://localhost:5173` and proxies requests to the backend via `frontend/src/api/client.ts`.
 
-**If it's not in the contract, it doesn't exist.**
+### 4. Daily flow
 
-Your first development task (Sprint 1) is to create a `src/api/mockClient.ts` file. This file will export fake, async functions that *perfectly* match the API contract (e.g., `login()`, `getServices()`).
+- Start backend + frontend in separate terminals.
+- Visit `http://localhost:5173` to use the app.
+- Complete trades from the **Trades** page to trigger rating modal (1-5 stars + tags).
+- The public profile and service cards show live reputation (average & count).
 
-This allows you to build the *entire* UI and all its logic without ever running the real backend. This is the key to our parallel workflow.
+## ?? Database Notes
 
-## 🤝 Our Workflow (Non-Negotiable)
+- The schema lives in `backend/prisma/schema.prisma`.
+- Migrations are generated into `backend/prisma/migrations/`.
+- After any schema change, rerun `npx prisma migrate dev` (or `npx prisma migrate reset` if you can drop data).
 
-We adhere to a strict development workflow to ensure code quality and prevent merge conflicts.
+## ?? Development Notes
 
-1.  **Branching:** The `main` branch is sacred. All work *must* be done on a feature branch.
-    * **Good:** `feat/login-page`, `fix/navbar-css`
-    * **Bad:** Committing directly to `main`.
+- Backend uses an event emitter pattern for notifications (`backend/src/core/events.js`).
+- Ratings are stored in the `ratings` table; each record stores tags, comments, and links to a completed trade.
+- The frontend exposes `frontend/src/components/ratings/RatingModal.tsx` for the new modal + tags UI.
 
-2.  **Pull Requests (PRs):** All code must be merged to `main` via a Pull Request.
-    * When you finish a feature, push your branch and open a PR.
-    * Tag me (`@your-github-username`) for review.
+## ? Recommended Commands
 
-3.  **Code Reviews:** I will review and approve your PRs. You will review and approve mine. This is our primary quality gate.
+| Area     | Command                   | Purpose |
+|----------|---------------------------|---------|
+| Backend  | `npm run dev`              | Start Express API with nodemon |
+| Backend  | `npx prisma migrate dev`   | Apply schema changes locally |
+| Backend  | `npx prisma generate`      | Refresh generated client |
+| Frontend | `npm run dev`              | Launch Vite dev server |
 
-4.  **Linting:** `Prettier` and `ESLint` are installed. **Configure your VS Code to format on save.** All PRs must pass the linter.
+## ?? Roles & Responsibilities
 
-## 🧑‍💻 Roles & Responsibilities
+- **Backend Lead**: Owns `backend/`, Prisma schema, and API quality.
+- **Frontend Dev**: Builds UI/UX, consumes the API, keeps the client in sync with the contract.
 
-* **Dev 1 (Backend Lead - Me):**
-    * Owns the `backend/` directory.
-    * Implements all API endpoints as defined in the contract.
-    * Manages the database schema (`schema.prisma`).
-    * Implements all server-side patterns (Repository, Observer, Factory).
+## ?? Contract
 
-* **Dev 2 (Frontend Dev - You):**
-    * Owns the `frontend/` directory.
-    * Implements all UI/UX (pages, components).
-    * Manages all client-side state.
-    * Consumes the API (first mock, then real).
+Reference `docs/api-contract.md` before adding or consuming endpoints. If it is not part of the contract, coordinate before implementation.

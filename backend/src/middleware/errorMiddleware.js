@@ -1,3 +1,4 @@
+// backend/src/middleware/errorMiddleware.js
 /**
  * Global Error Handler Middleware
  * Guideline #9: Error Handling - Standardize error responses.

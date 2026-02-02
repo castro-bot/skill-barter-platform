@@ -1,53 +1,92 @@
-import { useState } from 'react';
-import { 
-  Box, 
-  Button, 
-  Input, 
-  Text, 
-  VStack, 
-  IconButton,
-} from '@chakra-ui/react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
+// frontend/src/components/auth/LoginForm.tsx
+import { useState } from "react"
+import {
+  Box,
+  Button,
+  Input,
+  Text,
+  VStack,
+  IconButton
+} from "@chakra-ui/react"
+import { FaEye, FaEyeSlash } from "react-icons/fa"
+import { useAuth } from "../../context/AuthContext"
+import type { AxiosError } from "axios"
+
+function normalizeEmail(value: string) {
+  return value.trim().toLowerCase()
+}
+
+function normalizePassword(value: string) {
+  // En general no se debe alterar password, pero sí recortar espacios accidentales.
+  // Si ustedes permiten espacios intencionales, elimina el trim aquí.
+  return value.trim()
+}
+
+function extractAxiosErrorMessage(err: unknown): string {
+  // Caso 1: Error de Axios con response
+  if (err && typeof err === "object" && "isAxiosError" in err) {
+    const axiosError = err as AxiosError<{
+      message?: string
+      error?: string
+    }>
+
+    const data = axiosError.response?.data
+
+    if (data?.message) return data.message
+    if (data?.error) return data.error
+  }
+
+  // Caso 2: Error estándar de JS
+  if (err instanceof Error) {
+    return err.message
+  }
+
+  // Fallback seguro
+  return "No se pudo iniciar sesión. Revisa tus credenciales e intenta nuevamente."
+}
 
 export const LoginForm = () => {
-  const { login, isLoading } = useAuth();
-  
-  const [email, setEmail] = useState('axel@pucem.edu.ec'); 
-  const [password, setPassword] = useState('123456');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const { login, isLoading } = useAuth()
+
+  // Recomendación: no hardcodear credenciales reales.
+  // Si quieren demo, pongan una cuenta real de su BD o déjenlo vacío.
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError("")
 
-    if (!email || !password) {
-      setError('Por favor completa todos los campos');
-      return;
+    const cleanEmail = normalizeEmail(email)
+    const cleanPassword = normalizePassword(password)
+
+    if (!cleanEmail || !cleanPassword) {
+      setError("Por favor completa todos los campos")
+      return
     }
 
     try {
-      await login({ email, password });
+      await login({ email: cleanEmail, password: cleanPassword })
     } catch (err) {
-      console.error(err);
-      setError('Credenciales incorrectas. Intenta de nuevo.');
+      console.error("[Login] Error:", err)
+      setError(extractAxiosErrorMessage(err))
     }
-  };
+  }
 
   return (
     <Box as="form" onSubmit={handleSubmit} width="100%">
-      <VStack gap={5} align="stretch">
-        
-        {/* INPUT CORREO - Estilo limpio y moderno */}
+      <VStack spacing={5} align="stretch">
+        {/* INPUT CORREO */}
         <Box>
           <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={1}>
-            Correo Institucional
+            Correo
           </Text>
-          <Input 
+          <Input
             size="lg"
-            type="email" 
-            placeholder="estudiante@pucem.edu.ec" 
+            type="email"
+            placeholder="axel@ejemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
@@ -55,24 +94,24 @@ export const LoginForm = () => {
             border="1px solid"
             borderColor="gray.200"
             borderRadius="md"
-            _focus={{ 
-              bg: "white", 
-              borderColor: "blue.500", 
-              boxShadow: "0 0 0 1px #3182ce" // Efecto de brillo azul sutil
+            _focus={{
+              bg: "white",
+              borderColor: "blue.500",
+              boxShadow: "0 0 0 1px #3182ce"
             }}
           />
         </Box>
 
-        {/* INPUT CONTRASEÑA - Estilo limpio con icono integrado */}
+        {/* INPUT CONTRASEÑA */}
         <Box>
           <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={1}>
             Contraseña
           </Text>
           <Box position="relative">
-            <Input 
+            <Input
               size="lg"
-              type={showPassword ? 'text' : 'password'} 
-              placeholder="********" 
+              type={showPassword ? "text" : "password"}
+              placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
@@ -81,14 +120,14 @@ export const LoginForm = () => {
               borderColor="gray.200"
               borderRadius="md"
               paddingRight="3rem"
-              _focus={{ 
-                bg: "white", 
-                borderColor: "blue.500", 
-                boxShadow: "0 0 0 1px #3182ce" 
+              _focus={{
+                bg: "white",
+                borderColor: "blue.500",
+                boxShadow: "0 0 0 1px #3182ce"
               }}
             />
             <IconButton
-              aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
+              aria-label={showPassword ? "Ocultar" : "Mostrar"}
               onClick={() => setShowPassword(!showPassword)}
               variant="ghost"
               size="sm"
@@ -99,19 +138,18 @@ export const LoginForm = () => {
               zIndex="5"
               color="gray.400"
               _hover={{ color: "blue.500", bg: "transparent" }}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </IconButton>
+              icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+            />
           </Box>
         </Box>
 
-        {/* MENSAJE DE ERROR - Sutil y claro */}
+        {/* MENSAJE DE ERROR */}
         {error && (
-          <Box 
-            p={3} 
-            bg="red.50" 
-            border="1px solid" 
-            borderColor="red.100" 
+          <Box
+            p={3}
+            bg="red.50"
+            border="1px solid"
+            borderColor="red.100"
             borderRadius="md"
           >
             <Text color="red.600" fontSize="sm" fontWeight="medium">
@@ -120,29 +158,30 @@ export const LoginForm = () => {
           </Box>
         )}
 
-        {/* BOTÓN PRINCIPAL - Con mejor presencia y feedback */}
-        <Button 
-          type="submit" 
-          colorPalette="blue"
+        {/* BOTÓN */}
+        <Button
+          type="submit"
+          colorScheme="blue"
           size="lg"
-          height="3rem" // Un poco más alto para mejor click
+          height="3rem"
           fontSize="md"
-          loading={isLoading} 
+          isLoading={isLoading}
+          loadingText="Ingresando..."
           width="full"
           mt={2}
           fontWeight="bold"
           borderRadius="md"
           shadow="sm"
-          _hover={{ 
-            transform: 'translateY(-1px)', 
-            shadow: 'md',
-            bg: 'blue.600'
+          _hover={{
+            transform: "translateY(-1px)",
+            shadow: "md",
+            bg: "blue.600"
           }}
           transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
         >
-          {isLoading ? 'Ingresando...' : 'Iniciar Sesión'}
+          Iniciar Sesión
         </Button>
       </VStack>
     </Box>
-  );
-};
+  )
+}
