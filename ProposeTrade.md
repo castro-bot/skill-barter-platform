@@ -163,7 +163,8 @@ Authorization: Bearer <TOKEN_DEL_RECEIVER>
 Content-Type: application/json
 
 {
-  "action": "accept"
+  "action": "accept",
+  "contactWhatsapp": "+593 99 123 4567"
 }
 ```
 
@@ -175,7 +176,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Content-Type: application/json
 
 {
-  "action": "accept"
+  "action": "accept",
+  "contactWhatsapp": "+593 99 123 4567"
 }
 ```
 
@@ -249,7 +251,7 @@ $tokenB = $loginB.accessToken
 Invoke-RestMethod -Uri "http://localhost:3001/api/v1/trades/$tradeId/respond" `
   -Method PUT -ContentType "application/json" `
   -Headers @{Authorization="Bearer $tokenB"} `
-  -Body '{"action":"accept"}'
+  -Body '{"action":"accept","contactWhatsapp":"+593 99 123 4567"}'
 ```
 
 ### Script Automático Completo
@@ -272,7 +274,7 @@ Write-Host "Trade ID: $($pendingTrade.id)"
 Invoke-RestMethod -Uri "http://localhost:3001/api/v1/trades/$($pendingTrade.id)/respond" `
   -Method PUT -ContentType "application/json" `
   -Headers @{Authorization="Bearer $($alice.accessToken)"} `
-  -Body '{"action":"accept"}'
+  -Body '{"action":"accept","contactWhatsapp":"+593 99 123 4567"}'
 ```
 
 ## Validaciones Importantes

@@ -21,6 +21,16 @@ import {
   Spinner,
   Alert,
   AlertIcon,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
   useToast,
   useDisclosure
 } from "@chakra-ui/react";
@@ -35,6 +45,9 @@ export const TradesPage = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const ratingDisclosure = useDisclosure();
   const [ratingTarget, setRatingTarget] = useState<{ tradeId: string; counterpartyName: string } | null>(null);
+  const whatsappDisclosure = useDisclosure();
+  const [acceptTarget, setAcceptTarget] = useState<{ tradeId: string } | null>(null);
+  const [whatsapp, setWhatsapp] = useState("");
 
   const openRating = (trade: Trade, isIncoming: boolean) => {
     const counterpartyName = isIncoming
@@ -47,6 +60,18 @@ export const TradesPage = () => {
   const closeRating = () => {
     ratingDisclosure.onClose();
     setRatingTarget(null);
+  };
+
+  const openAccept = (tradeId: string) => {
+    setAcceptTarget({ tradeId });
+    setWhatsapp("");
+    whatsappDisclosure.onOpen();
+  };
+
+  const closeAccept = () => {
+    whatsappDisclosure.onClose();
+    setAcceptTarget(null);
+    setWhatsapp("");
   };
 
   const fetchTrades = async () => {
@@ -66,21 +91,40 @@ export const TradesPage = () => {
     fetchTrades();
   }, []);
 
-  const handleRespond = async (tradeId: string, action: "accept" | "reject") => {
+  const handleRespond = async (
+    tradeId: string,
+    action: "accept" | "reject",
+    contactWhatsapp?: string
+  ) => {
     setProcessingId(tradeId);
     try {
-      await tradesApi.respond(tradeId, action);
+      await tradesApi.respond(tradeId, action, contactWhatsapp);
       toast({
         title: action === "accept" ? "¡Trueque Aceptado!" : "Trueque Rechazado",
         status: action === "accept" ? "success" : "info"
       });
       fetchTrades();
+      return true;
     } catch (error) {
       console.error("Error respondiendo al trueque:", error);
       toast({ title: "Error al procesar la acción", status: "error" });
+      return false;
     } finally {
       setProcessingId(null);
     }
+  };
+
+  const handleAcceptConfirm = async () => {
+    if (!acceptTarget) return;
+
+    const trimmedWhatsapp = whatsapp.trim();
+    if (!trimmedWhatsapp) {
+      toast({ title: "Ingresa tu WhatsApp para continuar", status: "warning" });
+      return;
+    }
+
+    const ok = await handleRespond(acceptTarget.tradeId, "accept", trimmedWhatsapp);
+    if (ok) closeAccept();
   };
 
   // Sprint 3: completar trueque
@@ -258,7 +302,7 @@ export const TradesPage = () => {
                 shadow="md"
                 size="sm"
                 isLoading={processingId === trade.id}
-                onClick={() => handleRespond(trade.id, "accept")}
+                onClick={() => openAccept(trade.id)}
               >
                 Aceptar Trueque
               </Button>
@@ -300,6 +344,24 @@ export const TradesPage = () => {
               )}
             </Flex>
           )}
+
+          {(trade.status === "ACCEPTED" || trade.status === "COMPLETED") && trade.contactWhatsapp && (
+            <Box
+              mt={4}
+              p={3}
+              borderRadius="lg"
+              border="1px solid"
+              borderColor="green.200"
+              bg="green.50"
+            >
+              <Text fontSize="xs" fontWeight="bold" color="green.700" mb={1}>
+                Contacto WhatsApp
+              </Text>
+              <Text fontSize="sm" color="green.800">
+                {trade.contactWhatsapp}
+              </Text>
+            </Box>
+          )}
         </Box>
       </CardBody>
     </Card>
@@ -324,6 +386,38 @@ export const TradesPage = () => {
           onSuccess={fetchTrades}
         />
       )}
+      <Modal isOpen={whatsappDisclosure.isOpen} onClose={closeAccept} isCentered>
+        <ModalOverlay backdropFilter="blur(2px)" />
+        <ModalContent>
+          <ModalHeader>Comparte tu WhatsApp</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl isRequired>
+              <FormLabel>Número de WhatsApp</FormLabel>
+              <Input
+                placeholder="Ej: +593 99 123 4567"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+              />
+              <Text fontSize="xs" color="gray.500" mt={2}>
+                Se compartirá con la otra parte cuando aceptes el trueque.
+              </Text>
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={closeAccept}>
+              Cancelar
+            </Button>
+            <Button
+              colorScheme="green"
+              onClick={handleAcceptConfirm}
+              isLoading={processingId === acceptTarget?.tradeId}
+            >
+              Aceptar y Compartir
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Container maxW="container.md">
         <Heading mb={8} size="xl" color="gray.700" letterSpacing="tight">
           Mis Trueques

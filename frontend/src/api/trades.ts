@@ -13,6 +13,7 @@ export interface Trade {
   note?: string;
   createdAt: string;
   hasRated?: boolean;
+  contactWhatsapp?: string;
 
   // Nota: en GET /trades tu backend devuelve solo { name } (sin id),
   // por eso dejamos id como opcional para evitar inconsistencias.
@@ -57,8 +58,13 @@ export const tradesApi = {
   },
 
   // 3) Responder (Aceptar o Rechazar)
-  respond: async (tradeId: string, action: "accept" | "reject"): Promise<Trade> => {
-    const { data } = await client.put<Trade>(`/trades/${tradeId}/respond`, { action });
+  respond: async (
+    tradeId: string,
+    action: "accept" | "reject",
+    contactWhatsapp?: string
+  ): Promise<Trade> => {
+    const payload = action === "accept" ? { action, contactWhatsapp } : { action };
+    const { data } = await client.put<Trade>(`/trades/${tradeId}/respond`, payload);
     return data;
   },
 

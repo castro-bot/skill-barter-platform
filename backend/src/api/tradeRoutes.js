@@ -31,13 +31,13 @@ router.get("/", async (req, res, next) => {
 // 3) Responder (Aceptar/Rechazar)
 router.put("/:id/respond", async (req, res, next) => {
   try {
-    const { action } = req.body // 'accept' or 'reject'
+    const { action, contactWhatsapp } = req.body // 'accept' or 'reject'
     // Puedes dejar esta validación aquí por UX, aunque ya se valida en el service
     if (!["accept", "reject"].includes(action)) {
       return res.status(400).json({ success: false, error: "Action must be 'accept' or 'reject'" })
     }
 
-    const trade = await TradeService.respondTrade(req.user.id, req.params.id, action)
+    const trade = await TradeService.respondTrade(req.user.id, req.params.id, action, { contactWhatsapp })
     return res.json(trade)
   } catch (error) {
     next(error)

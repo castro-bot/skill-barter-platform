@@ -3,6 +3,10 @@ const prisma = require("../core/db")
 const { appEmitter, EVENTS } = require("../core/events")
 const AppError = require("../utils/AppError")
 
+const WHATSAPP_REGEX = /^[+\d][\d\s().-]{6,19}$/
+
+const normalizeWhatsapp = (value) => String(value ?? "").trim()
+
 class TradeService {
   /**
    * Create a trade proposal
@@ -71,8 +75,13 @@ class TradeService {
 
     const mapTrade = (trade) => {
       const hasRated = Array.isArray(trade.ratings) && trade.ratings.length > 0
-      const { ratings, ...rest } = trade
-      return { ...rest, hasRated }
+      const { ratings, contactWhatsapp, ...rest } = trade
+      const canShowContact = trade.status === "ACCEPTED" || trade.status === "COMPLETED"
+      return {
+        ...rest,
+        hasRated,
+        contactWhatsapp: canShowContact ? contactWhatsapp : undefined
+      }
     }
 
     return {
@@ -84,7 +93,7 @@ class TradeService {
   /**
    * Respond to a trade (accept/reject)
    */
-  static async respondTrade(userId, tradeId, action) {
+  static async respondTrade(userId, tradeId, action, { contactWhatsapp } = {}) {
     if (!["accept", "reject"].includes(action)) {
       throw new AppError("Accion invalida. Usa 'accept' o 'reject'.", 400)
     }
@@ -101,10 +110,25 @@ class TradeService {
     }
 
     const newStatus = action === "accept" ? "ACCEPTED" : "REJECTED"
+    let whatsappValue = null
+
+    if (action === "accept") {
+      const trimmedWhatsapp = normalizeWhatsapp(contactWhatsapp)
+      if (!trimmedWhatsapp) {
+        throw new AppError("El numero de WhatsApp es obligatorio para aceptar el trueque", 400)
+      }
+      if (!WHATSAPP_REGEX.test(trimmedWhatsapp)) {
+        throw new AppError("Numero de WhatsApp invalido", 400)
+      }
+      whatsappValue = trimmedWhatsapp
+    }
 
     const updatedTrade = await prisma.tradeProposal.update({
       where: { id: tradeId },
-      data: { status: newStatus }
+      data: {
+        status: newStatus,
+        ...(action === "accept" ? { contactWhatsapp: whatsappValue } : {})
+      }
     })
 
     if (newStatus === "ACCEPTED") {
