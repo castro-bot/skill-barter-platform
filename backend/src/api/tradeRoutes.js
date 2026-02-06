@@ -10,8 +10,12 @@ router.use(authenticate)
 // 1) Proponer
 router.post("/", async (req, res, next) => {
   try {
-    const { proposerServiceId, receiverServiceId } = req.body
-    const trade = await TradeService.createTrade(req.user.id, { proposerServiceId, receiverServiceId })
+    const { proposerServiceId, receiverServiceId, note } = req.body
+    const trade = await TradeService.createTrade(req.user.id, {
+      proposerServiceId,
+      receiverServiceId,
+      note
+    })
     return res.status(201).json(trade)
   } catch (error) {
     next(error)

@@ -3,15 +3,21 @@ const prisma = require("../core/db")
 const { appEmitter, EVENTS } = require("../core/events")
 const AppError = require("../utils/AppError")
 
-const WHATSAPP_REGEX = /^[+\d][\d\s().-]{6,19}$/
+const WHATSAPP_REGEX = /^(?:\+5939\d{8}|09\d{8})$/
 
-const normalizeWhatsapp = (value) => String(value ?? "").trim()
+const normalizeWhatsapp = (value) => {
+  const raw = String(value ?? "").trim()
+  if (!raw) return ""
+  const hasPlus = raw.startsWith("+")
+  const digits = raw.replace(/\D/g, "")
+  return hasPlus ? `+${digits}` : digits
+}
 
 class TradeService {
   /**
    * Create a trade proposal
    */
-  static async createTrade(proposerId, { proposerServiceId, receiverServiceId }) {
+  static async createTrade(proposerId, { proposerServiceId, receiverServiceId, note }) {
     const receiverService = await prisma.serviceListing.findUnique({
       where: { id: receiverServiceId },
       include: { owner: true }
@@ -31,13 +37,16 @@ class TradeService {
       throw new AppError("No eres duenio del servicio que ofreces", 403)
     }
 
+    const trimmedNote = note !== undefined && note !== null ? String(note).trim() : null
+
     const trade = await prisma.tradeProposal.create({
       data: {
         proposerId,
         receiverId: receiverService.ownerId,
         proposerServiceId,
         receiverServiceId,
-        status: "PENDING"
+        status: "PENDING",
+        note: trimmedNote && trimmedNote.length > 0 ? trimmedNote : null
       }
     })
 
@@ -113,14 +122,14 @@ class TradeService {
     let whatsappValue = null
 
     if (action === "accept") {
-      const trimmedWhatsapp = normalizeWhatsapp(contactWhatsapp)
-      if (!trimmedWhatsapp) {
+      const normalizedWhatsapp = normalizeWhatsapp(contactWhatsapp)
+      if (!normalizedWhatsapp) {
         throw new AppError("El numero de WhatsApp es obligatorio para aceptar el trueque", 400)
       }
-      if (!WHATSAPP_REGEX.test(trimmedWhatsapp)) {
-        throw new AppError("Numero de WhatsApp invalido", 400)
+      if (!WHATSAPP_REGEX.test(normalizedWhatsapp)) {
+        throw new AppError("Numero de WhatsApp invalido. Usa +5939XXXXXXXX o 09XXXXXXXX", 400)
       }
-      whatsappValue = trimmedWhatsapp
+      whatsappValue = normalizedWhatsapp
     }
 
     const updatedTrade = await prisma.tradeProposal.update({

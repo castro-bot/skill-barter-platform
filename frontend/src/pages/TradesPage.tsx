@@ -38,6 +38,15 @@ import { FaExchangeAlt } from "react-icons/fa";
 import { tradesApi, type Trade, type TradesResponse } from "../api/trades";
 import { RatingModal } from "../components/ratings/RatingModal";
 
+const WHATSAPP_REGEX = /^(?:\+5939\d{8}|09\d{8})$/;
+
+const normalizeWhatsappInput = (value: string) => {
+  const trimmed = value.trim();
+  const hasPlus = trimmed.startsWith("+");
+  const digitsOnly = trimmed.replace(/\D/g, "");
+  return hasPlus ? `+${digitsOnly}` : digitsOnly;
+};
+
 export const TradesPage = () => {
   const toast = useToast();
   const [trades, setTrades] = useState<TradesResponse>({ incoming: [], outgoing: [] });
@@ -117,13 +126,21 @@ export const TradesPage = () => {
   const handleAcceptConfirm = async () => {
     if (!acceptTarget) return;
 
-    const trimmedWhatsapp = whatsapp.trim();
-    if (!trimmedWhatsapp) {
+    const normalizedWhatsapp = normalizeWhatsappInput(whatsapp);
+    if (!normalizedWhatsapp) {
       toast({ title: "Ingresa tu WhatsApp para continuar", status: "warning" });
       return;
     }
+    if (!WHATSAPP_REGEX.test(normalizedWhatsapp)) {
+      toast({
+        title: "WhatsApp inválido",
+        description: "Usa +5939XXXXXXXX o 09XXXXXXXX",
+        status: "error"
+      });
+      return;
+    }
 
-    const ok = await handleRespond(acceptTarget.tradeId, "accept", trimmedWhatsapp);
+    const ok = await handleRespond(acceptTarget.tradeId, "accept", normalizedWhatsapp);
     if (ok) closeAccept();
   };
 
@@ -395,9 +412,10 @@ export const TradesPage = () => {
             <FormControl isRequired>
               <FormLabel>Número de WhatsApp</FormLabel>
               <Input
-                placeholder="Ej: +593 99 123 4567"
+                placeholder="Ej: +593994601733 o 0994601733"
                 value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
+                onChange={(e) => setWhatsapp(normalizeWhatsappInput(e.target.value))}
+                inputMode="tel"
               />
               <Text fontSize="xs" color="gray.500" mt={2}>
                 Se compartirá con la otra parte cuando aceptes el trueque.
