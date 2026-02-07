@@ -105,7 +105,7 @@ class ServiceListingService {
       )
     )
 
-    const where = { ownerId: userId }
+    const where = { ownerId: userId, isActive: true }
 
     if (usedServiceIds.length > 0) {
       where.NOT = { id: { in: usedServiceIds } }
@@ -204,8 +204,13 @@ class ServiceListingService {
       throw error
     }
 
-    await prisma.serviceListing.delete({
-      where: { id: serviceId }
+    if (!service.isActive) {
+      return { success: true, message: "Service already deactivated" }
+    }
+
+    await prisma.serviceListing.update({
+      where: { id: serviceId },
+      data: { isActive: false, deactivatedAt: new Date() }
     })
 
     return { success: true, message: "Service deleted successfully" }
