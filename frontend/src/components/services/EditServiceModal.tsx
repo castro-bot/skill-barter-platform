@@ -24,6 +24,7 @@ import {
 import { useEffect, useState } from "react"
 import { FaHeading, FaTag, FaAlignLeft, FaPencilAlt } from "react-icons/fa"
 import { servicesApi, type ServiceListing } from "../../api/services"
+import { getApiErrorMessage } from "../../utils/error"
 
 interface Props {
   isOpen: boolean
@@ -89,7 +90,7 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
       console.error(error)
       toast({
         title: "Error al actualizar",
-        description: "Verifica tu sesión o intenta nuevamente.",
+        description: getApiErrorMessage(error, "Verifica tu sesión o intenta nuevamente."),
         status: "error",
         duration: 3500,
         isClosable: true,

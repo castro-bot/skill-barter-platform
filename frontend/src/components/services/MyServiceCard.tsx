@@ -22,6 +22,7 @@ import { FaTrash, FaEdit, FaTag } from "react-icons/fa"
 import type { ServiceListing } from "../../api/services"
 import { servicesApi } from "../../api/services"
 import { EditServiceModal } from "./EditServiceModal"
+import { getApiErrorMessage } from "../../utils/error"
 
 interface Props {
   service: ServiceListing
@@ -58,7 +59,7 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
       console.error(error)
       toast({
         title: "No se pudo eliminar",
-        description: "Verifica permisos (403) o tu sesión.",
+        description: getApiErrorMessage(error, "Verifica permisos (403) o tu sesión."),
         status: "error",
         duration: 3500,
         isClosable: true,

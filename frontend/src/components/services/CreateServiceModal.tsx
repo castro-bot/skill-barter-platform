@@ -7,6 +7,7 @@ import {
 import { useState } from 'react';
 import { FaHeading, FaTag, FaAlignLeft, FaMagic } from 'react-icons/fa';
 import { servicesApi } from '../../api/services';
+import { getApiErrorMessage } from '../../utils/error';
 
 interface Props {
   isOpen: boolean;
@@ -55,7 +56,11 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
 
     } catch (error) {
       console.error(error);
-      toast({ title: 'Error al publicar', description: 'Inténtalo de nuevo', status: 'error' });
+      toast({
+        title: 'Error al publicar',
+        description: getApiErrorMessage(error, 'Inténtalo de nuevo'),
+        status: 'error'
+      });
     } finally {
       setIsLoading(false);
     }

@@ -10,6 +10,7 @@ import {
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { getApiErrorMessage } from '../../utils/error';
 
 export const RegisterForm = () => {
   const { register, isLoading } = useAuth();
@@ -35,7 +36,7 @@ export const RegisterForm = () => {
       navigate('/services'); 
     } catch (err) {
       console.error(err);
-      setError('Error al registrarse. Intenta con otro correo.');
+      setError(getApiErrorMessage(err, 'Error al registrarse. Intenta con otro correo.'));
     }
   };
 

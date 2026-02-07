@@ -37,6 +37,7 @@ import {
 import { FaExchangeAlt } from "react-icons/fa";
 import { tradesApi, type Trade, type TradesResponse } from "../api/trades";
 import { RatingModal } from "../components/ratings/RatingModal";
+import { getApiErrorMessage } from "../utils/error";
 
 const WHATSAPP_REGEX = /^(?:\+5939\d{8}|09\d{8})$/;
 
@@ -90,7 +91,11 @@ export const TradesPage = () => {
       setTrades(data);
     } catch (error) {
       console.error("Error cargando trueques", error);
-      toast({ title: "Error cargando trueques", status: "error" });
+      toast({
+        title: "Error cargando trueques",
+        description: getApiErrorMessage(error, "Intenta nuevamente en unos segundos."),
+        status: "error"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +121,11 @@ export const TradesPage = () => {
       return true;
     } catch (error) {
       console.error("Error respondiendo al trueque:", error);
-      toast({ title: "Error al procesar la acción", status: "error" });
+      toast({
+        title: "Error al procesar la acción",
+        description: getApiErrorMessage(error, "Intenta nuevamente."),
+        status: "error"
+      });
       return false;
     } finally {
       setProcessingId(null);
@@ -153,7 +162,11 @@ export const TradesPage = () => {
       fetchTrades();
     } catch (error) {
       console.error("Error completando el trueque:", error);
-      toast({ title: "Error al completar el trueque", status: "error" });
+      toast({
+        title: "Error al completar el trueque",
+        description: getApiErrorMessage(error, "Intenta nuevamente."),
+        status: "error"
+      });
     } finally {
       setProcessingId(null);
     }
