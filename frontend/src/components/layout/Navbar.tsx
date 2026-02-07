@@ -290,7 +290,7 @@ export const Navbar = () => {
                     fontWeight="bold"
                     shadow="md"
                     border="2px solid white">
-                    {getInitials(user?.name)}
+                    <Icon as={FaUser} boxSize={4} />
                   </Flex>
 
                   <Box textAlign="left" display={{ base: "none", md: "block" }}>

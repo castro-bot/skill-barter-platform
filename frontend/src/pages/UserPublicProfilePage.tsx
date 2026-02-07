@@ -18,6 +18,7 @@ import {
   WrapItem,
   useColorModeValue
 } from "@chakra-ui/react"
+import { FaUser } from "react-icons/fa"
 import { useParams } from "react-router-dom"
 import client from "../api/client"
 import { ServiceCard } from "../components/services/ServiceCard"
@@ -65,6 +66,8 @@ export const UserPublicProfilePage = () => {
   const borderTone = useColorModeValue("gray.100", "whiteAlpha.200")
   const textMuted = useColorModeValue("gray.500", "gray.400")
   const titleColor = useColorModeValue("gray.800", "gray.100")
+  const avatarBg = useColorModeValue("linear(to-br, brand.500, sand.400)", "linear(to-br, brand.600, sand.500)")
+  const avatarFg = useColorModeValue("white", "gray.100")
 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -168,7 +171,13 @@ export const UserPublicProfilePage = () => {
         <Box bg={cardBg} border="1px solid" borderColor={borderTone} borderRadius="2xl" p={6} shadow="sm">
           <HStack spacing={4} align="center" justify="space-between" wrap="wrap">
             <HStack spacing={4} align="center">
-              <Avatar name={safeName(profile.user.name)} size="lg" />
+              <Avatar
+                name={safeName(profile.user.name)}
+                size="lg"
+                icon={<FaUser />}
+                bgGradient={avatarBg}
+                color={avatarFg}
+              />
               <Box>
                 <HStack spacing={3} align="center">
                   <Heading size="md" color={titleColor}>
