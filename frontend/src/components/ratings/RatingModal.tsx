@@ -20,16 +20,8 @@ import {
   useToast
 } from "@chakra-ui/react"
 import { FaStar } from "react-icons/fa"
-import { ratingsApi } from "../../api/ratings"
+import { ratingsApi, type RatingMeta } from "../../api/ratings"
 import { getApiErrorMessage } from "../../utils/error"
-
-const TAGS_BY_SCORE: Record<number, string[]> = {
-  1: ["Incumplio lo acordado", "No se presento", "Mala comunicacion", "Calidad baja", "Tiempo de entrega"],
-  2: ["Incumplio lo acordado", "No se presento", "Mala comunicacion", "Calidad baja", "Tiempo de entrega"],
-  3: ["Aceptable", "Retraso leve", "Comunicacion media", "Calidad regular"],
-  4: ["Gran comunicacion", "Entrega puntual", "Alta calidad", "Volveria a intercambiar"],
-  5: ["Gran comunicacion", "Entrega puntual", "Alta calidad", "Volveria a intercambiar"]
-}
 
 type RatingModalProps = {
   isOpen: boolean
@@ -52,11 +44,42 @@ export const RatingModal = ({
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [comment, setComment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [meta, setMeta] = useState<RatingMeta | null>(null)
+  const [isMetaLoading, setIsMetaLoading] = useState(false)
+  const [metaError, setMetaError] = useState(false)
 
   const availableTags = useMemo(() => {
-    if (!score) return []
-    return TAGS_BY_SCORE[score] || []
-  }, [score])
+    if (!score || !meta?.tagsByScore) return []
+    return meta.tagsByScore[score] || []
+  }, [score, meta])
+
+  useEffect(() => {
+    if (!isOpen || meta || isMetaLoading) return
+
+    let isActive = true
+    setIsMetaLoading(true)
+    setMetaError(false)
+
+    ratingsApi
+      .getMeta()
+      .then((data) => {
+        if (!isActive) return
+        setMeta(data)
+      })
+      .catch((error) => {
+        if (!isActive) return
+        console.error("Error cargando metadata de calificaciones", error)
+        setMetaError(true)
+      })
+      .finally(() => {
+        if (!isActive) return
+        setIsMetaLoading(false)
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [isOpen, meta, isMetaLoading])
 
   useEffect(() => {
     if (!isOpen) return
@@ -77,6 +100,13 @@ export const RatingModal = ({
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => {
       if (prev.includes(tag)) return prev.filter((t) => t !== tag)
+      if (typeof meta?.maxTags === "number" && prev.length >= meta.maxTags) {
+        toast({
+          title: `Puedes seleccionar hasta ${meta.maxTags} motivos`,
+          status: "warning"
+        })
+        return prev
+      }
       return [...prev, tag]
     })
   }
@@ -143,6 +173,18 @@ export const RatingModal = ({
               )}
             </Box>
 
+            {isMetaLoading && score > 0 && (
+              <Text fontSize="sm" color="gray.500">
+                Cargando motivos...
+              </Text>
+            )}
+
+            {metaError && score > 0 && (
+              <Text fontSize="sm" color="gray.500">
+                No se pudieron cargar los motivos. Puedes calificar sin tags.
+              </Text>
+            )}
+
             {availableTags.length > 0 && (
               <Box>
                 <Text fontWeight="bold" mb={2}>
@@ -165,6 +207,11 @@ export const RatingModal = ({
                     )
                   })}
                 </Wrap>
+                {typeof meta?.maxTags === "number" && (
+                  <Text fontSize="xs" color="gray.500" mt={2}>
+                    Puedes elegir hasta {meta.maxTags} motivos.
+                  </Text>
+                )}
               </Box>
             )}
 
@@ -177,7 +224,13 @@ export const RatingModal = ({
                 onChange={(event) => setComment(event.target.value)}
                 placeholder="Cuenta tu experiencia..."
                 resize="vertical"
+                maxLength={meta?.maxCommentLength}
               />
+              {typeof meta?.maxCommentLength === "number" && (
+                <Text fontSize="xs" color="gray.500" mt={2}>
+                  {comment.length}/{meta.maxCommentLength}
+                </Text>
+              )}
             </Box>
           </VStack>
         </ModalBody>

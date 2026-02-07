@@ -19,6 +19,12 @@ export interface RatingSummary {
   count: number
 }
 
+export interface RatingMeta {
+  tagsByScore: Record<number, string[]>
+  maxTags: number
+  maxCommentLength: number
+}
+
 export interface CreateRatingDto {
   tradeId: string
   score: number
@@ -43,5 +49,10 @@ export const ratingsApi = {
     params.set("offset", String(offset))
     const { data } = await client.get<{ ratings: Rating[] }>(`/users/${userId}/ratings?${params.toString()}`)
     return data.ratings
+  },
+
+  getMeta: async (): Promise<RatingMeta> => {
+    const { data } = await client.get<RatingMeta>("/ratings/meta")
+    return data
   }
 }

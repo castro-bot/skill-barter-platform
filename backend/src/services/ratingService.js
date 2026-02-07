@@ -2,17 +2,7 @@
 const prisma = require("../core/db")
 const { appEmitter, EVENTS } = require("../core/events")
 const AppError = require("../utils/AppError")
-
-const TAGS_BY_SCORE = {
-  1: ["Incumplio lo acordado", "No se presento", "Mala comunicacion", "Calidad baja", "Tiempo de entrega"],
-  2: ["Incumplio lo acordado", "No se presento", "Mala comunicacion", "Calidad baja", "Tiempo de entrega"],
-  3: ["Aceptable", "Retraso leve", "Comunicacion media", "Calidad regular"],
-  4: ["Gran comunicacion", "Entrega puntual", "Alta calidad", "Volveria a intercambiar"],
-  5: ["Gran comunicacion", "Entrega puntual", "Alta calidad", "Volveria a intercambiar"]
-}
-
-const MAX_COMMENT_LENGTH = 300
-const MAX_TAGS = 5
+const { TAGS_BY_SCORE, MAX_COMMENT_LENGTH, MAX_TAGS } = require("../constants/ratingConstants")
 
 const normalizeTags = (tags, score) => {
   if (tags === undefined || tags === null) return []
