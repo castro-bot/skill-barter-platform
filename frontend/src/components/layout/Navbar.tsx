@@ -4,6 +4,7 @@ import {
   Flex,
   Text,
   Button,
+  IconButton,
   Container,
   Heading,
   Menu,
@@ -24,15 +25,24 @@ import {
   VStack,
   Badge,
   Spinner,
-  Link as ChakraLink
+  Link as ChakraLink,
+  useColorMode,
+  useColorModeValue
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
-import { FaSignOutAlt, FaUser, FaChevronDown, FaExchangeAlt, FaBell } from "react-icons/fa"
+import { FaSignOutAlt, FaUser, FaChevronDown, FaExchangeAlt, FaBell, FaMoon, FaSun } from "react-icons/fa"
 import { useAuth } from "../../context/AuthContext"
 import { useNotifications } from "../../context/NotificationsContext"
 
 export const Navbar = () => {
   const { user, logout } = useAuth()
+  const { colorMode, toggleColorMode } = useColorMode()
+  const navBg = useColorModeValue("rgba(255, 255, 255, 0.85)", "rgba(15, 23, 23, 0.85)")
+  const navBorder = useColorModeValue("gray.100", "whiteAlpha.200")
+  const menuBg = useColorModeValue("white", "gray.800")
+  const menuBorder = useColorModeValue("gray.100", "whiteAlpha.200")
+  const hoverSoft = useColorModeValue("gray.50", "whiteAlpha.100")
+  const iconSoft = useColorModeValue("gray.400", "gray.300")
   const {
     notifications,
     unreadCount,
@@ -71,10 +81,10 @@ export const Navbar = () => {
       position="sticky"
       top="0"
       zIndex="1000"
-      bg="rgba(255, 255, 255, 0.85)"
+      bg={navBg}
       backdropFilter="blur(12px)"
       borderBottom="1px solid"
-      borderColor="gray.100"
+      borderColor={navBorder}
       transition="all 0.3s">
       <Container maxW="container.xl">
         <Flex h={16} alignItems="center" justify="space-between">
@@ -109,6 +119,16 @@ export const Navbar = () => {
 
           {/* LADO DERECHO: ACCIONES */}
           <HStack spacing={3}>
+            <IconButton
+              aria-label={colorMode === "light" ? "Activar modo oscuro" : "Activar modo claro"}
+              icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
+              variant="ghost"
+              size="sm"
+              borderRadius="full"
+              color={iconSoft}
+              _hover={{ color: "brand.500", bg: "brand.50" }}
+              onClick={toggleColorMode}
+            />
             {/* NOTIFICACIONES */}
             <Popover placement="bottom-end" onOpen={handleOpenNotifications}>
               <PopoverTrigger>
@@ -117,7 +137,7 @@ export const Navbar = () => {
                   size="sm"
                   borderRadius="full"
                   position="relative"
-                  color="gray.400"
+                  color={iconSoft}
                   _hover={{ color: "brand.500", bg: "brand.50" }}
                   aria-label="Notificaciones">
                   <Icon as={FaBell} boxSize={4} />
@@ -141,7 +161,8 @@ export const Navbar = () => {
                 w="360px"
                 borderRadius="2xl"
                 border="1px solid"
-                borderColor="gray.100"
+                borderColor={menuBorder}
+                bg={menuBg}
                 shadow="2xl">
                 <PopoverArrow />
                 <PopoverCloseButton />
@@ -180,8 +201,8 @@ export const Navbar = () => {
                           p={3}
                           borderRadius="xl"
                           border="1px solid"
-                          borderColor={n.read ? "gray.100" : "brand.100"}
-                          bg={n.read ? "white" : "brand.50"}
+                          borderColor={n.read ? menuBorder : "brand.100"}
+                          bg={n.read ? menuBg : "brand.50"}
                           transition="all 0.2s"
                           cursor="pointer"
                           _hover={{ borderColor: "brand.200" }}
@@ -230,7 +251,7 @@ export const Navbar = () => {
                 <PopoverFooter
                   borderBottomRadius="2xl"
                   borderTop="1px solid"
-                  borderColor="gray.100">
+                  borderColor={menuBorder}>
                   <HStack justify="space-between">
                     <Text fontSize="xs" color="gray.500">
                       {notifications.length > 0 ? `${notifications.length} en total` : "—"}
@@ -252,8 +273,8 @@ export const Navbar = () => {
                 p={1}
                 pr={3}
                 borderRadius="full"
-                _hover={{ bg: "gray.50" }}
-                _active={{ bg: "gray.100" }}>
+                _hover={{ bg: hoverSoft }}
+                _active={{ bg: hoverSoft }}>
                 <HStack spacing={3}>
                   <Flex
                     align="center"
@@ -284,12 +305,12 @@ export const Navbar = () => {
 
               <MenuList
                 minW="260px"
-                bg="white"
+                bg={menuBg}
                 p={2}
                 shadow="2xl"
                 borderRadius="2xl"
                 border="1px solid"
-                borderColor="gray.100"
+                borderColor={menuBorder}
                 zIndex="popover">
                 <Box px={4} py={3} mb={2}>
                   <Text
@@ -306,7 +327,7 @@ export const Navbar = () => {
                   </Text>
                 </Box>
 
-                <MenuDivider borderColor="gray.100" mb={2} />
+                <MenuDivider borderColor={menuBorder} mb={2} />
 
                 <MenuItem
                   as={Link}
@@ -361,7 +382,7 @@ export const Navbar = () => {
                   </HStack>
                 </MenuItem>
 
-                <MenuDivider borderColor="gray.100" my={2} />
+                <MenuDivider borderColor={menuBorder} my={2} />
                 
                 <MenuItem
                   as={Link}

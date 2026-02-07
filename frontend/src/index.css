@@ -16,6 +16,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  --sb-ink: #e8f0ef;
+  --sb-muted: #a4b7b4;
+  --sb-bg: #0f1515;
+  --sb-surface: #141b1b;
+  --sb-accent: #6cd1c7;
+  --sb-accent-2: #e6b273;
+  --sb-ring: rgba(108, 209, 199, 0.35);
+  --sb-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
 *,
 *::before,
 *::after {
@@ -29,6 +41,14 @@ body {
   background:
     radial-gradient(1200px 500px at 15% -10%, rgba(47, 150, 142, 0.18), transparent 60%),
     radial-gradient(900px 400px at 110% 10%, rgba(217, 148, 69, 0.16), transparent 50%),
+    var(--sb-bg);
+  color: var(--sb-ink);
+}
+
+body[data-theme="dark"] {
+  background:
+    radial-gradient(1200px 500px at 15% -10%, rgba(108, 209, 199, 0.18), transparent 60%),
+    radial-gradient(900px 400px at 110% 10%, rgba(230, 178, 115, 0.12), transparent 50%),
     var(--sb-bg);
   color: var(--sb-ink);
 }

@@ -1,7 +1,13 @@
 // frontend/src/theme.ts
-import { extendTheme } from "@chakra-ui/react"
+import { extendTheme, type ThemeConfig } from "@chakra-ui/react"
+
+const config: ThemeConfig = {
+  initialColorMode: "light",
+  useSystemColorMode: false
+}
 
 const theme = extendTheme({
+  config,
   fonts: {
     heading: "'Space Grotesk', sans-serif",
     body: "'Source Sans 3', sans-serif"
@@ -59,7 +65,8 @@ const theme = extendTheme({
         container: {
           borderRadius: "2xl",
           borderWidth: "1px",
-          borderColor: "gray.100",
+          borderColor: "borderSubtle",
+          bg: "surface",
           boxShadow: "sm",
           _hover: {
             boxShadow: "md",
@@ -84,9 +91,19 @@ const theme = extendTheme({
     Modal: {
       baseStyle: {
         dialog: {
-          borderRadius: "2xl"
+          borderRadius: "2xl",
+          bg: "surface",
+          borderColor: "borderSubtle"
         }
       }
+    }
+  },
+  semanticTokens: {
+    colors: {
+      surface: { default: "white", _dark: "gray.800" },
+      surfaceMuted: { default: "gray.50", _dark: "gray.900" },
+      borderSubtle: { default: "gray.100", _dark: "whiteAlpha.200" },
+      textMuted: { default: "gray.600", _dark: "gray.300" }
     }
   },
   styles: {
