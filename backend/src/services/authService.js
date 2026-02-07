@@ -16,11 +16,17 @@ class AuthService {
    * @param {string} userType - Optional: 'REGULAR' or 'MODERATOR' (default: REGULAR)
    */
   static async register({ name, email, password, userType = 'REGULAR' }) {
-    if (!email || !password) {
+    const rawEmail = String(email ?? '').trim();
+
+    if (!rawEmail || !password) {
       throw new Error('Email and password are required');
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = rawEmail.toLowerCase();
+
+    const existingUser = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+    });
     if (existingUser) {
       throw new Error('Email already in use');
     }
@@ -30,7 +36,7 @@ class AuthService {
     // Factory Pattern: Create user data with appropriate role
     const userData = UserFactory.create(userType, {
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 

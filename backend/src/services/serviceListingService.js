@@ -36,7 +36,7 @@ class ServiceListingService {
    * Get all services with optional filters
    */
   static async getAllServices({ q, category, excludeOwnerId } = {}) {
-    const where = {}
+    const where = { isActive: true }
 
     if (category) {
       where.category = category
@@ -126,8 +126,8 @@ class ServiceListingService {
    * Get a single service by ID
    */
   static async getServiceById(id) {
-    const service = await prisma.serviceListing.findUnique({
-      where: { id },
+    const service = await prisma.serviceListing.findFirst({
+      where: { id, isActive: true },
       include: {
         owner: { select: { id: true, name: true, createdAt: true, ratingAverage: true, ratingCount: true } }
       }
