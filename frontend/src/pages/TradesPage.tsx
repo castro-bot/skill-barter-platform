@@ -21,6 +21,7 @@ import {
   Spinner,
   Alert,
   AlertIcon,
+  keyframes,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -40,6 +41,11 @@ import { RatingModal } from "../components/ratings/RatingModal";
 import { getApiErrorMessage } from "../utils/error";
 
 const WHATSAPP_REGEX = /^(?:\+5939\d{8}|09\d{8})$/;
+
+const fadeUp = keyframes`
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 const normalizeWhatsappInput = (value: string) => {
   const trimmed = value.trim();
@@ -179,9 +185,9 @@ export const TradesPage = () => {
       case "REJECTED":
         return "red";
       case "COMPLETED":
-        return "purple";
+        return "brand";
       default:
-        return "blue"; // PENDING
+        return "sand"; // PENDING
     }
   };
 
@@ -190,7 +196,7 @@ export const TradesPage = () => {
       mb={6}
       overflow="hidden"
       variant="outline"
-      borderColor={trade.status === "PENDING" ? "blue.300" : "gray.200"}
+      borderColor={trade.status === "PENDING" ? "sand.300" : "gray.200"}
       boxShadow={trade.status === "PENDING" ? "md" : "sm"}
       borderRadius="xl"
       borderWidth={trade.status === "PENDING" ? "2px" : "1px"}
@@ -200,7 +206,7 @@ export const TradesPage = () => {
       <CardBody p={0}>
         {/* CABECERA */}
         <Flex
-          bg={trade.status === "PENDING" ? "blue.50" : "gray.50"}
+          bg={trade.status === "PENDING" ? "sand.50" : "gray.50"}
           p={4}
           justify="space-between"
           align="center"
@@ -238,7 +244,7 @@ export const TradesPage = () => {
               {isIncoming ? "TE OFRECEN" : "TÚ OFRECES"}
             </Text>
 
-            <Heading size="md" color="blue.600" mb={2}>
+            <Heading size="md" color="brand.700" mb={2}>
               {trade.proposerService?.title || "Servicio no disponible"}
             </Heading>
 
@@ -278,7 +284,7 @@ export const TradesPage = () => {
                 {isIncoming ? "A CAMBIO DE TU" : "POR SU"}
               </Text>
 
-              <Heading size="md" color="purple.600" mb={2}>
+              <Heading size="md" color="sand.600" mb={2}>
                 {trade.receiverService?.title || "Servicio no disponible"}
               </Heading>
 
@@ -347,7 +353,7 @@ export const TradesPage = () => {
               </Badge>
 
               <Button
-                colorScheme="purple"
+                colorScheme="brand"
                 size="sm"
                 isLoading={processingId === trade.id}
                 onClick={() => handleComplete(trade.id)}
@@ -360,7 +366,7 @@ export const TradesPage = () => {
           {/* Estado COMPLETED */}
           {trade.status === "COMPLETED" && (
             <Flex mt={4} gap={3} justify={{ base: "center", md: "flex-end" }} align="center" wrap="wrap">
-              <Badge colorScheme="purple" variant="solid" px={3} py={1} borderRadius="full">
+              <Badge colorScheme="brand" variant="solid" px={3} py={1} borderRadius="full">
                 🎉 Trueque Completado
               </Badge>
               {trade.hasRated ? (
@@ -368,7 +374,7 @@ export const TradesPage = () => {
                   Calificado
                 </Badge>
               ) : (
-                <Button size="sm" colorScheme="blue" onClick={() => openRating(trade, isIncoming)}>
+                <Button size="sm" colorScheme="brand" onClick={() => openRating(trade, isIncoming)}>
                   Calificar
                 </Button>
               )}
@@ -400,13 +406,13 @@ export const TradesPage = () => {
   if (isLoading) {
     return (
       <Flex justify="center" align="center" minH="50vh">
-        <Spinner size="xl" color="blue.500" thickness="4px" />
+        <Spinner size="xl" color="brand.500" thickness="4px" />
       </Flex>
     );
   }
 
   return (
-    <Box bg="gray.50" minH="calc(100vh - 64px)" py={8}>
+    <Box bg="transparent" minH="calc(100vh - 64px)" py={8}>
       {ratingTarget && (
         <RatingModal
           isOpen={ratingDisclosure.isOpen}
@@ -454,7 +460,7 @@ export const TradesPage = () => {
           Mis Trueques
         </Heading>
 
-        <Tabs isFitted variant="soft-rounded" colorScheme="blue">
+        <Tabs isFitted variant="soft-rounded" colorScheme="brand">
           <TabList mb={6} bg="white" p={1} borderRadius="full" shadow="sm">
             <Tab borderRadius="full" fontWeight="bold">
               Recibidos (Inbox)
@@ -468,7 +474,11 @@ export const TradesPage = () => {
             {/* RECIBIDOS */}
             <TabPanel px={0}>
               {trades.incoming?.length > 0 ? (
-                trades.incoming.map((t) => <TradeCard key={t.id} trade={t} isIncoming={true} />)
+                trades.incoming.map((t, index) => (
+                  <Box key={t.id} animation={`${fadeUp} 0.5s ease ${index * 0.04}s both`}>
+                    <TradeCard trade={t} isIncoming={true} />
+                  </Box>
+                ))
               ) : (
                 <Alert
                   status="info"
@@ -495,7 +505,11 @@ export const TradesPage = () => {
             {/* ENVIADOS */}
             <TabPanel px={0}>
               {trades.outgoing?.length > 0 ? (
-                trades.outgoing.map((t) => <TradeCard key={t.id} trade={t} isIncoming={false} />)
+                trades.outgoing.map((t, index) => (
+                  <Box key={t.id} animation={`${fadeUp} 0.5s ease ${index * 0.04}s both`}>
+                    <TradeCard trade={t} isIncoming={false} />
+                  </Box>
+                ))
               ) : (
                 <Alert
                   status="info"

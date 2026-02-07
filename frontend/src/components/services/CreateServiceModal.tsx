@@ -73,7 +73,7 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
         
         {/* CABECERA CON GRADIENTE */}
         <ModalHeader 
-          bgGradient="linear(to-r, blue.600, purple.600)" 
+          bgGradient="linear(to-r, brand.600, sand.500)" 
           color="white" 
           py={6}
         >
@@ -106,7 +106,7 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                   placeholder="Ej. Clases de Matemáticas Avanzadas" 
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  focusBorderColor="blue.500"
+                  focusBorderColor="brand.500"
                   borderRadius="lg"
                   bg="gray.50"
                   _focus={{ bg: 'white' }}
@@ -124,7 +124,7 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                 <Select 
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  focusBorderColor="blue.500"
+                  focusBorderColor="brand.500"
                   borderRadius="lg"
                   pl={10} // Espacio extra para el icono
                   bg="gray.50"
@@ -208,7 +208,7 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                   rows={5}
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  focusBorderColor="blue.500"
+                  focusBorderColor="brand.500"
                   borderRadius="lg"
                   pl={10} // Espacio para el icono simulado
                   pt={2.5}
@@ -236,9 +236,9 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
             Cancelar
           </Button>
           <Button 
-            colorScheme="blue" 
-            bgGradient="linear(to-r, blue.500, blue.600)"
-            _hover={{ bgGradient: "linear(to-r, blue.600, blue.700)", shadow: "md" }}
+            colorScheme="brand" 
+            bgGradient="linear(to-r, brand.500, brand.700)"
+            _hover={{ bgGradient: "linear(to-r, brand.600, brand.800)", shadow: "md" }}
             onClick={handleSubmit} 
             isLoading={isLoading}
             loadingText="Publicando"

@@ -85,17 +85,17 @@ export const Navbar = () => {
                 size="lg"
                 letterSpacing="tighter"
                 fontWeight="900"
-                bgGradient="linear(to-r, blue.600, purple.600)"
+                bgGradient="linear(to-r, brand.600, sand.500)"
                 bgClip="text"
                 transition="all 0.3s"
                 _groupHover={{
-                  bgGradient: "linear(to-r, blue.500, purple.500)",
+                  bgGradient: "linear(to-r, brand.500, sand.400)",
                   transform: "scale(1.02)"
                 }}>
                 SkillBarter
               </Heading>
               <Box
-                bgGradient="linear(to-r, blue.500, purple.500)"
+                bgGradient="linear(to-r, brand.500, sand.400)"
                 px={2}
                 py={0.5}
                 borderRadius="full"
@@ -118,7 +118,7 @@ export const Navbar = () => {
                   borderRadius="full"
                   position="relative"
                   color="gray.400"
-                  _hover={{ color: "blue.500", bg: "blue.50" }}
+                  _hover={{ color: "brand.500", bg: "brand.50" }}
                   aria-label="Notificaciones">
                   <Icon as={FaBell} boxSize={4} />
 
@@ -180,11 +180,11 @@ export const Navbar = () => {
                           p={3}
                           borderRadius="xl"
                           border="1px solid"
-                          borderColor={n.read ? "gray.100" : "blue.100"}
-                          bg={n.read ? "white" : "blue.50"}
+                          borderColor={n.read ? "gray.100" : "brand.100"}
+                          bg={n.read ? "white" : "brand.50"}
                           transition="all 0.2s"
                           cursor="pointer"
-                          _hover={{ borderColor: "blue.200" }}
+                          _hover={{ borderColor: "brand.200" }}
                           onClick={() => {
                             if (!n.read) markReadByIds([n.id])
                           }}>
@@ -206,7 +206,7 @@ export const Navbar = () => {
                                   <ChakraLink
                                     as={Link}
                                     to="/trades"
-                                    color="blue.600"
+                                    color="brand.600"
                                     fontSize="xs"
                                     fontWeight="700">
                                     Ver trueque
@@ -216,7 +216,7 @@ export const Navbar = () => {
                             </Box>
 
                             {!n.read && (
-                              <Badge colorScheme="blue" borderRadius="full" fontSize="10px">
+                              <Badge colorScheme="brand" borderRadius="full" fontSize="10px">
                                 Nuevo
                               </Badge>
                             )}
@@ -258,7 +258,7 @@ export const Navbar = () => {
                   <Flex
                     align="center"
                     justify="center"
-                    bgGradient="linear(to-br, blue.500, purple.600)"
+                    bgGradient="linear(to-br, brand.600, sand.500)"
                     color="white"
                     w={9}
                     h={9}
@@ -311,7 +311,7 @@ export const Navbar = () => {
                 <MenuItem
                   as={Link}
                   to={user?.id ? `/users/${user.id}` : "/services"}
-                  _hover={{ bg: "blue.50", color: "blue.700" }}
+                  _hover={{ bg: "brand.50", color: "brand.700" }}
                   borderRadius="lg"
                   py={3}
                   transition="all 0.2s">
@@ -319,11 +319,11 @@ export const Navbar = () => {
                     <Flex
                       w={8}
                       h={8}
-                      bg="blue.100"
+                      bg="brand.100"
                       borderRadius="md"
                       align="center"
                       justify="center"
-                      color="blue.600">
+                      color="brand.600">
                       <Icon as={FaUser} boxSize={4} />
                     </Flex>
                     <Text fontSize="sm" fontWeight="medium">
@@ -335,7 +335,7 @@ export const Navbar = () => {
                 <MenuItem
                   as={Link}
                   to="/trades"
-                  _hover={{ bg: "purple.50", color: "purple.700" }}
+                  _hover={{ bg: "sand.50", color: "sand.700" }}
                   borderRadius="lg"
                   py={3}
                   transition="all 0.2s">
@@ -343,11 +343,11 @@ export const Navbar = () => {
                     <Flex
                       w={8}
                       h={8}
-                      bg="purple.100"
+                      bg="sand.100"
                       borderRadius="md"
                       align="center"
                       justify="center"
-                      color="purple.600">
+                      color="sand.600">
                       <Icon as={FaExchangeAlt} boxSize={4} />
                     </Flex>
                     <Box>
@@ -366,7 +366,7 @@ export const Navbar = () => {
                 <MenuItem
                   as={Link}
                   to="/profile/settings"
-                  _hover={{ bg: "blue.50", color: "blue.700" }}
+                  _hover={{ bg: "brand.50", color: "brand.700" }}
                   borderRadius="lg"
                   py={3}
                   transition="all 0.2s"
@@ -375,11 +375,11 @@ export const Navbar = () => {
                     <Flex
                       w={8}
                       h={8}
-                      bg="blue.100"
+                      bg="brand.100"
                       borderRadius="md"
                       align="center"
                       justify="center"
-                      color="blue.600"
+                      color="brand.600"
                     >
                       <Icon as={FaUser} boxSize={4} />
                     </Flex>

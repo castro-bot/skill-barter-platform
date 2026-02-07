@@ -191,7 +191,7 @@ export const ProfileSettingsPage = () => {
 
               <HStack justify="flex-end" pt={2}>
                 <Button
-                  colorScheme="blue"
+                  colorScheme="brand"
                   borderRadius="xl"
                   onClick={handleSaveProfile}
                   isLoading={isSavingProfile}

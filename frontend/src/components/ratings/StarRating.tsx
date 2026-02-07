@@ -33,7 +33,7 @@ export const StarRating = ({
         <Icon
           key={`star-${index}`}
           as={FaStar}
-          color={safeValue >= index + 1 ? "yellow.400" : "gray.300"}
+          color={safeValue >= index + 1 ? "brand.500" : "gray.300"}
           boxSize={sizeMap[size]}
         />
       ))}

@@ -71,7 +71,7 @@ export const MyServicesSection = () => {
 
       {isLoading ? (
         <Flex justify="center" py={14} direction="column" align="center" gap={3}>
-          <Spinner size="xl" color="blue.500" thickness="4px" />
+          <Spinner size="xl" color="brand.500" thickness="4px" />
           <Text color="gray.400" fontSize="sm">
             Cargando tus servicios...
           </Text>
@@ -95,14 +95,14 @@ export const MyServicesSection = () => {
           textAlign="center"
         >
           <Flex
-            bg="purple.50"
+            bg="sand.100"
             w={20}
             h={20}
             borderRadius="full"
             align="center"
             justify="center"
             mb={6}
-            color="purple.500"
+            color="sand.600"
           >
             <Icon as={FaBoxOpen} boxSize={8} />
           </Flex>

@@ -11,7 +11,7 @@ export const ProtectedRoute = () => {
     return (
       <Flex minH="100vh" align="center" justify="center" bg="gray.50">
         <VStack spacing={4}>
-          <Spinner size="xl" color="blue.500" thickness="4px" />
+          <Spinner size="xl" color="brand.500" thickness="4px" />
           <Text color="gray.500" fontSize="sm">Verificando sesión...</Text>
         </VStack>
       </Flex>

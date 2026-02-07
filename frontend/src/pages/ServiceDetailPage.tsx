@@ -118,7 +118,7 @@ export const ServiceDetailPage = () => {
     if (import.meta.env.DEV) console.log("[ServiceDetail] Renderizando Spinner")
     return (
       <Flex justify="center" align="center" minH="50vh">
-        <Spinner size="xl" color="blue.500" thickness="4px" />
+        <Spinner size="xl" color="brand.500" thickness="4px" />
       </Flex>
     )
   }
@@ -149,7 +149,7 @@ export const ServiceDetailPage = () => {
   const serviceExtended = service as unknown as ServiceWithExtras
 
   return (
-    <Box bg="gray.50" minH="calc(100vh - 64px)" py={8}>
+    <Box bg="transparent" minH="calc(100vh - 64px)" py={8}>
       <Container maxW="container.md">
         <CreateTradeModal
           isOpen={isOpen}
@@ -166,7 +166,7 @@ export const ServiceDetailPage = () => {
         <Card size="lg" shadow="lg" bg="white" borderRadius="2xl" overflow="hidden">
           <CardBody p={{ base: 6, md: 8 }}>
             <HStack mb={4} justify="space-between">
-              <Badge colorScheme="blue" px={3} py={1} borderRadius="full" fontSize="sm">
+              <Badge colorScheme="brand" px={3} py={1} borderRadius="full" fontSize="sm">
                 {service.category}
               </Badge>
 
@@ -215,7 +215,7 @@ export const ServiceDetailPage = () => {
               {!isMyService && (
                 <Button
                   size="lg"
-                  colorScheme="blue"
+                  colorScheme="brand"
                   leftIcon={<Icon as={FaExchangeAlt} />}
                   onClick={onOpen}
                   width={{ base: "full", sm: "auto" }}>

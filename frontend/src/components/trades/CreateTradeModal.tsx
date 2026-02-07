@@ -131,7 +131,7 @@ export const CreateTradeModal = ({
     if (isLoadingServices) {
       return (
         <VStack py={8} spacing={4}>
-          <Spinner size="xl" color="blue.500" thickness='4px' />
+          <Spinner size="xl" color="brand.500" thickness='4px' />
           <Text color="gray.500">Buscando tus servicios disponibles...</Text>
         </VStack>
       );
@@ -164,11 +164,11 @@ export const CreateTradeModal = ({
 
     return (
       <VStack spacing={5} align="stretch">
-        <Box bg="blue.50" p={3} borderRadius="md" borderLeft="4px solid" borderColor="blue.400">
-          <Text fontSize="sm" color="blue.800">
+        <Box bg="brand.50" p={3} borderRadius="md" borderLeft="4px solid" borderColor="brand.400">
+          <Text fontSize="sm" color="brand.800">
             Estás solicitando: <strong>{requestedServiceTitle}</strong>
           </Text>
-          <Text fontSize="xs" color="blue.600">
+          <Text fontSize="xs" color="brand.600">
             Propietario: {ownerName}
           </Text>
         </Box>
@@ -179,7 +179,7 @@ export const CreateTradeModal = ({
             placeholder="Selecciona uno de tus servicios..."
             value={selectedServiceId}
             onChange={(e) => setSelectedServiceId(e.target.value)}
-            focusBorderColor="blue.500"
+            focusBorderColor="brand.500"
           >
             {myServices.map((service) => (
               <option key={service.id} value={service.id}>
@@ -221,7 +221,7 @@ export const CreateTradeModal = ({
           
           {myServices.length > 0 && !isLoadingServices && (
             <Button 
-              colorScheme="blue" 
+              colorScheme="brand" 
               onClick={handleSubmit}
               isLoading={isSubmitting}
               loadingText="Enviando..."

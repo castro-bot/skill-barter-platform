@@ -119,7 +119,7 @@ export const UserPublicProfilePage = () => {
 
   if (isLoading) {
     return (
-      <Box bg="gray.50" minH="calc(100vh - 64px)">
+      <Box bg="transparent" minH="calc(100vh - 64px)">
         <Container maxW="container.md" py={16}>
           <VStack spacing={4}>
             <Spinner size="xl" thickness="4px" />
@@ -132,7 +132,7 @@ export const UserPublicProfilePage = () => {
 
   if (error) {
     return (
-      <Box bg="gray.50" minH="calc(100vh - 64px)">
+      <Box bg="transparent" minH="calc(100vh - 64px)">
         <Container maxW="container.md" py={10}>
           <Alert status="error" borderRadius="xl">
             <AlertIcon />
@@ -145,7 +145,7 @@ export const UserPublicProfilePage = () => {
 
   if (!profile) {
     return (
-      <Box bg="gray.50" minH="calc(100vh - 64px)">
+      <Box bg="transparent" minH="calc(100vh - 64px)">
         <Container maxW="container.md" py={10}>
           <Alert status="warning" borderRadius="xl">
             <AlertIcon />
@@ -157,7 +157,7 @@ export const UserPublicProfilePage = () => {
   }
 
   return (
-    <Box bg="gray.50" minH="calc(100vh - 64px)">
+    <Box bg="transparent" minH="calc(100vh - 64px)">
       <Container maxW="container.xl" py={10}>
         {/* HEADER PERFIL */}
         <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="2xl" p={6} shadow="sm">
@@ -170,7 +170,7 @@ export const UserPublicProfilePage = () => {
                     {safeName(profile.user.name)}
                   </Heading>
                   {isMyProfile && (
-                    <Badge colorScheme="blue" borderRadius="full" px={3}>
+                    <Badge colorScheme="brand" borderRadius="full" px={3}>
                       Tu
                     </Badge>
                   )}
@@ -186,7 +186,7 @@ export const UserPublicProfilePage = () => {
               {ratingSummary.count > 0 ? (
                 <StarRating value={ratingSummary.average} count={ratingSummary.count} size="sm" />
               ) : (
-                <Badge colorScheme="gray" variant="subtle">
+                <Badge colorScheme="sand" variant="subtle">
                   Sin calificaciones
                 </Badge>
               )}
@@ -233,7 +233,7 @@ export const UserPublicProfilePage = () => {
                     <Wrap mt={3} spacing={2}>
                       {rating.tags.map((tag) => (
                         <WrapItem key={tag}>
-                          <Tag size="sm" colorScheme="blue" variant="subtle">
+                          <Tag size="sm" colorScheme="brand" variant="subtle">
                             {tag}
                           </Tag>
                         </WrapItem>
@@ -278,7 +278,7 @@ export const UserPublicProfilePage = () => {
                   author={s.owner?.name ?? safeName(profile.user.name)}
                   category={s.category}
                   price="Trueque"
-                  colorPalette="blue"
+                  colorPalette="brand"
                   ratingAverage={s.owner.ratingAverage}
                   ratingCount={s.owner.ratingCount}
                 />

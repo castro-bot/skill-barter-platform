@@ -80,11 +80,11 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
       borderColor="gray.100"
       p={5}
       transition="all 0.2s"
-      _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: "blue.200" }}
+      _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: "brand.200" }}
     >
       <HStack mb={2} color="gray.500">
         <Icon as={FaTag} boxSize={3} />
-        <Badge colorScheme="blue" variant="subtle" borderRadius="full">
+        <Badge colorScheme="brand" variant="subtle" borderRadius="full">
           {service.category}
         </Badge>
         <Spacer />
@@ -104,7 +104,7 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
       <HStack mt={5} spacing={3}>
         <Button
           leftIcon={<FaEdit />}
-          colorScheme="blue"
+          colorScheme="brand"
           variant="outline"
           borderRadius="xl"
           size="sm"

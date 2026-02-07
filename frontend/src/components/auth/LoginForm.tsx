@@ -78,8 +78,8 @@ export const LoginForm = () => {
             borderRadius="md"
             _focus={{
               bg: "white",
-              borderColor: "blue.500",
-              boxShadow: "0 0 0 1px #3182ce"
+              borderColor: "brand.500",
+              boxShadow: "0 0 0 1px var(--sb-ring)"
             }}
           />
         </Box>
@@ -104,8 +104,8 @@ export const LoginForm = () => {
               paddingRight="3rem"
               _focus={{
                 bg: "white",
-                borderColor: "blue.500",
-                boxShadow: "0 0 0 1px #3182ce"
+                borderColor: "brand.500",
+                boxShadow: "0 0 0 1px var(--sb-ring)"
               }}
             />
             <IconButton
@@ -119,7 +119,7 @@ export const LoginForm = () => {
               transform="translateY(-50%)"
               zIndex="5"
               color="gray.400"
-              _hover={{ color: "blue.500", bg: "transparent" }}
+              _hover={{ color: "brand.500", bg: "transparent" }}
               icon={showPassword ? <FaEyeSlash /> : <FaEye />}
             />
           </Box>
@@ -143,7 +143,7 @@ export const LoginForm = () => {
         {/* BOTÓN */}
         <Button
           type="submit"
-          colorScheme="blue"
+          colorScheme="brand"
           size="lg"
           height="3rem"
           fontSize="md"
@@ -157,7 +157,7 @@ export const LoginForm = () => {
           _hover={{
             transform: "translateY(-1px)",
             shadow: "md",
-            bg: "blue.600"
+            bg: "brand.600"
           }}
           transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
         >

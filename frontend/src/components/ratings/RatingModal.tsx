@@ -113,7 +113,7 @@ export const RatingModal = ({
 
   const handleSubmit = async () => {
     if (!score) {
-      toast({ title: "Selecciona una calificacion", status: "warning" })
+      toast({ title: "Selecciona una calificación", status: "warning" })
       return
     }
 
@@ -130,9 +130,9 @@ export const RatingModal = ({
       onClose()
       onSuccess?.()
     } catch (error) {
-      console.error("Error creando calificacion", error)
+      console.error("Error creando calificación", error)
       toast({
-        title: "No se pudo registrar la calificacion",
+        title: "No se pudo registrar la calificación",
         description: getApiErrorMessage(error, "Intenta nuevamente."),
         status: "error"
       })
@@ -144,14 +144,14 @@ export const RatingModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
       <ModalOverlay backdropFilter="blur(2px)" />
-      <ModalContent>
+      <ModalContent boxShadow="xl">
         <ModalHeader>Califica a {counterpartyName}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <VStack align="stretch" spacing={4}>
             <Box>
               <Text fontWeight="bold" mb={2}>
-                Tu calificacion
+                Tu calificación
               </Text>
               <HStack spacing={1}>
                 {Array.from({ length: 5 }).map((_, index) => (
@@ -161,7 +161,9 @@ export const RatingModal = ({
                     icon={<FaStar />}
                     size="lg"
                     variant="ghost"
-                    color={score >= index + 1 ? "yellow.400" : "gray.300"}
+                    color={score >= index + 1 ? "brand.500" : "gray.300"}
+                    bg={score >= index + 1 ? "brand.50" : "transparent"}
+                    _hover={{ bg: score >= index + 1 ? "brand.100" : "gray.100" }}
                     onClick={() => setScore(index + 1)}
                   />
                 ))}
@@ -198,7 +200,7 @@ export const RatingModal = ({
                         <Button
                           size="sm"
                           variant={isActive ? "solid" : "outline"}
-                          colorScheme={isActive ? "blue" : "gray"}
+                          colorScheme={isActive ? "brand" : "gray"}
                           onClick={() => toggleTag(tag)}
                         >
                           {tag}
@@ -208,7 +210,7 @@ export const RatingModal = ({
                   })}
                 </Wrap>
                 {typeof meta?.maxTags === "number" && (
-                  <Text fontSize="xs" color="gray.500" mt={2}>
+                  <Text fontSize="xs" color="brand.700" mt={2}>
                     Puedes elegir hasta {meta.maxTags} motivos.
                   </Text>
                 )}
@@ -238,8 +240,8 @@ export const RatingModal = ({
           <Button variant="ghost" mr={3} onClick={onClose}>
             Cancelar
           </Button>
-          <Button colorScheme="blue" onClick={handleSubmit} isLoading={isSubmitting}>
-            Enviar calificacion
+          <Button colorScheme="brand" onClick={handleSubmit} isLoading={isSubmitting}>
+            Enviar calificación
           </Button>
         </ModalFooter>
       </ModalContent>

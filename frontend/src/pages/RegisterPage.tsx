@@ -36,7 +36,7 @@ export const RegisterPage = () => {
             <Text fontSize="sm" color="gray.600" textAlign="center" mt={4}>
               ¿Ya tienes cuenta?{' '}
               {/* CORRECCIÓN AQUÍ: Usamos 'as={Link}' en lugar de 'asChild' */}
-              <ChakraLink as={Link} to="/login" color="blue.600" fontWeight="bold">
+              <ChakraLink as={Link} to="/login" color="brand.600" fontWeight="bold">
                 Inicia Sesión aquí
               </ChakraLink>
             </Text>
