@@ -73,6 +73,12 @@ model TradeProposal {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
+  // Optional note/message from proposer
+  note      String?
+
+  // Contact (shared by receiver when accepting)
+  contactWhatsapp String?
+
   // Who proposes
   proposerId String
   proposer   User   @relation("ProposerTrades", fields: [proposerId], references: [id])

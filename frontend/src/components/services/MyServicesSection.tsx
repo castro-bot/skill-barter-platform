@@ -13,6 +13,7 @@ import {
 import { FaBoxOpen, FaSyncAlt } from "react-icons/fa"
 import { servicesApi, type ServiceListing } from "../../api/services"
 import { MyServiceCard } from "./MyServiceCard"
+import { getApiErrorMessage } from "../../utils/error"
 
 export const MyServicesSection = () => {
   const toast = useToast()
@@ -28,7 +29,7 @@ export const MyServicesSection = () => {
       console.error("Error cargando mis servicios:", error)
       toast({
         title: "No se pudieron cargar tus servicios",
-        description: "Verifica tu sesión o intenta nuevamente.",
+        description: getApiErrorMessage(error, "Verifica tu sesión o intenta nuevamente."),
         status: "error",
         duration: 3500,
         isClosable: true,

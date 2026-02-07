@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react"
 import { FaStar } from "react-icons/fa"
 import { ratingsApi } from "../../api/ratings"
+import { getApiErrorMessage } from "../../utils/error"
 
 const TAGS_BY_SCORE: Record<number, string[]> = {
   1: ["Incumplio lo acordado", "No se presento", "Mala comunicacion", "Calidad baja", "Tiempo de entrega"],
@@ -100,7 +101,11 @@ export const RatingModal = ({
       onSuccess?.()
     } catch (error) {
       console.error("Error creando calificacion", error)
-      toast({ title: "No se pudo registrar la calificacion", status: "error" })
+      toast({
+        title: "No se pudo registrar la calificacion",
+        description: getApiErrorMessage(error, "Intenta nuevamente."),
+        status: "error"
+      })
     } finally {
       setIsSubmitting(false)
     }

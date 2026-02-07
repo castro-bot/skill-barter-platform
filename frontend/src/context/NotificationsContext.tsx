@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 import { notificationsApi } from "../api/notifications"
 import type { Notification } from "../types/notification"
 import { useAuth } from "./AuthContext"
+import { getApiErrorMessage } from "../utils/error"
 
 type NotificationsContextType = {
   notifications: Notification[]
@@ -80,7 +81,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         setError(null)
       })
     } catch (e) {
-      safeSetState(() => setError(e instanceof Error ? e.message : "Error obteniendo unreadCount"))
+      safeSetState(() => setError(getApiErrorMessage(e, "Error obteniendo unreadCount")))
     } finally {
       inFlightRef.current.unread = false
     }
@@ -105,7 +106,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         setError(null)
       })
     } catch (e) {
-      safeSetState(() => setError(e instanceof Error ? e.message : "Error obteniendo notificaciones"))
+      safeSetState(() => setError(getApiErrorMessage(e, "Error obteniendo notificaciones")))
     } finally {
       safeSetState(() => setIsLoading(false))
       inFlightRef.current.list = false
@@ -135,7 +136,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         setError(null)
       })
     } catch (e) {
-      safeSetState(() => setError(e instanceof Error ? e.message : "Error refrescando notificaciones"))
+      safeSetState(() => setError(getApiErrorMessage(e, "Error refrescando notificaciones")))
     } finally {
       safeSetState(() => setIsLoading(false))
       inFlightRef.current.all = false
@@ -166,7 +167,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       } catch (e) {
         // Si falla, re-sincronizamos para quedar consistentes
         await refreshAll()
-        safeSetState(() => setError(e instanceof Error ? e.message : "Error marcando notificaciones"))
+        safeSetState(() => setError(getApiErrorMessage(e, "Error marcando notificaciones")))
       } finally {
         inFlightRef.current.mark = false
       }

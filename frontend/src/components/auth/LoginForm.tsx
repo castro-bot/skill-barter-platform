@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { FaEye, FaEyeSlash } from "react-icons/fa"
 import { useAuth } from "../../context/AuthContext"
-import type { AxiosError } from "axios"
+import { getApiErrorMessage } from "../../utils/error"
 
 function normalizeEmail(value: string) {
   return value.trim().toLowerCase()
@@ -20,29 +20,6 @@ function normalizePassword(value: string) {
   // En general no se debe alterar password, pero sí recortar espacios accidentales.
   // Si ustedes permiten espacios intencionales, elimina el trim aquí.
   return value.trim()
-}
-
-function extractAxiosErrorMessage(err: unknown): string {
-  // Caso 1: Error de Axios con response
-  if (err && typeof err === "object" && "isAxiosError" in err) {
-    const axiosError = err as AxiosError<{
-      message?: string
-      error?: string
-    }>
-
-    const data = axiosError.response?.data
-
-    if (data?.message) return data.message
-    if (data?.error) return data.error
-  }
-
-  // Caso 2: Error estándar de JS
-  if (err instanceof Error) {
-    return err.message
-  }
-
-  // Fallback seguro
-  return "No se pudo iniciar sesión. Revisa tus credenciales e intenta nuevamente."
 }
 
 export const LoginForm = () => {
@@ -71,7 +48,12 @@ export const LoginForm = () => {
       await login({ email: cleanEmail, password: cleanPassword })
     } catch (err) {
       console.error("[Login] Error:", err)
-      setError(extractAxiosErrorMessage(err))
+      setError(
+        getApiErrorMessage(
+          err,
+          "No se pudo iniciar sesión. Revisa tus credenciales e intenta nuevamente."
+        )
+      )
     }
   }
 

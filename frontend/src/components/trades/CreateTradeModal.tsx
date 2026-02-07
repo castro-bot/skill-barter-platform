@@ -1,6 +1,6 @@
 // frontend/src/components/trades/CreateTradeModal.tsx
 import { useState, useEffect } from 'react';
-import { AxiosError } from 'axios';
+import { getApiErrorMessage } from '../../utils/error';
 import {
   Modal,
   ModalOverlay,
@@ -112,12 +112,10 @@ export const CreateTradeModal = ({
     } catch (error) {
       console.error('Error creando trade', error);
       
-      let errorMsg = 'Hubo un problema procesando tu solicitud.';
-      
-      // ✅ VERIFICACIÓN DE TIPO SEGURA (Sin usar any)
-      if (error instanceof AxiosError && error.response?.data?.message) {
-        errorMsg = error.response.data.message;
-      }
+      const errorMsg = getApiErrorMessage(
+        error,
+        'Hubo un problema procesando tu solicitud.'
+      );
       
       toast({
         title: 'Error al enviar',

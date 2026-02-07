@@ -23,6 +23,7 @@ import { ServiceCard } from "../components/services/ServiceCard"
 import { useAuth } from "../context/AuthContext"
 import { ratingsApi, type Rating, type RatingSummary } from "../api/ratings"
 import { StarRating } from "../components/ratings/StarRating"
+import { getApiErrorMessage } from "../utils/error"
 
 type PublicUser = {
   id: string
@@ -103,8 +104,8 @@ export const UserPublicProfilePage = () => {
       } catch (innerError) {
         console.error("Error cargando calificaciones", innerError)
       }
-    } catch {
-      setError("No se pudo cargar el perfil publico.")
+    } catch (error) {
+      setError(getApiErrorMessage(error, "No se pudo cargar el perfil publico."))
       setProfile(null)
     } finally {
       setIsLoading(false)

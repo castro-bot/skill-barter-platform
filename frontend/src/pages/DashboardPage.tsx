@@ -13,11 +13,12 @@ import {
   useDisclosure,
   Spinner
 } from "@chakra-ui/react"
-import { FaPlus, FaBoxOpen, FaExchangeAlt, FaCoins, FaChartLine } from "react-icons/fa"
+import { FaPlus, FaBoxOpen, FaExchangeAlt, FaChartLine, FaCheckCircle } from "react-icons/fa"
 import { useAuth } from "../context/AuthContext"
 import { CreateServiceModal } from "../components/services/CreateServiceModal"
 import { ServiceCard } from "../components/services/ServiceCard"
 import { servicesApi, type ServiceListing } from "../api/services"
+import { tradesApi } from "../api/trades"
 import type { ElementType } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { MyServicesSection } from "../components/services/MyServicesSection"
@@ -87,6 +88,9 @@ export const DashboardPage = () => {
 
   const [services, setServices] = useState<ServiceListing[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isStatsLoading, setIsStatsLoading] = useState(true)
+  const [completedTradesCount, setCompletedTradesCount] = useState(0)
+  const [activeTradesCount, setActiveTradesCount] = useState(0)
 
   // Evita re-abrir el modal dos veces en dev (React StrictMode monta/desmonta doble)
   const handledNewRouteRef = useRef(false)
@@ -107,13 +111,36 @@ export const DashboardPage = () => {
     }
   }
 
+  const loadStats = async () => {
+    setIsStatsLoading(true)
+    try {
+      const trades = await tradesApi.getAll()
+
+      const allTrades = [...(trades.incoming || []), ...(trades.outgoing || [])]
+      const active = allTrades.filter((t) => t.status === "PENDING" || t.status === "ACCEPTED")
+      const completed = allTrades.filter((t) => t.status === "COMPLETED")
+      setActiveTradesCount(active.length)
+      setCompletedTradesCount(completed.length)
+    } catch (error) {
+      console.error("Error cargando estadisticas:", error)
+      setActiveTradesCount(0)
+      setCompletedTradesCount(0)
+    } finally {
+      setIsStatsLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (user) {
       loadServices()
+      loadStats()
     } else {
       // si no hay user (por ejemplo, en transición), evita estado inconsistente
       setServices([])
       setIsLoading(false)
+      setIsStatsLoading(false)
+      setActiveTradesCount(0)
+      setCompletedTradesCount(0)
     }
   }, [user])
 
@@ -196,9 +223,30 @@ export const DashboardPage = () => {
           </Flex>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
-            <StatCard icon={FaCoins} label="Mis Créditos" value="100" color="yellow" />
-            <StatCard icon={FaExchangeAlt} label="Intercambios Activos" value="0" color="purple" />
-            <StatCard icon={FaChartLine} label="Reputación" value="Nueva" color="green" />
+            <StatCard
+              icon={FaCheckCircle}
+              label="Trueques Completados"
+              value={isStatsLoading ? "..." : String(completedTradesCount)}
+              color="yellow"
+            />
+            <StatCard
+              icon={FaExchangeAlt}
+              label="Intercambios Activos"
+              value={isStatsLoading ? "..." : String(activeTradesCount)}
+              color="purple"
+            />
+            <StatCard
+              icon={FaChartLine}
+              label="Reputación"
+              value={
+                isStatsLoading
+                  ? "..."
+                  : user?.ratingCount
+                    ? `${(user.ratingAverage ?? 0).toFixed(1)}/5.0 (${user.ratingCount})`
+                    : "Nueva"
+              }
+              color="green"
+            />
           </SimpleGrid>
         </Container>
       </Box>

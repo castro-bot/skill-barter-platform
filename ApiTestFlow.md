@@ -115,7 +115,7 @@ curl http://localhost:3001/api/v1/trades \
 curl -X PUT http://localhost:3001/api/v1/trades/TRADE_ID/respond \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"action": "accept"}'
+  -d '{"action": "accept", "contactWhatsapp": "+593 99 123 4567"}'
 ```
 
 ### 4. Complete Trade

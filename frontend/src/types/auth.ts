@@ -1,11 +1,13 @@
-// src/types/auth.ts
+﻿// src/types/auth.ts
 
 export interface User {
   id: string;
   name: string;
   email: string;
   createdAt: string;
-  role: 'student' | 'admin'; // Asumimos student por defecto según SRS
+  role: 'student' | 'admin'; // Asumimos student por defecto segun SRS
+  ratingAverage?: number;
+  ratingCount?: number;
 }
 
 export interface AuthResponse {
@@ -16,7 +18,7 @@ export interface AuthResponse {
 // Lo que enviamos al hacer Login
 export interface LoginDTO {
   email: string;
-  password: string; // "a-strong-password-123" según el PDF
+  password: string; // "a-strong-password-123" segun el PDF
 }
 
 // Lo que enviamos al Registrarse
