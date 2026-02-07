@@ -17,6 +17,7 @@ import {
   Spinner,
   Tag,
   useDisclosure,
+  useColorModeValue,
   Divider
 } from "@chakra-ui/react"
 import { FaArrowLeft, FaExchangeAlt } from "react-icons/fa"
@@ -41,6 +42,9 @@ export const ServiceDetailPage = () => {
 
   const [service, setService] = useState<ServiceListing | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const titleColor = useColorModeValue("gray.800", "gray.100")
+  const textMuted = useColorModeValue("gray.600", "gray.400")
+  const cardBorder = useColorModeValue("gray.100", "whiteAlpha.200")
 
   // Timer label estable (solo para DEV)
   const timerLabel = useMemo(() => `Navegación-Servicio-${id ?? "undefined"}`, [id])
@@ -127,12 +131,12 @@ export const ServiceDetailPage = () => {
   if (!service) {
     return (
       <Container maxW="container.md" py={10}>
-        <Card shadow="md" borderRadius="xl">
+        <Card shadow="md" borderRadius="xl" borderColor={cardBorder}>
           <CardBody>
-            <Heading size="lg" mb={2}>
+            <Heading size="lg" mb={2} color={titleColor}>
               Servicio no encontrado
             </Heading>
-            <Text color="gray.600" mb={6}>
+            <Text color={textMuted} mb={6}>
               El servicio que buscas no existe o no está disponible.
             </Text>
 
@@ -163,7 +167,7 @@ export const ServiceDetailPage = () => {
           Volver al mercado
         </Button>
 
-        <Card size="lg" shadow="lg" bg="white" borderRadius="2xl" overflow="hidden">
+        <Card size="lg" shadow="lg" bg="surface" borderRadius="2xl" overflow="hidden" borderColor={cardBorder}>
           <CardBody p={{ base: 6, md: 8 }}>
             <HStack mb={4} justify="space-between">
               <Badge colorScheme="brand" px={3} py={1} borderRadius="full" fontSize="sm">
@@ -175,11 +179,11 @@ export const ServiceDetailPage = () => {
               </Tag>
             </HStack>
 
-            <Heading size="2xl" mb={6} color="gray.800" lineHeight="tight">
+            <Heading size="2xl" mb={6} color={titleColor} lineHeight="tight">
               {service.title}
             </Heading>
 
-            <Text fontSize="lg" color="gray.600" lineHeight="tall" mb={8}>
+            <Text fontSize="lg" color={textMuted} lineHeight="tall" mb={8}>
               {service.description}
             </Text>
 
@@ -206,7 +210,7 @@ export const ServiceDetailPage = () => {
                     size="xs"
                     showValue={false}
                   />
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="sm" color={textMuted}>
                     Propietario
                   </Text>
                 </Box>

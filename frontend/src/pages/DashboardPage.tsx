@@ -12,6 +12,7 @@ import {
   HStack,
   keyframes,
   useDisclosure,
+  useColorModeValue,
   Spinner
 } from "@chakra-ui/react"
 import { FaPlus, FaBoxOpen, FaExchangeAlt, FaChartLine, FaCheckCircle } from "react-icons/fa"
@@ -38,58 +39,69 @@ interface StatCardProps {
   delay?: number
 }
 
-const StatCard = ({ icon, label, value, color, delay = 0 }: StatCardProps) => (
-  <Box
-    bg="white"
-    p={5}
-    borderRadius="2xl"
-    border="1px solid"
-    borderColor="gray.100"
-    shadow="sm"
-    position="relative"
-    overflow="hidden"
-    transition="all 0.2s"
-    _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: `${color}.200` }}
-    animation={`${fadeUp} 0.6s ease ${delay}s both`}
-  >
-    <Box position="absolute" right="-10px" top="-10px" opacity={0.1} transform="rotate(15deg)">
-      <Icon as={icon} boxSize={24} color={color} />
-    </Box>
+const StatCard = ({ icon, label, value, color, delay = 0 }: StatCardProps) => {
+  const subtleBg = useColorModeValue(`${color}.50`, "whiteAlpha.100")
+  const labelColor = useColorModeValue("gray.500", "gray.400")
+  const valueColor = useColorModeValue("gray.700", "gray.100")
 
-    <Flex align="center" gap={4} position="relative" zIndex={1}>
-      <Flex
-        w={12}
-        h={12}
-        align="center"
-        justify="center"
-        borderRadius="xl"
-        bg={`${color}.50`}
-        color={`${color}.500`}
-        shadow="sm"
-      >
-        <Icon as={icon} boxSize={6} />
-      </Flex>
-      <Box>
-        <Text
-          fontSize="xs"
-          color="gray.500"
-          fontWeight="bold"
-          textTransform="uppercase"
-          letterSpacing="wider"
-        >
-          {label}
-        </Text>
-        <Text fontSize="2xl" fontWeight="800" color="gray.700" lineHeight="1">
-          {value}
-        </Text>
+  return (
+    <Box
+      bg="surface"
+      p={5}
+      borderRadius="2xl"
+      border="1px solid"
+      borderColor="borderSubtle"
+      shadow="sm"
+      position="relative"
+      overflow="hidden"
+      transition="all 0.2s"
+      _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: `${color}.200` }}
+      animation={`${fadeUp} 0.6s ease ${delay}s both`}
+    >
+      <Box position="absolute" right="-10px" top="-10px" opacity={0.1} transform="rotate(15deg)">
+        <Icon as={icon} boxSize={24} color={color} />
       </Box>
-    </Flex>
-  </Box>
-)
+
+      <Flex align="center" gap={4} position="relative" zIndex={1}>
+        <Flex
+          w={12}
+          h={12}
+          align="center"
+          justify="center"
+          borderRadius="xl"
+          bg={subtleBg}
+          color={`${color}.500`}
+          shadow="sm"
+        >
+          <Icon as={icon} boxSize={6} />
+        </Flex>
+        <Box>
+          <Text
+            fontSize="xs"
+            color={labelColor}
+            fontWeight="bold"
+            textTransform="uppercase"
+            letterSpacing="wider"
+          >
+            {label}
+          </Text>
+          <Text fontSize="2xl" fontWeight="800" color={valueColor} lineHeight="1">
+            {value}
+          </Text>
+        </Box>
+      </Flex>
+    </Box>
+  )
+}
 
 export const DashboardPage = () => {
   const { user } = useAuth()
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const heroGradient = useColorModeValue("linear(to-b, white, brand.50)", "linear(to-b, gray.900, gray.800)")
+  const heroBorder = useColorModeValue("gray.200", "whiteAlpha.200")
+  const subtleText = useColorModeValue("gray.500", "gray.400")
+  const titleColor = useColorModeValue("gray.800", "gray.100")
+  const emptyIconBg = useColorModeValue("brand.50", "whiteAlpha.100")
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -185,12 +197,12 @@ export const DashboardPage = () => {
 
       {/* HERO HEADER */}
       <Box
-        bg="white"
+        bg="surface"
         borderBottom="1px solid"
-        borderColor="gray.200"
+        borderColor={heroBorder}
         pb={12}
         pt={10}
-        bgGradient="linear(to-b, white, brand.50)"
+        bgGradient={heroGradient}
       >
         <Container maxW="container.xl">
           <Flex
@@ -201,14 +213,14 @@ export const DashboardPage = () => {
             mb={10}
           >
             <Box maxW="2xl">
-              <Heading size="2xl" color="gray.800" letterSpacing="tight" mb={3}>
+              <Heading size="2xl" color={titleColor} letterSpacing="tight" mb={3}>
                 Hola,{" "}
                 <Box as="span" bgGradient="linear(to-r, brand.500, sand.400)" bgClip="text">
                   {user?.name?.split(" ")[0]}
                 </Box>{" "}
                 👋
               </Heading>
-              <Text fontSize="lg" color="gray.500">
+              <Text fontSize="lg" color={subtleText}>
                 Bienvenido a <b>SkillBarter</b>. Encuentra lo que necesitas intercambiando tus
                 habilidades.
               </Text>
@@ -265,7 +277,7 @@ export const DashboardPage = () => {
       {/* ÁREA DE SERVICIOS */}
       <Container maxW="container.xl" py={12}>
         <HStack mb={8} justify="space-between" align="center">
-          <Heading size="lg" color="gray.700" letterSpacing="tight">
+          <Heading size="lg" color={titleColor} letterSpacing="tight">
             Explorar Mercado
           </Heading>
         </HStack>
@@ -273,7 +285,7 @@ export const DashboardPage = () => {
         {isLoading ? (
           <Flex justify="center" py={20} direction="column" align="center" gap={4}>
             <Spinner size="xl" color="brand.500" thickness="4px" />
-            <Text color="gray.400" fontSize="sm">
+            <Text color={subtleText} fontSize="sm">
               Cargando ofertas...
             </Text>
           </Flex>
@@ -300,16 +312,16 @@ export const DashboardPage = () => {
             align="center"
             justify="center"
             py={20}
-            bg="white"
+            bg="surface"
             borderRadius="3xl"
             border="2px dashed"
-            borderColor="gray.200"
+            borderColor="borderSubtle"
             textAlign="center"
             mx="auto"
             maxW="3xl"
           >
             <Flex
-              bg="brand.50"
+              bg={emptyIconBg}
               w={20}
               h={20}
               borderRadius="full"
@@ -320,10 +332,10 @@ export const DashboardPage = () => {
             >
               <Icon as={FaBoxOpen} boxSize={8} />
             </Flex>
-            <Heading size="md" color="gray.800" mb={2}>
+            <Heading size="md" color={titleColor} mb={2}>
               No hay otros servicios disponibles
             </Heading>
-            <Text color="gray.500" maxW="md" mb={8}>
+            <Text color={subtleText} maxW="md" mb={8}>
               Parece que eres el único aquí o ya has visto todo. ¡Invita a más amigos!
             </Text>
             <Button

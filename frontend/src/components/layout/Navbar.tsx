@@ -43,6 +43,8 @@ export const Navbar = () => {
   const menuBorder = useColorModeValue("gray.100", "whiteAlpha.200")
   const hoverSoft = useColorModeValue("gray.50", "whiteAlpha.100")
   const iconSoft = useColorModeValue("gray.400", "gray.300")
+  const textMuted = useColorModeValue("gray.500", "gray.400")
+  const textStrong = useColorModeValue("gray.800", "gray.100")
   const {
     notifications,
     unreadCount,
@@ -166,7 +168,7 @@ export const Navbar = () => {
                 shadow="2xl">
                 <PopoverArrow />
                 <PopoverCloseButton />
-                <PopoverHeader borderTopRadius="2xl" fontWeight="800" color="gray.700">
+                <PopoverHeader borderTopRadius="2xl" fontWeight="800" color={textStrong}>
                   Notificaciones
                 </PopoverHeader>
 
@@ -174,7 +176,7 @@ export const Navbar = () => {
                   {isLoading ? (
                     <Flex py={6} justify="center" align="center" gap={3}>
                       <Spinner size="sm" />
-                      <Text fontSize="sm" color="gray.500">
+                      <Text fontSize="sm" color={textMuted}>
                         Cargando...
                       </Text>
                     </Flex>
@@ -183,13 +185,13 @@ export const Navbar = () => {
                       <Text fontSize="sm" color="red.600" fontWeight="600" mb={2}>
                         No se pudieron cargar las notificaciones
                       </Text>
-                      <Text fontSize="xs" color="gray.500">
+                      <Text fontSize="xs" color={textMuted}>
                         {error}
                       </Text>
                     </Box>
                   ) : notifications.length === 0 ? (
                     <Box py={6} textAlign="center">
-                      <Text fontSize="sm" color="gray.500">
+                      <Text fontSize="sm" color={textMuted}>
                         No tienes notificaciones aún.
                       </Text>
                     </Box>
@@ -214,11 +216,11 @@ export const Navbar = () => {
                               <Text
                                 fontSize="sm"
                                 fontWeight={n.read ? "600" : "800"}
-                                color="gray.700"
+                                color={textStrong}
                                 mb={1}>
                                 {n.message}
                               </Text>
-                              <Text fontSize="xs" color="gray.500">
+                              <Text fontSize="xs" color={textMuted}>
                                 {formatDateTime(n.createdAt)}
                               </Text>
 
@@ -253,7 +255,7 @@ export const Navbar = () => {
                   borderTop="1px solid"
                   borderColor={menuBorder}>
                   <HStack justify="space-between">
-                    <Text fontSize="xs" color="gray.500">
+                    <Text fontSize="xs" color={textMuted}>
                       {notifications.length > 0 ? `${notifications.length} en total` : "—"}
                     </Text>
                     <Button size="xs" variant="ghost" onClick={refreshAll}>
@@ -292,10 +294,10 @@ export const Navbar = () => {
                   </Flex>
 
                   <Box textAlign="left" display={{ base: "none", md: "block" }}>
-                    <Text fontSize="sm" fontWeight="bold" color="gray.700" lineHeight="1">
+                    <Text fontSize="sm" fontWeight="bold" color={textStrong} lineHeight="1">
                       {user?.name?.split(" ")[0]}
                     </Text>
-                    <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                    <Text fontSize="xs" color={textMuted} fontWeight="medium">
                       Mi Cuenta
                     </Text>
                   </Box>
@@ -375,7 +377,7 @@ export const Navbar = () => {
                       <Text fontSize="sm" fontWeight="medium">
                         Mis Trueques
                       </Text>
-                      <Text fontSize="xs" color="gray.500">
+                      <Text fontSize="xs" color={textMuted}>
                         Bandeja de entrada
                       </Text>
                     </Box>
@@ -408,7 +410,7 @@ export const Navbar = () => {
                       <Text fontSize="sm" fontWeight="medium">
                         Ajustes de Perfil
                       </Text>
-                      <Text fontSize="xs" color="gray.500">
+                      <Text fontSize="xs" color={textMuted}>
                         Datos y contraseña
                       </Text>
                     </Box>

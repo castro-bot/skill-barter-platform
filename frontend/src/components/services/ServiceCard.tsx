@@ -8,7 +8,8 @@ import {
   Avatar,
   HStack,
   Icon,
-  Spacer
+  Spacer,
+  useColorModeValue
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { FaArrowRight, FaTag } from "react-icons/fa"
@@ -35,6 +36,10 @@ export const ServiceCard = ({
   ratingAverage,
   ratingCount
 }: ServiceCardProps) => {
+  const titleColor = useColorModeValue("gray.800", "gray.100")
+  const bodyColor = useColorModeValue("gray.600", "gray.400")
+  const borderTone = useColorModeValue("gray.100", "whiteAlpha.200")
+
   // Debug handler (solo DEV)
   const handleNavigationDebug = () => {
     if (!import.meta.env.DEV) return
@@ -79,12 +84,12 @@ export const ServiceCard = ({
   return (
     <Box
       position="relative"
-      bg="white"
+      bg="surface"
       borderRadius="2xl"
       overflow="hidden"
       shadow="md"
       border="1px solid"
-      borderColor="gray.100"
+      borderColor={borderTone}
       transition="all 0.3s ease"
       display="flex"
       flexDirection="column"
@@ -134,7 +139,7 @@ export const ServiceCard = ({
         </HStack>
 
         {/* Título */}
-        <Heading size="md" mb={2} lineHeight="short" color="gray.800" noOfLines={2}>
+        <Heading size="md" mb={2} lineHeight="short" color={titleColor} noOfLines={2}>
           {title}
         </Heading>
 
@@ -143,9 +148,9 @@ export const ServiceCard = ({
         {/* Autor */}
         <HStack mt={4} mb={4}>
           <Avatar size="xs" name={author} bg={palette.base} color="white" />
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color={bodyColor}>
             por{" "}
-            <Text as="span" fontWeight="semibold" color="gray.800">
+            <Text as="span" fontWeight="semibold" color={titleColor}>
               {author}
             </Text>
           </Text>

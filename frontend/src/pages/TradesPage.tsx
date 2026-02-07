@@ -33,7 +33,8 @@ import {
   FormLabel,
   Input,
   useToast,
-  useDisclosure
+  useDisclosure,
+  useColorModeValue
 } from "@chakra-ui/react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { tradesApi, type Trade, type TradesResponse } from "../api/trades";
@@ -59,6 +60,7 @@ export const TradesPage = () => {
   const [trades, setTrades] = useState<TradesResponse>({ incoming: [], outgoing: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const titleColor = useColorModeValue("gray.700", "gray.100");
   const ratingDisclosure = useDisclosure();
   const [ratingTarget, setRatingTarget] = useState<{ tradeId: string; counterpartyName: string } | null>(null);
   const whatsappDisclosure = useDisclosure();
@@ -191,27 +193,38 @@ export const TradesPage = () => {
     }
   };
 
-  const TradeCard = ({ trade, isIncoming }: { trade: Trade; isIncoming: boolean }) => (
-    <Card
-      mb={6}
-      overflow="hidden"
-      variant="outline"
-      borderColor={trade.status === "PENDING" ? "sand.300" : "gray.200"}
-      boxShadow={trade.status === "PENDING" ? "md" : "sm"}
-      borderRadius="xl"
-      borderWidth={trade.status === "PENDING" ? "2px" : "1px"}
-      transition="all 0.2s"
-      _hover={{ shadow: "lg" }}
-    >
+  const TradeCard = ({ trade, isIncoming }: { trade: Trade; isIncoming: boolean }) => {
+    const borderBase = useColorModeValue("gray.200", "whiteAlpha.200")
+    const pendingBorder = useColorModeValue("sand.300", "sand.500")
+    const headerPending = useColorModeValue("sand.50", "whiteAlpha.100")
+    const headerNeutral = useColorModeValue("gray.50", "whiteAlpha.50")
+    const noteBg = useColorModeValue("yellow.50", "whiteAlpha.100")
+    const noteBorder = useColorModeValue("yellow.400", "yellow.300")
+    const noteText = useColorModeValue("gray.700", "gray.300")
+    const labelMuted = useColorModeValue("gray.500", "gray.400")
+    const badgeLabel = useColorModeValue("gray.400", "gray.500")
+
+    return (
+      <Card
+        mb={6}
+        overflow="hidden"
+        variant="outline"
+        borderColor={trade.status === "PENDING" ? pendingBorder : borderBase}
+        boxShadow={trade.status === "PENDING" ? "md" : "sm"}
+        borderRadius="xl"
+        borderWidth={trade.status === "PENDING" ? "2px" : "1px"}
+        transition="all 0.2s"
+        _hover={{ shadow: "lg" }}
+      >
       <CardBody p={0}>
         {/* CABECERA */}
         <Flex
-          bg={trade.status === "PENDING" ? "sand.50" : "gray.50"}
+          bg={trade.status === "PENDING" ? headerPending : headerNeutral}
           p={4}
           justify="space-between"
           align="center"
           borderBottom="1px solid"
-          borderColor="gray.100"
+          borderColor={borderBase}
         >
           <Badge
             colorScheme={getStatusColor(trade.status)}
@@ -224,7 +237,7 @@ export const TradesPage = () => {
             {trade.status === "PENDING" ? "PENDIENTE DE RESPUESTA" : trade.status}
           </Badge>
 
-          <Text fontSize="xs" fontWeight="bold" color="gray.500">
+          <Text fontSize="xs" fontWeight="bold" color={labelMuted}>
             {new Date(trade.createdAt).toLocaleDateString()}
           </Text>
         </Flex>
@@ -236,7 +249,7 @@ export const TradesPage = () => {
             <Text
               fontSize="xx-small"
               fontWeight="bold"
-              color="gray.400"
+              color={badgeLabel}
               textTransform="uppercase"
               mb={2}
               letterSpacing="wider"
@@ -250,7 +263,7 @@ export const TradesPage = () => {
 
             <HStack justify={{ base: "center", md: "start" }} spacing={3}>
               <Avatar size="xs" name={trade.proposer?.name || "Usuario"} />
-              <Text fontSize="sm" color="gray.600" fontWeight="medium">
+              <Text fontSize="sm" color={labelMuted} fontWeight="medium">
                 {trade.proposer?.name || "Usuario"}
               </Text>
             </HStack>
@@ -276,24 +289,24 @@ export const TradesPage = () => {
               <Text
                 fontSize="xx-small"
                 fontWeight="bold"
-                color="gray.400"
-                textTransform="uppercase"
-                mb={2}
-                letterSpacing="wider"
-              >
-                {isIncoming ? "A CAMBIO DE TU" : "POR SU"}
+              color={badgeLabel}
+              textTransform="uppercase"
+              mb={2}
+              letterSpacing="wider"
+            >
+              {isIncoming ? "A CAMBIO DE TU" : "POR SU"}
+            </Text>
+
+            <Heading size="md" color="sand.600" mb={2}>
+              {trade.receiverService?.title || "Servicio no disponible"}
+            </Heading>
+
+            <HStack spacing={3}>
+              <Text fontSize="sm" color={labelMuted} fontWeight="medium">
+                {isIncoming ? "Tu servicio" : trade.receiver?.name || "Usuario"}
               </Text>
-
-              <Heading size="md" color="sand.600" mb={2}>
-                {trade.receiverService?.title || "Servicio no disponible"}
-              </Heading>
-
-              <HStack spacing={3}>
-                <Text fontSize="sm" color="gray.600" fontWeight="medium">
-                  {isIncoming ? "Tu servicio" : trade.receiver?.name || "Usuario"}
-                </Text>
-                {!isIncoming && <Avatar size="xs" name={trade.receiver?.name || "Usuario"} />}
-              </HStack>
+              {!isIncoming && <Avatar size="xs" name={trade.receiver?.name || "Usuario"} />}
+            </HStack>
             </Flex>
           </Box>
         </Flex>
@@ -302,17 +315,17 @@ export const TradesPage = () => {
         <Box px={6} pb={6}>
           {trade.note && (
             <Box
-              bg="yellow.50"
+              bg={noteBg}
               p={4}
               borderRadius="lg"
               mb={4}
               borderLeft="4px solid"
-              borderColor="yellow.400"
+              borderColor={noteBorder}
             >
-              <Text fontSize="xs" color="gray.500" fontWeight="bold" mb={1}>
+              <Text fontSize="xs" color={labelMuted} fontWeight="bold" mb={1}>
                 NOTA:
               </Text>
-              <Text fontSize="sm" fontStyle="italic" color="gray.700">
+              <Text fontSize="sm" fontStyle="italic" color={noteText}>
                 "{trade.note}"
               </Text>
             </Box>
@@ -401,7 +414,8 @@ export const TradesPage = () => {
         </Box>
       </CardBody>
     </Card>
-  );
+    )
+  };
 
   if (isLoading) {
     return (
@@ -456,7 +470,7 @@ export const TradesPage = () => {
         </ModalContent>
       </Modal>
       <Container maxW="container.md">
-        <Heading mb={8} size="xl" color="gray.700" letterSpacing="tight">
+        <Heading mb={8} size="xl" color={titleColor} letterSpacing="tight">
           Mis Trueques
         </Heading>
 

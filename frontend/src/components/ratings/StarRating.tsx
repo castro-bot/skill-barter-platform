@@ -38,12 +38,12 @@ export const StarRating = ({
         />
       ))}
       {showValue && (
-        <Text fontSize="xs" color="gray.600">
+        <Text fontSize="xs" color="textMuted">
           {rounded.toFixed(1)}
         </Text>
       )}
       {showCount && typeof count === "number" && (
-        <Text fontSize="xs" color="gray.500">
+        <Text fontSize="xs" color="textMuted">
           ({count})
         </Text>
       )}

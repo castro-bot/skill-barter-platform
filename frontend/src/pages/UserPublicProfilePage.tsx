@@ -15,7 +15,8 @@ import {
   Badge,
   Tag,
   Wrap,
-  WrapItem
+  WrapItem,
+  useColorModeValue
 } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 import client from "../api/client"
@@ -60,6 +61,10 @@ const safeName = (name?: string) => (name && name.trim().length > 0 ? name : "Us
 export const UserPublicProfilePage = () => {
   const { id } = useParams()
   const { user: me } = useAuth()
+  const cardBg = useColorModeValue("surface", "surface")
+  const borderTone = useColorModeValue("gray.100", "whiteAlpha.200")
+  const textMuted = useColorModeValue("gray.500", "gray.400")
+  const titleColor = useColorModeValue("gray.800", "gray.100")
 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -123,7 +128,7 @@ export const UserPublicProfilePage = () => {
         <Container maxW="container.md" py={16}>
           <VStack spacing={4}>
             <Spinner size="xl" thickness="4px" />
-            <Text color="gray.500">Cargando perfil...</Text>
+            <Text color={textMuted}>Cargando perfil...</Text>
           </VStack>
         </Container>
       </Box>
@@ -160,13 +165,13 @@ export const UserPublicProfilePage = () => {
     <Box bg="transparent" minH="calc(100vh - 64px)">
       <Container maxW="container.xl" py={10}>
         {/* HEADER PERFIL */}
-        <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="2xl" p={6} shadow="sm">
+        <Box bg={cardBg} border="1px solid" borderColor={borderTone} borderRadius="2xl" p={6} shadow="sm">
           <HStack spacing={4} align="center" justify="space-between" wrap="wrap">
             <HStack spacing={4} align="center">
               <Avatar name={safeName(profile.user.name)} size="lg" />
               <Box>
                 <HStack spacing={3} align="center">
-                  <Heading size="md" color="gray.800">
+                  <Heading size="md" color={titleColor}>
                     {safeName(profile.user.name)}
                   </Heading>
                   {isMyProfile && (
@@ -176,7 +181,7 @@ export const UserPublicProfilePage = () => {
                   )}
                 </HStack>
 
-                <Text color="gray.500" fontSize="sm">
+                <Text color={textMuted} fontSize="sm">
                   Perfil publico
                 </Text>
               </Box>
@@ -195,36 +200,36 @@ export const UserPublicProfilePage = () => {
         </Box>
 
         {/* CALIFICACIONES */}
-        <Box mt={8} bg="white" border="1px solid" borderColor="gray.100" borderRadius="2xl" p={6} shadow="sm">
+        <Box mt={8} bg={cardBg} border="1px solid" borderColor={borderTone} borderRadius="2xl" p={6} shadow="sm">
           <HStack justify="space-between" mb={4} wrap="wrap">
-            <Heading size="md" color="gray.800">
+            <Heading size="md" color={titleColor}>
               Calificaciones recientes
             </Heading>
-            <Text color="gray.500" fontSize="sm">
+            <Text color={textMuted} fontSize="sm">
               {ratingSummary.count} total
             </Text>
           </HStack>
 
           {ratings.length === 0 ? (
-            <Text color="gray.500">Aun no hay calificaciones.</Text>
+            <Text color={textMuted}>Aun no hay calificaciones.</Text>
           ) : (
             <VStack align="stretch" spacing={4}>
               {ratings.map((rating) => (
-                <Box key={rating.id} border="1px solid" borderColor="gray.100" borderRadius="xl" p={4}>
+                <Box key={rating.id} border="1px solid" borderColor={borderTone} borderRadius="xl" p={4}>
                   <HStack justify="space-between" align="start" wrap="wrap">
                     <Box>
-                      <Text fontWeight="bold" color="gray.700">
+                      <Text fontWeight="bold" color={titleColor}>
                         {rating.rater?.name || "Usuario"}
                       </Text>
                       <StarRating value={rating.score} showValue={false} showCount={false} size="xs" />
                     </Box>
-                    <Text fontSize="xs" color="gray.400">
+                    <Text fontSize="xs" color={textMuted}>
                       {new Date(rating.createdAt).toLocaleDateString()}
                     </Text>
                   </HStack>
 
                   {rating.comment && (
-                    <Text mt={2} color="gray.600" fontSize="sm">
+                    <Text mt={2} color={textMuted} fontSize="sm">
                       "{rating.comment}"
                     </Text>
                   )}
@@ -233,11 +238,11 @@ export const UserPublicProfilePage = () => {
                     <Wrap mt={3} spacing={2}>
                       {rating.tags.map((tag) => (
                         <WrapItem key={tag}>
-                          <Tag size="sm" colorScheme="brand" variant="subtle">
-                            {tag}
-                          </Tag>
-                        </WrapItem>
-                      ))}
+                        <Tag size="sm" colorScheme="brand" variant="subtle">
+                          {tag}
+                        </Tag>
+                      </WrapItem>
+                    ))}
                     </Wrap>
                   )}
                 </Box>
@@ -249,24 +254,24 @@ export const UserPublicProfilePage = () => {
         {/* SERVICIOS */}
         <Box mt={8}>
           <HStack justify="space-between" mb={4}>
-            <Heading size="md" color="gray.800">
+            <Heading size="md" color={titleColor}>
               Servicios publicados
             </Heading>
-            <Text color="gray.500" fontSize="sm">
+            <Text color={textMuted} fontSize="sm">
               {profile.services.length} disponibles
             </Text>
           </HStack>
 
           {profile.services.length === 0 ? (
             <Box
-              bg="white"
+              bg={cardBg}
               border="1px dashed"
-              borderColor="gray.200"
+              borderColor={borderTone}
               borderRadius="2xl"
               p={10}
               textAlign="center"
             >
-              <Text color="gray.500">Este usuario no tiene servicios visibles.</Text>
+              <Text color={textMuted}>Este usuario no tiene servicios visibles.</Text>
             </Box>
           ) : (
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={8} pb={10}>

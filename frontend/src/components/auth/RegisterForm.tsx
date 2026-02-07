@@ -5,7 +5,8 @@ import {
   Input, 
   Text, 
   VStack,
-  IconButton 
+  IconButton,
+  useColorModeValue
 } from '@chakra-ui/react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
@@ -15,6 +16,10 @@ import { getApiErrorMessage } from '../../utils/error';
 export const RegisterForm = () => {
   const { register, isLoading } = useAuth();
   const navigate = useNavigate();
+  const inputBg = useColorModeValue("gray.50", "whiteAlpha.100")
+  const inputBorder = useColorModeValue("gray.200", "whiteAlpha.200")
+  const focusBg = useColorModeValue("white", "gray.800")
+  const focusShadow = useColorModeValue("0 0 0 1px var(--sb-ring)", "0 0 0 1px var(--sb-ring)")
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -55,11 +60,11 @@ export const RegisterForm = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={isLoading}
-            bg="gray.50"
+            bg={inputBg}
             border="1px solid"
-            borderColor="gray.200"
+            borderColor={inputBorder}
             borderRadius="md"
-            _focus={{ bg: "white", borderColor: "green.500", boxShadow: "0 0 0 1px #38a169" }}
+            _focus={{ bg: focusBg, borderColor: "brand.500", boxShadow: focusShadow }}
           />
         </Box>
 
@@ -75,11 +80,11 @@ export const RegisterForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
-            bg="gray.50"
+            bg={inputBg}
             border="1px solid"
-            borderColor="gray.200"
+            borderColor={inputBorder}
             borderRadius="md"
-            _focus={{ bg: "white", borderColor: "green.500", boxShadow: "0 0 0 1px #38a169" }}
+            _focus={{ bg: focusBg, borderColor: "brand.500", boxShadow: focusShadow }}
           />
         </Box>
 
@@ -96,12 +101,12 @@ export const RegisterForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              bg="gray.50"
+              bg={inputBg}
               border="1px solid"
-              borderColor="gray.200"
+              borderColor={inputBorder}
               borderRadius="md"
               paddingRight="3rem"
-              _focus={{ bg: "white", borderColor: "green.500", boxShadow: "0 0 0 1px #38a169" }}
+              _focus={{ bg: focusBg, borderColor: "brand.500", boxShadow: focusShadow }}
             />
             <IconButton
               aria-label={showPassword ? 'Ocultar' : 'Mostrar'}
@@ -114,7 +119,7 @@ export const RegisterForm = () => {
               transform="translateY(-50%)"
               zIndex="5"
               color="gray.400"
-              _hover={{ color: "green.500", bg: "transparent" }}
+              _hover={{ color: "brand.500", bg: "transparent" }}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </IconButton>
@@ -129,7 +134,7 @@ export const RegisterForm = () => {
 
         <Button 
           type="submit"
-          colorScheme="green"
+          colorScheme="brand"
           size="lg"
           height="3rem"
           isLoading={isLoading}
@@ -139,7 +144,7 @@ export const RegisterForm = () => {
           fontWeight="bold"
           borderRadius="md"
           shadow="sm"
-          _hover={{ transform: 'translateY(-1px)', shadow: 'md', bg: 'green.600' }}
+          _hover={{ transform: 'translateY(-1px)', shadow: 'md', bg: 'brand.600' }}
           transition="all 0.2s"
         >
           Registrarse

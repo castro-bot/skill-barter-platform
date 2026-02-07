@@ -1,7 +1,7 @@
 // frontend/src/components/services/CreateServiceModal.tsx
 import { 
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton,
-  Button, FormControl, FormLabel, Input, Textarea, Select, VStack, useToast, 
+  Button, FormControl, FormLabel, Input, Textarea, Select, VStack, useToast, useColorModeValue, 
   InputGroup, InputLeftElement, Icon, Box, Text
 } from '@chakra-ui/react';
 import { useState } from 'react';
@@ -18,6 +18,11 @@ interface Props {
 export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
+  const inputBg = useColorModeValue("gray.50", "whiteAlpha.100");
+  const inputFocusBg = useColorModeValue("white", "gray.800");
+  const labelColor = useColorModeValue("gray.600", "gray.300");
+  const helperColor = useColorModeValue("gray.500", "gray.400");
+  const footerBg = useColorModeValue("gray.50", "whiteAlpha.100");
 
   const [formData, setFormData] = useState({
     title: '',
@@ -97,7 +102,7 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
             
             {/* TÍTULO */}
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" fontSize="sm" color="gray.600">Título del Servicio</FormLabel>
+              <FormLabel fontWeight="bold" fontSize="sm" color={labelColor}>Título del Servicio</FormLabel>
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.400">
                   <Icon as={FaHeading} />
@@ -108,15 +113,15 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   focusBorderColor="brand.500"
                   borderRadius="lg"
-                  bg="gray.50"
-                  _focus={{ bg: 'white' }}
+                  bg={inputBg}
+                  _focus={{ bg: inputFocusBg }}
                 />
               </InputGroup>
             </FormControl>
 
             {/* CATEGORÍA */}
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" fontSize="sm" color="gray.600">Categoría</FormLabel>
+              <FormLabel fontWeight="bold" fontSize="sm" color={labelColor}>Categoría</FormLabel>
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.400">
                   <Icon as={FaTag} />
@@ -127,8 +132,8 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                   focusBorderColor="brand.500"
                   borderRadius="lg"
                   pl={10} // Espacio extra para el icono
-                  bg="gray.50"
-                  _focus={{ bg: 'white' }}
+                  bg={inputBg}
+                  _focus={{ bg: inputFocusBg }}
                 >
                   <option value="Tecnología">Tecnología</option>
                   <option value="Programación">Programación</option>
@@ -198,7 +203,7 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
 
             {/* DESCRIPCIÓN */}
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" fontSize="sm" color="gray.600">Descripción Detallada</FormLabel>
+              <FormLabel fontWeight="bold" fontSize="sm" color={labelColor}>Descripción Detallada</FormLabel>
               <Box position="relative">
                 <Box position="absolute" top={3} left={4} zIndex={2} color="gray.400">
                    <Icon as={FaAlignLeft} />
@@ -212,8 +217,8 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
                   borderRadius="lg"
                   pl={10} // Espacio para el icono simulado
                   pt={2.5}
-                  bg="gray.50"
-                  _focus={{ bg: 'white' }}
+                  bg={inputBg}
+                  _focus={{ bg: inputFocusBg }}
                   resize="none"
                 />
               </Box>
@@ -225,13 +230,13 @@ export const CreateServiceModal = ({ isOpen, onClose, onSuccess }: Props) => {
           </VStack>
         </ModalBody>
 
-        <ModalFooter bg="gray.50" py={4}>
+        <ModalFooter bg={footerBg} py={4}>
           <Button 
             variant="ghost" 
             mr={3} 
             onClick={onClose}
             borderRadius="lg"
-            color="gray.500"
+            color={helperColor}
           >
             Cancelar
           </Button>

@@ -169,20 +169,20 @@ export const RatingModal = ({
                 ))}
               </HStack>
               {score > 0 && (
-                <Text fontSize="sm" color="gray.500" mt={1}>
+                <Text fontSize="sm" color="textMuted" mt={1}>
                   {score} de 5
                 </Text>
               )}
             </Box>
 
             {isMetaLoading && score > 0 && (
-              <Text fontSize="sm" color="gray.500">
+              <Text fontSize="sm" color="textMuted">
                 Cargando motivos...
               </Text>
             )}
 
             {metaError && score > 0 && (
-              <Text fontSize="sm" color="gray.500">
+              <Text fontSize="sm" color="textMuted">
                 No se pudieron cargar los motivos. Puedes calificar sin tags.
               </Text>
             )}
@@ -229,7 +229,7 @@ export const RatingModal = ({
                 maxLength={meta?.maxCommentLength}
               />
               {typeof meta?.maxCommentLength === "number" && (
-                <Text fontSize="xs" color="gray.500" mt={2}>
+                <Text fontSize="xs" color="textMuted" mt={2}>
                   {comment.length}/{meta.maxCommentLength}
                 </Text>
               )}

@@ -6,7 +6,8 @@ import {
   Input,
   Text,
   VStack,
-  IconButton
+  IconButton,
+  useColorModeValue
 } from "@chakra-ui/react"
 import { FaEye, FaEyeSlash } from "react-icons/fa"
 import { useAuth } from "../../context/AuthContext"
@@ -24,6 +25,10 @@ function normalizePassword(value: string) {
 
 export const LoginForm = () => {
   const { login, isLoading } = useAuth()
+  const inputBg = useColorModeValue("gray.50", "whiteAlpha.100")
+  const inputBorder = useColorModeValue("gray.200", "whiteAlpha.200")
+  const focusShadow = useColorModeValue("0 0 0 1px var(--sb-ring)", "0 0 0 1px var(--sb-ring)")
+  const focusBg = useColorModeValue("white", "gray.800")
 
   // Recomendación: no hardcodear credenciales reales.
   // Si quieren demo, pongan una cuenta real de su BD o déjenlo vacío.
@@ -72,14 +77,14 @@ export const LoginForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
-            bg="gray.50"
+            bg={inputBg}
             border="1px solid"
-            borderColor="gray.200"
+            borderColor={inputBorder}
             borderRadius="md"
             _focus={{
-              bg: "white",
+              bg: focusBg,
               borderColor: "brand.500",
-              boxShadow: "0 0 0 1px var(--sb-ring)"
+              boxShadow: focusShadow
             }}
           />
         </Box>
@@ -96,17 +101,17 @@ export const LoginForm = () => {
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              bg="gray.50"
-              border="1px solid"
-              borderColor="gray.200"
-              borderRadius="md"
-              paddingRight="3rem"
-              _focus={{
-                bg: "white",
-                borderColor: "brand.500",
-                boxShadow: "0 0 0 1px var(--sb-ring)"
-              }}
+            disabled={isLoading}
+            bg={inputBg}
+            border="1px solid"
+            borderColor={inputBorder}
+            borderRadius="md"
+            paddingRight="3rem"
+            _focus={{
+              bg: focusBg,
+              borderColor: "brand.500",
+              boxShadow: focusShadow
+            }}
             />
             <IconButton
               aria-label={showPassword ? "Ocultar" : "Mostrar"}

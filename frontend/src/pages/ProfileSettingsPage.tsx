@@ -14,7 +14,8 @@ import {
   Alert,
   AlertIcon,
   useToast,
-  HStack
+  HStack,
+  useColorModeValue
 } from "@chakra-ui/react"
 import type { AxiosError } from "axios"
 import client from "../api/client"
@@ -42,6 +43,13 @@ const getErrorMessage = (err: unknown, fallback: string) => {
 export const ProfileSettingsPage = () => {
   const toast = useToast()
   const { user } = useAuth()
+  const pageBg = useColorModeValue("transparent", "transparent")
+  const cardBg = useColorModeValue("surface", "surface")
+  const borderTone = useColorModeValue("gray.100", "whiteAlpha.200")
+  const textMuted = useColorModeValue("gray.500", "gray.400")
+  const titleColor = useColorModeValue("gray.800", "gray.100")
+  const inputBg = useColorModeValue("white", "gray.800")
+  const inputDisabledBg = useColorModeValue("gray.50", "whiteAlpha.100")
 
   const [isBootLoading, setIsBootLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -142,12 +150,12 @@ export const ProfileSettingsPage = () => {
   }
 
   return (
-    <Box bg="gray.50" minH="calc(100vh - 64px)">
+    <Box bg={pageBg} minH="calc(100vh - 64px)">
       <Container maxW="container.md" py={10}>
-        <Heading size="lg" color="gray.800" mb={2}>
+        <Heading size="lg" color={titleColor} mb={2}>
           Ajustes de Perfil
         </Heading>
-        <Text color="gray.500" mb={8}>
+        <Text color={textMuted} mb={8}>
           Actualiza tu información y tu contraseña.
         </Text>
 
@@ -161,14 +169,14 @@ export const ProfileSettingsPage = () => {
         <VStack spacing={6} align="stretch">
           {/* PERFIL */}
           <Box
-            bg="white"
+            bg={cardBg}
             border="1px solid"
-            borderColor="gray.100"
+            borderColor={borderTone}
             borderRadius="2xl"
             p={6}
             shadow="sm"
           >
-            <Heading size="md" color="gray.800" mb={4}>
+            <Heading size="md" color={titleColor} mb={4}>
               Información
             </Heading>
 
@@ -179,14 +187,14 @@ export const ProfileSettingsPage = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Tu nombre"
-                  bg="white"
+                  bg={inputBg}
                   isDisabled={isBootLoading}
                 />
               </FormControl>
 
               <FormControl isDisabled>
                 <FormLabel>Email</FormLabel>
-                <Input value={email} placeholder="Tu email" bg="gray.50" />
+                <Input value={email} placeholder="Tu email" bg={inputDisabledBg} />
               </FormControl>
 
               <HStack justify="flex-end" pt={2}>
@@ -207,14 +215,14 @@ export const ProfileSettingsPage = () => {
 
           {/* PASSWORD */}
           <Box
-            bg="white"
+            bg={cardBg}
             border="1px solid"
-            borderColor="gray.100"
+            borderColor={borderTone}
             borderRadius="2xl"
             p={6}
             shadow="sm"
           >
-            <Heading size="md" color="gray.800" mb={4}>
+            <Heading size="md" color={titleColor} mb={4}>
               Cambiar contraseña
             </Heading>
 
@@ -226,7 +234,7 @@ export const ProfileSettingsPage = () => {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="********"
-                  bg="white"
+                  bg={inputBg}
                   isDisabled={isBootLoading}
                 />
               </FormControl>
@@ -238,7 +246,7 @@ export const ProfileSettingsPage = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="********"
-                  bg="white"
+                  bg={inputBg}
                   isDisabled={isBootLoading}
                 />
               </FormControl>
@@ -250,7 +258,7 @@ export const ProfileSettingsPage = () => {
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   placeholder="********"
-                  bg="white"
+                  bg={inputBg}
                   isDisabled={isBootLoading}
                 />
               </FormControl>
