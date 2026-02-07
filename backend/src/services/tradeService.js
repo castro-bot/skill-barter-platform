@@ -18,6 +18,23 @@ class TradeService {
    * Create a trade proposal
    */
   static async createTrade(proposerId, { proposerServiceId, receiverServiceId, note }) {
+    // Prevent duplicate pending proposals using the same service from the same user
+    const pendingDuplicate = await prisma.tradeProposal.findFirst({
+      where: {
+        proposerId,
+        proposerServiceId,
+        status: "PENDING"
+      },
+      select: { id: true }
+    })
+
+    if (pendingDuplicate) {
+      throw new AppError(
+        "No se puede solicitar trueque porque ya se solicitó con este servicio y está pendiente de respuesta.",
+        409
+      )
+    }
+
     const receiverService = await prisma.serviceListing.findUnique({
       where: { id: receiverServiceId },
       include: { owner: true }
