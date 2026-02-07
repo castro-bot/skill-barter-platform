@@ -242,7 +242,7 @@ export const DashboardPage = () => {
                 isStatsLoading
                   ? "..."
                   : user?.ratingCount
-                    ? `${(user.ratingAverage ?? 0).toFixed(1)} (${user.ratingCount})`
+                    ? `${(user.ratingAverage ?? 0).toFixed(1)}/5.0 (${user.ratingCount})`
                     : "Nueva"
               }
               color="green"
