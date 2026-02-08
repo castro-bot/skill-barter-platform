@@ -54,32 +54,35 @@ export const RatingModal = ({
   }, [score, meta])
 
   useEffect(() => {
-    if (!isOpen || meta || isMetaLoading) return
+    if (!isOpen || meta) return
 
     let isActive = true
-    setIsMetaLoading(true)
-    setMetaError(false)
 
-    ratingsApi
-      .getMeta()
-      .then((data) => {
+    const loadMeta = async () => {
+      setIsMetaLoading(true)
+      setMetaError(false)
+
+      try {
+        const data = await ratingsApi.getMeta()
         if (!isActive) return
         setMeta(data)
-      })
-      .catch((error) => {
+      } catch (error) {
         if (!isActive) return
         console.error("Error cargando metadata de calificaciones", error)
         setMetaError(true)
-      })
-      .finally(() => {
-        if (!isActive) return
-        setIsMetaLoading(false)
-      })
+      } finally {
+        if (isActive) {
+          setIsMetaLoading(false)
+        }
+      }
+    }
+
+    loadMeta()
 
     return () => {
       isActive = false
     }
-  }, [isOpen, meta, isMetaLoading])
+  }, [isOpen, meta])
 
   useEffect(() => {
     if (!isOpen) return

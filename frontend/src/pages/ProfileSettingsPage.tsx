@@ -17,9 +17,9 @@ import {
   HStack,
   useColorModeValue
 } from "@chakra-ui/react"
-import type { AxiosError } from "axios"
 import client from "../api/client"
 import { useAuth } from "../context/AuthContext"
+import { getApiErrorMessage } from "../utils/error"
 
 type MeResponse = {
   id: string
@@ -27,17 +27,8 @@ type MeResponse = {
   email: string
 }
 
-type ApiErrorBody = {
-  message?: string
-  error?: string
-}
-
 const getErrorMessage = (err: unknown, fallback: string) => {
-  const axiosErr = err as AxiosError<ApiErrorBody>
-  const fromApi = axiosErr?.response?.data?.message || axiosErr?.response?.data?.error
-  if (typeof fromApi === "string" && fromApi.trim().length > 0) return fromApi
-  if (err instanceof Error && err.message.trim().length > 0) return err.message
-  return fallback
+  return getApiErrorMessage(err, fallback)
 }
 
 export const ProfileSettingsPage = () => {

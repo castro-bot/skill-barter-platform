@@ -55,7 +55,6 @@ export const Navbar = () => {
     markReadByIds
   } = useNotifications()
 
-  const getInitials = (name: string = "") => name.substring(0, 2).toUpperCase()
 
   /**
    * Formateo simple de fecha ISO (sin librerías).
