@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prisma:generate": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "npm run prisma:generate",
     "start": "node src/index.js",
+    "predev": "npm run prisma:generate",
     "dev": "nodemon"
   },
   "keywords": [],

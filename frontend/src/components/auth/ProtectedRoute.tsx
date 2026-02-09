@@ -1,18 +1,20 @@
 // frontend/src/components/auth/ProtectedRoute.tsx
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Flex, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Flex, Spinner, Text, VStack, useColorModeValue } from '@chakra-ui/react';
 
 export const ProtectedRoute = () => {
   const { user, isLoading } = useAuth();
+  const pageBg = useColorModeValue("surfaceMuted", "surfaceMuted")
+  const textMuted = useColorModeValue("gray.500", "gray.400")
 
   // 1. SI ESTÁ CARGANDO: Muestra un spinner, NO REDIRIJA AÚN
   if (isLoading) {
     return (
-      <Flex minH="100vh" align="center" justify="center" bg="gray.50">
+      <Flex minH="100vh" align="center" justify="center" bg={pageBg}>
         <VStack spacing={4}>
-          <Spinner size="xl" color="blue.500" thickness="4px" />
-          <Text color="gray.500" fontSize="sm">Verificando sesión...</Text>
+          <Spinner size="xl" color="brand.500" thickness="4px" />
+          <Text color={textMuted} fontSize="sm">Verificando sesión...</Text>
         </VStack>
       </Flex>
     );

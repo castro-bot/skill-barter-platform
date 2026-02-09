@@ -8,7 +8,8 @@ import {
   Avatar,
   HStack,
   Icon,
-  Spacer
+  Spacer,
+  useColorModeValue
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { FaArrowRight, FaTag } from "react-icons/fa"
@@ -35,6 +36,10 @@ export const ServiceCard = ({
   ratingAverage,
   ratingCount
 }: ServiceCardProps) => {
+  const titleColor = useColorModeValue("gray.800", "gray.100")
+  const bodyColor = useColorModeValue("gray.600", "gray.400")
+  const borderTone = useColorModeValue("gray.100", "whiteAlpha.200")
+
   // Debug handler (solo DEV)
   const handleNavigationDebug = () => {
     if (!import.meta.env.DEV) return
@@ -48,18 +53,28 @@ export const ServiceCard = ({
   }
 
   // Función estética: color según categoría
-  const getCategoryColor = (cat: string) => {
-    const colors: Record<string, string> = {
-      Tecnología: "blue.500",
-      Idiomas: "purple.500",
-      Asesoría: "teal.500",
-      Otros: "orange.500",
-      Diseño: "pink.500"
+  const getCategoryPalette = (cat: string) => {
+    const palettes: Record<string, { base: string; soft: string }> = {
+      Tecnología: { base: "brand.600", soft: "brand.100" },
+      Idiomas: { base: "sand.500", soft: "sand.100" },
+      Asesoría: { base: "green.500", soft: "green.100" },
+      Otros: { base: "gray.500", soft: "gray.100" },
+      Diseño: { base: "orange.400", soft: "orange.100" }
     }
-    return colors[cat] || `${colorPalette}.500`
+    const normalized = cat.trim()
+
+    if (normalized.startsWith("Asesor")) {
+      return { base: "green.500", soft: "green.100" }
+    }
+
+    if (normalized.startsWith("Diseño")) {
+      return { base: "orange.400", soft: "orange.100" }
+    }
+
+    return palettes[normalized] || { base: `${colorPalette}.500`, soft: "gray.100" }
   }
 
-  const bgHeader = getCategoryColor(category)
+  const palette = getCategoryPalette(category)
 
   // Blindaje: si por error llega id vacío o "new", no debería navegar al detalle
   // (En tu arquitectura, "new" se maneja con modal en DashboardPage)
@@ -69,12 +84,12 @@ export const ServiceCard = ({
   return (
     <Box
       position="relative"
-      bg="white"
+      bg="surface"
       borderRadius="2xl"
       overflow="hidden"
       shadow="md"
       border="1px solid"
-      borderColor="gray.100"
+      borderColor={borderTone}
       transition="all 0.3s ease"
       display="flex"
       flexDirection="column"
@@ -82,10 +97,21 @@ export const ServiceCard = ({
       _hover={{
         transform: "translateY(-5px)",
         shadow: "xl",
-        borderColor: "blue.200"
-      }}>
+        borderColor: "brand.200"
+      }}
+    >
       {/* Header decorativo */}
-      <Box h="80px" bgGradient={`linear(to-r, ${bgHeader}, gray.300)`} position="relative">
+      <Box h="86px" bgGradient={`linear(120deg, ${palette.base}, ${palette.soft})`} position="relative">
+        <Box
+          position="absolute"
+          right="-30px"
+          top="-30px"
+          w="120px"
+          h="120px"
+          borderRadius="full"
+          bg="whiteAlpha.300"
+          filter="blur(2px)"
+        />
         <Badge
           position="absolute"
           top={3}
@@ -105,7 +131,7 @@ export const ServiceCard = ({
       {/* Contenido */}
       <Box p={5} flex="1" display="flex" flexDirection="column">
         {/* Categoría */}
-        <HStack spacing={1} mb={2} color="gray.500">
+        <HStack spacing={2} mb={2} color="gray.500">
           <Icon as={FaTag} boxSize={3} />
           <Text fontSize="xs" textTransform="uppercase" fontWeight="bold" letterSpacing="wide">
             {category}
@@ -113,25 +139,25 @@ export const ServiceCard = ({
         </HStack>
 
         {/* Título */}
-        <Heading size="md" mb={2} lineHeight="short" color="gray.800" noOfLines={2}>
+        <Heading size="md" mb={2} lineHeight="short" color={titleColor} noOfLines={2}>
           {title}
         </Heading>
 
         <Spacer />
 
         {/* Autor */}
-        <HStack mt={4} mb={6}>
-          <Avatar size="xs" name={author} bg={bgHeader} color="white" />
-          <Text fontSize="sm" color="gray.600">
+        <HStack mt={4} mb={4}>
+          <Avatar size="xs" name={author} bg={palette.base} color="white" />
+          <Text fontSize="sm" color={bodyColor}>
             por{" "}
-            <Text as="span" fontWeight="semibold" color="gray.800">
+            <Text as="span" fontWeight="semibold" color={titleColor}>
               {author}
             </Text>
           </Text>
         </HStack>
 
         {typeof ratingAverage === "number" && typeof ratingCount === "number" && (
-          <StarRating value={ratingAverage} count={ratingCount} size="xs" showValue={false} />
+          <StarRating value={ratingAverage} count={ratingCount} size="xs" />
         )}
 
         {/* Botón */}

@@ -33,17 +33,17 @@ export const StarRating = ({
         <Icon
           key={`star-${index}`}
           as={FaStar}
-          color={safeValue >= index + 1 ? "yellow.400" : "gray.300"}
+          color={safeValue >= index + 1 ? "brand.500" : "gray.300"}
           boxSize={sizeMap[size]}
         />
       ))}
       {showValue && (
-        <Text fontSize="xs" color="gray.600">
+        <Text fontSize="xs" color="textMuted">
           {rounded.toFixed(1)}
         </Text>
       )}
       {showCount && typeof count === "number" && (
-        <Text fontSize="xs" color="gray.500">
+        <Text fontSize="xs" color="textMuted">
           ({count})
         </Text>
       )}

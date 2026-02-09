@@ -7,7 +7,7 @@ import { NotificationsProvider } from "../context/NotificationsContext"
 export const MainLayout = () => {
   return (
     <NotificationsProvider>
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="transparent">
         {/* Barra Superior */}
         <Navbar />
 

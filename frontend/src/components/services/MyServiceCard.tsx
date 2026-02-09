@@ -15,7 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
-  useToast
+  useToast,
+  useColorModeValue
 } from "@chakra-ui/react"
 import { useRef, useState } from "react"
 import { FaTrash, FaEdit, FaTag } from "react-icons/fa"
@@ -30,6 +31,12 @@ interface Props {
 }
 
 export const MyServiceCard = ({ service, onChanged }: Props) => {
+  const cardBg = useColorModeValue("surface", "surface")
+  const borderTone = useColorModeValue("gray.100", "whiteAlpha.200")
+  const textMuted = useColorModeValue("gray.600", "gray.400")
+  const subtleText = useColorModeValue("gray.400", "gray.500")
+  const titleColor = useColorModeValue("gray.800", "gray.100")
+
   const edit = useDisclosure()
   const del = useDisclosure()
 
@@ -73,38 +80,38 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
   return (
     <Box
       position="relative"
-      bg="white"
+      bg={cardBg}
       borderRadius="2xl"
       shadow="sm"
       border="1px solid"
-      borderColor="gray.100"
+      borderColor={borderTone}
       p={5}
       transition="all 0.2s"
-      _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: "blue.200" }}
+      _hover={{ transform: "translateY(-2px)", shadow: "md", borderColor: "brand.200" }}
     >
       <HStack mb={2} color="gray.500">
         <Icon as={FaTag} boxSize={3} />
-        <Badge colorScheme="blue" variant="subtle" borderRadius="full">
+        <Badge colorScheme="brand" variant="subtle" borderRadius="full">
           {service.category}
         </Badge>
         <Spacer />
-        <Text fontSize="xs" color="gray.400">
+        <Text fontSize="xs" color={subtleText}>
           {new Date(service.createdAt).toLocaleDateString()}
         </Text>
       </HStack>
 
-      <Heading size="md" color="gray.800" noOfLines={2}>
+      <Heading size="md" color={titleColor} noOfLines={2}>
         {service.title}
       </Heading>
 
-      <Text mt={2} color="gray.600" fontSize="sm" noOfLines={3}>
+      <Text mt={2} color={textMuted} fontSize="sm" noOfLines={3}>
         {service.description}
       </Text>
 
       <HStack mt={5} spacing={3}>
         <Button
           leftIcon={<FaEdit />}
-          colorScheme="blue"
+          colorScheme="brand"
           variant="outline"
           borderRadius="xl"
           size="sm"

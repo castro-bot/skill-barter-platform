@@ -15,6 +15,7 @@ import {
   Select,
   VStack,
   useToast,
+  useColorModeValue,
   InputGroup,
   InputLeftElement,
   Icon,
@@ -36,6 +37,11 @@ interface Props {
 export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
+  const inputBg = useColorModeValue("gray.50", "whiteAlpha.100")
+  const inputFocusBg = useColorModeValue("white", "gray.800")
+  const labelColor = useColorModeValue("gray.600", "gray.300")
+  const helperColor = useColorModeValue("gray.500", "gray.400")
+  const footerBg = useColorModeValue("gray.50", "whiteAlpha.100")
 
   const [formData, setFormData] = useState({
     title: "",
@@ -105,7 +111,7 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
     <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered motionPreset="slideInBottom">
       <ModalOverlay backdropFilter="blur(3px)" />
       <ModalContent borderRadius="2xl" overflow="hidden" shadow="2xl">
-        <ModalHeader bgGradient="linear(to-r, purple.600, blue.600)" color="white" py={6}>
+        <ModalHeader bgGradient="linear(to-r, brand.600, sand.500)" color="white" py={6}>
           <Box display="flex" alignItems="center" gap={3}>
             <Box bg="whiteAlpha.200" p={2} borderRadius="lg">
               <Icon as={FaPencilAlt} boxSize={5} />
@@ -126,7 +132,7 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
         <ModalBody py={6} px={6}>
           <VStack spacing={5}>
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" fontSize="sm" color="gray.600">
+              <FormLabel fontWeight="bold" fontSize="sm" color={labelColor}>
                 Título del Servicio
               </FormLabel>
               <InputGroup>
@@ -137,16 +143,16 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
                   placeholder="Ej. Clases de Matemáticas Avanzadas"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  focusBorderColor="blue.500"
+                  focusBorderColor="brand.500"
                   borderRadius="lg"
-                  bg="gray.50"
-                  _focus={{ bg: "white" }}
+                  bg={inputBg}
+                  _focus={{ bg: inputFocusBg }}
                 />
               </InputGroup>
             </FormControl>
 
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" fontSize="sm" color="gray.600">
+              <FormLabel fontWeight="bold" fontSize="sm" color={labelColor}>
                 Categoría
               </FormLabel>
               <InputGroup>
@@ -156,11 +162,11 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
                 <Select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  focusBorderColor="blue.500"
+                  focusBorderColor="brand.500"
                   borderRadius="lg"
                   pl={10}
-                  bg="gray.50"
-                  _focus={{ bg: "white" }}
+                  bg={inputBg}
+                  _focus={{ bg: inputFocusBg }}
                 >
                   <option value="Tecnología">Tecnología</option>
                   <option value="Idiomas">Idiomas</option>
@@ -172,7 +178,7 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
             </FormControl>
 
             <FormControl isRequired>
-              <FormLabel fontWeight="bold" fontSize="sm" color="gray.600">
+              <FormLabel fontWeight="bold" fontSize="sm" color={labelColor}>
                 Descripción Detallada
               </FormLabel>
               <Box position="relative">
@@ -184,30 +190,30 @@ export const EditServiceModal = ({ isOpen, onClose, service, onSuccess }: Props)
                   rows={5}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  focusBorderColor="blue.500"
+                  focusBorderColor="brand.500"
                   borderRadius="lg"
                   pl={10}
                   pt={2.5}
-                  bg="gray.50"
-                  _focus={{ bg: "white" }}
+                  bg={inputBg}
+                  _focus={{ bg: inputFocusBg }}
                   resize="none"
                 />
               </Box>
-              <Text fontSize="xs" color="gray.400" textAlign="right" mt={1}>
+              <Text fontSize="xs" color={helperColor} textAlign="right" mt={1}>
                 Mantén la descripción clara y concreta.
               </Text>
             </FormControl>
           </VStack>
         </ModalBody>
 
-        <ModalFooter bg="gray.50" py={4}>
-          <Button variant="ghost" mr={3} onClick={onClose} borderRadius="lg" color="gray.500">
+        <ModalFooter bg={footerBg} py={4}>
+          <Button variant="ghost" mr={3} onClick={onClose} borderRadius="lg" color={helperColor}>
             Cancelar
           </Button>
           <Button
-            colorScheme="blue"
-            bgGradient="linear(to-r, blue.500, blue.600)"
-            _hover={{ bgGradient: "linear(to-r, blue.600, blue.700)", shadow: "md" }}
+            colorScheme="brand"
+            bgGradient="linear(to-r, brand.500, brand.700)"
+            _hover={{ bgGradient: "linear(to-r, brand.600, brand.800)", shadow: "md" }}
             onClick={handleSubmit}
             isLoading={isLoading}
             loadingText="Guardando"

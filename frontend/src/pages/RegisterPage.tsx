@@ -1,9 +1,11 @@
 // frontend/src/pages/RegisterPage.tsx
-import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex } from '@chakra-ui/react';
+import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex, useColorModeValue } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { RegisterForm } from '../components/auth/RegisterForm';
 
 export const RegisterPage = () => {
+  const titleColor = useColorModeValue("brand.600", "brand.400")
+  const textMuted = useColorModeValue("gray.500", "gray.400")
   return (
     <Grid minH="100vh" templateColumns={{ base: "1fr", md: "1fr 1fr" }}>
       
@@ -13,7 +15,7 @@ export const RegisterPage = () => {
         flexDir="column" 
         align="center" 
         justify="center" 
-        bg="white"
+        bg="surface"
       >
         <Box w="full" maxW="md">
           <VStack spacing={6} align="stretch"> {/* Cambié gap por spacing (más estándar en v2) */}
@@ -21,12 +23,12 @@ export const RegisterPage = () => {
             <Box textAlign="center" mb={{ base: 2, md: 4 }}>
               <Heading 
                 size={{ base: "xl", md: "2xl" }} 
-                color="green.600" 
+                color={titleColor} 
                 letterSpacing="tight"
               >
                 Únete a SkillBarter
               </Heading>
-              <Text color="gray.500" fontSize={{ base: "md", md: "lg" }} mt={2}>
+              <Text color={textMuted} fontSize={{ base: "md", md: "lg" }} mt={2}>
                 Crea tu cuenta en segundos
               </Text>
             </Box>
@@ -36,7 +38,7 @@ export const RegisterPage = () => {
             <Text fontSize="sm" color="gray.600" textAlign="center" mt={4}>
               ¿Ya tienes cuenta?{' '}
               {/* CORRECCIÓN AQUÍ: Usamos 'as={Link}' en lugar de 'asChild' */}
-              <ChakraLink as={Link} to="/login" color="blue.600" fontWeight="bold">
+              <ChakraLink as={Link} to="/login" color="brand.600" fontWeight="bold">
                 Inicia Sesión aquí
               </ChakraLink>
             </Text>

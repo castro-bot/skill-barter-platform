@@ -36,7 +36,7 @@ class ServiceListingService {
    * Get all services with optional filters
    */
   static async getAllServices({ q, category, excludeOwnerId } = {}) {
-    const where = {}
+    const where = { isActive: true }
 
     if (category) {
       where.category = category
@@ -105,7 +105,7 @@ class ServiceListingService {
       )
     )
 
-    const where = { ownerId: userId }
+    const where = { ownerId: userId, isActive: true }
 
     if (usedServiceIds.length > 0) {
       where.NOT = { id: { in: usedServiceIds } }
@@ -126,8 +126,8 @@ class ServiceListingService {
    * Get a single service by ID
    */
   static async getServiceById(id) {
-    const service = await prisma.serviceListing.findUnique({
-      where: { id },
+    const service = await prisma.serviceListing.findFirst({
+      where: { id, isActive: true },
       include: {
         owner: { select: { id: true, name: true, createdAt: true, ratingAverage: true, ratingCount: true } }
       }
@@ -204,8 +204,13 @@ class ServiceListingService {
       throw error
     }
 
-    await prisma.serviceListing.delete({
-      where: { id: serviceId }
+    if (!service.isActive) {
+      return { success: true, message: "Service already deactivated" }
+    }
+
+    await prisma.serviceListing.update({
+      where: { id: serviceId },
+      data: { isActive: false, deactivatedAt: new Date() }
     })
 
     return { success: true, message: "Service deleted successfully" }

@@ -1,5 +1,5 @@
 // frontend/src/pages/LoginPage.tsx
-import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex } from '@chakra-ui/react';
+import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex, useColorModeValue } from '@chakra-ui/react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -8,6 +8,8 @@ import { LoginForm } from '../components/auth/LoginForm';
 export const LoginPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const titleColor = useColorModeValue("brand.600", "brand.400")
+  const textMuted = useColorModeValue("gray.500", "gray.400")
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -19,15 +21,15 @@ export const LoginPage = () => {
     <Grid minH="100vh" templateColumns={{ base: "1fr", md: "1fr 1fr" }}>
       
       {/* Columna Izquierda */}
-      <Flex p={{ base: 5, md: 8 }} flexDir="column" align="center" justify="center" bg="white">
+      <Flex p={{ base: 5, md: 8 }} flexDir="column" align="center" justify="center" bg="surface">
         <Box w="full" maxW="md">
           <VStack spacing={6} align="stretch">
             
             <Box textAlign="center" mb={{ base: 2, md: 4 }}>
-              <Heading size={{ base: "xl", md: "2xl" }} color="blue.600" letterSpacing="tight">
+              <Heading size={{ base: "xl", md: "2xl" }} color={titleColor} letterSpacing="tight">
                 SkillBarter
               </Heading>
-              <Text color="gray.500" fontSize={{ base: "md", md: "lg" }} mt={2}>
+              <Text color={textMuted} fontSize={{ base: "md", md: "lg" }} mt={2}>
                 Tu mercado de habilidades universitario
               </Text>
             </Box>
@@ -37,7 +39,7 @@ export const LoginPage = () => {
             <Text fontSize="sm" color="gray.600" textAlign="center" mt={4}>
               ¿No tienes cuenta?{' '}
               {/* 👇 ESTA ES LA LÍNEA QUE ARREGLA EL ERROR DE CONSOLA 👇 */}
-              <ChakraLink as={Link} to="/register" color="blue.600" fontWeight="bold">
+              <ChakraLink as={Link} to="/register" color="brand.600" fontWeight="bold">
                 Regístrate gratis
               </ChakraLink>
             </Text>

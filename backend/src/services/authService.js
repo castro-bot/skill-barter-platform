@@ -16,13 +16,17 @@ class AuthService {
    * @param {string} userType - Optional: 'REGULAR' or 'MODERATOR' (default: REGULAR)
    */
   static async register({ name, email, password, userType = 'REGULAR' }) {
-    if (!email || !password) {
+    const rawEmail = this._normalizeEmail(email);
+
+    if (!rawEmail || !password) {
       throw new Error('Email and password are required');
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = rawEmail;
+
+    const existingUser = await this._findUserByEmailInsensitive(normalizedEmail);
     if (existingUser) {
-      throw new Error('Email already in use');
+      throw new Error('El correo ya está en uso');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -30,7 +34,7 @@ class AuthService {
     // Factory Pattern: Create user data with appropriate role
     const userData = UserFactory.create(userType, {
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
@@ -71,7 +75,8 @@ class AuthService {
    * Iniciar sesión
    */
   static async login(email, password) {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = this._normalizeEmail(email);
+    const user = await this._findUserByEmailInsensitive(normalizedEmail);
     if (!user) {
       throw new Error('Invalid credentials');
     }
@@ -138,12 +143,14 @@ class AuthService {
     }
 
     if (email !== undefined) {
+      const normalizedEmail = this._normalizeEmail(email);
+
       // Check email uniqueness if changing email
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await this._findUserByEmailInsensitive(normalizedEmail);
       if (existingUser && existingUser.id !== userId) {
-        throw new Error('Email already in use');
+        throw new Error('El correo ya está en uso');
       }
-      updateData.email = email;
+      updateData.email = normalizedEmail;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -212,6 +219,21 @@ class AuthService {
     // Retorna el usuario sin la contraseña
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  static _normalizeEmail(email) {
+    return String(email ?? '').trim().toLowerCase();
+  }
+
+  static async _findUserByEmailInsensitive(email) {
+    return prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: 'insensitive',
+        },
+      },
+    });
   }
 }
 

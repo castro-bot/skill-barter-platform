@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Helper para errores
 const handleAuthError = (res, error) => {
-  if (error.message === 'Invalid credentials' || error.message === 'Email already in use') {
+  if (error.message === 'Invalid credentials' || error.message === 'El correo ya está en uso') {
     return res.status(400).json({ error: error.message });
   }
   console.error(error);
@@ -95,7 +95,7 @@ router.put('/me', authenticate, async (req, res) => {
     const updatedUser = await AuthService.updateProfile(req.user.id, { name, email });
     res.status(200).json(updatedUser);
   } catch (error) {
-    if (error.message === 'Email already in use' || error.message === 'No valid fields to update') {
+    if (error.message === 'El correo ya está en uso' || error.message === 'No valid fields to update') {
       return res.status(400).json({ error: error.message });
     }
     handleAuthError(res, error);

@@ -17,6 +17,7 @@ import {
   FormControl,
   FormLabel,
   useToast,
+  useColorModeValue,
   Spinner,
   Alert,
   AlertIcon,
@@ -45,6 +46,11 @@ export const CreateTradeModal = ({
   const { user } = useAuth(); // <--- Obtenemos el usuario actual
   const toast = useToast();
   const navigate = useNavigate();
+  const inputBg = useColorModeValue("gray.50", "whiteAlpha.100");
+  const inputFocusBg = useColorModeValue("white", "gray.800");
+  const labelColor = useColorModeValue("gray.600", "gray.300");
+  const helperColor = useColorModeValue("gray.500", "gray.400");
+  const footerBg = useColorModeValue("gray.50", "whiteAlpha.100");
   
   const [myServices, setMyServices] = useState<ServiceListing[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(false);
@@ -131,8 +137,8 @@ export const CreateTradeModal = ({
     if (isLoadingServices) {
       return (
         <VStack py={8} spacing={4}>
-          <Spinner size="xl" color="blue.500" thickness='4px' />
-          <Text color="gray.500">Buscando tus servicios disponibles...</Text>
+          <Spinner size="xl" color="brand.500" thickness='4px' />
+          <Text color={helperColor}>Buscando tus servicios disponibles...</Text>
         </VStack>
       );
     }
@@ -150,7 +156,7 @@ export const CreateTradeModal = ({
             </Box>
           </Alert>
           <Button 
-            colorScheme="green" 
+            colorScheme="brand" 
             onClick={() => {
               onClose();
               navigate('/services/new');
@@ -164,22 +170,24 @@ export const CreateTradeModal = ({
 
     return (
       <VStack spacing={5} align="stretch">
-        <Box bg="blue.50" p={3} borderRadius="md" borderLeft="4px solid" borderColor="blue.400">
-          <Text fontSize="sm" color="blue.800">
+        <Box bg="brand.50" p={3} borderRadius="md" borderLeft="4px solid" borderColor="brand.400">
+          <Text fontSize="sm" color="brand.800">
             Estás solicitando: <strong>{requestedServiceTitle}</strong>
           </Text>
-          <Text fontSize="xs" color="blue.600">
+          <Text fontSize="xs" color="brand.600">
             Propietario: {ownerName}
           </Text>
         </Box>
 
         <FormControl isRequired>
-          <FormLabel>¿Qué ofreces a cambio?</FormLabel>
+          <FormLabel color={labelColor}>¿Qué ofreces a cambio?</FormLabel>
           <Select 
             placeholder="Selecciona uno de tus servicios..."
             value={selectedServiceId}
             onChange={(e) => setSelectedServiceId(e.target.value)}
-            focusBorderColor="blue.500"
+            focusBorderColor="brand.500"
+            bg={inputBg}
+            _focus={{ bg: inputFocusBg }}
           >
             {myServices.map((service) => (
               <option key={service.id} value={service.id}>
@@ -190,13 +198,15 @@ export const CreateTradeModal = ({
         </FormControl>
 
         <FormControl>
-          <FormLabel>Nota o Mensaje (Opcional)</FormLabel>
+          <FormLabel color={labelColor}>Nota o Mensaje (Opcional)</FormLabel>
           <Textarea 
             placeholder={`Hola ${ownerName}, me interesa tu servicio porque...`}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             resize="none"
             rows={3}
+            bg={inputBg}
+            _focus={{ bg: inputFocusBg }}
           />
         </FormControl>
       </VStack>
@@ -214,14 +224,14 @@ export const CreateTradeModal = ({
           {renderContent()}
         </ModalBody>
 
-        <ModalFooter borderTopWidth="1px">
+        <ModalFooter borderTopWidth="1px" bg={footerBg}>
           <Button variant="ghost" mr={3} onClick={onClose}>
             Cancelar
           </Button>
           
           {myServices.length > 0 && !isLoadingServices && (
             <Button 
-              colorScheme="blue" 
+              colorScheme="brand" 
               onClick={handleSubmit}
               isLoading={isSubmitting}
               loadingText="Enviando..."
