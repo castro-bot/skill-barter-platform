@@ -80,9 +80,16 @@ class UserService {
         throw err
       }
 
-      const existing = await prisma.user.findUnique({ where: { email: trimmed } })
+      const existing = await prisma.user.findFirst({
+        where: {
+          email: {
+            equals: trimmed,
+            mode: "insensitive"
+          }
+        }
+      })
       if (existing && existing.id !== userId) {
-        const err = new Error("Email already in use")
+        const err = new Error("El correo ya está en uso")
         err.statusCode = 409
         throw err
       }
