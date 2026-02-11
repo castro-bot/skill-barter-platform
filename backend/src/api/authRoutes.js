@@ -1,13 +1,10 @@
-// backend/src/api/authRoutes.js
 const express = require('express');
 const AuthService = require('../services/authService');
 const { COOKIE_SETTINGS } = require('../config/constants');
-// CORRECCIÓN: Apuntamos a la carpeta 'middleware' (singular)
 const authenticate = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Helper para errores
 const handleAuthError = (res, error) => {
   if (error.message === 'Invalid credentials' || error.message === 'El correo ya está en uso') {
     return res.status(400).json({ error: error.message });
@@ -24,7 +21,6 @@ router.post('/register', async (req, res) => {
     const { name, email, password } = req.body || {};
     const { user, accessToken, refreshToken } = await AuthService.register({ name, email, password });
 
-    // ðŸ”— Alineamos la respuesta con /login: guardamos refresh en cookie httpOnly
     res.cookie('refreshToken', refreshToken, COOKIE_SETTINGS);
     res.status(201).json({ user, accessToken });
   } catch (error) {
@@ -70,11 +66,9 @@ router.post('/refresh', async (req, res) => {
 
 /**
  * GET /api/v1/auth/me
- * 👇 ESTA ES LA PARTE CRÍTICA QUE FALTABA 👇
  */
 router.get('/me', authenticate, async (req, res) => {
   try {
-    // req.user.id viene del middleware
     const user = await AuthService.getUserById(req.user.id);
     res.status(200).json(user);
   } catch (error) {
