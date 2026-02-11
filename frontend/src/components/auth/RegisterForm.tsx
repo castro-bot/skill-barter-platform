@@ -40,8 +40,11 @@ export const RegisterForm = () => {
       await register({ name, email, password });
       navigate('/services'); 
     } catch (err) {
-      console.error(err);
-      setError(getApiErrorMessage(err, 'Error al registrarse. Intenta con otro correo.'));
+      const message = getApiErrorMessage(err, 'Error al registrarse. Intenta con otro correo.');
+      setError(message);
+      if (import.meta.env.DEV) {
+        console.warn('[Register] Registro rechazado:', message);
+      }
     }
   };
 

@@ -51,12 +51,25 @@ const translateApiMessage = (message: string): string => {
 export const getApiErrorMessage = (err: unknown, fallback: string) => {
   if (err && typeof err === "object" && "isAxiosError" in err) {
     const axiosErr = err as AxiosError<ApiErrorBody>
+    const status = axiosErr.response?.status
     const data = axiosErr.response?.data
+
+    if (axiosErr.code === "ERR_NETWORK" || !axiosErr.response) {
+      return "No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose."
+    }
+
+    if (status && status >= 500) {
+      return "Ocurrió un error interno del servidor. Intenta nuevamente en unos segundos."
+    }
+
     if (data?.message) return translateApiMessage(data.message)
     if (data?.error) return translateApiMessage(data.error)
   }
 
   if (err instanceof Error && err.message.trim().length > 0) {
+    if (err.message === "Network Error") {
+      return "No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose."
+    }
     return translateApiMessage(err.message)
   }
 

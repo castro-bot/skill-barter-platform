@@ -42,9 +42,18 @@ export const Navbar = () => {
   const menuBg = useColorModeValue("white", "gray.800")
   const menuBorder = useColorModeValue("gray.100", "whiteAlpha.200")
   const hoverSoft = useColorModeValue("gray.50", "whiteAlpha.100")
+  const hoverGhostBg = useColorModeValue("brand.50", "whiteAlpha.100")
   const iconSoft = useColorModeValue("gray.400", "gray.300")
   const textMuted = useColorModeValue("gray.500", "gray.400")
   const textStrong = useColorModeValue("gray.800", "gray.100")
+  const accountLabel = useColorModeValue("gray.400", "gray.500")
+  const accountEmail = useColorModeValue("gray.800", "gray.100")
+  const itemSoftBgBrand = useColorModeValue("brand.100", "whiteAlpha.200")
+  const itemSoftBgSand = useColorModeValue("sand.100", "whiteAlpha.200")
+  const itemHoverBrandBg = useColorModeValue("brand.50", "whiteAlpha.100")
+  const itemHoverBrandColor = useColorModeValue("brand.700", "brand.200")
+  const itemHoverSandBg = useColorModeValue("sand.50", "whiteAlpha.100")
+  const itemHoverSandColor = useColorModeValue("sand.700", "sand.200")
   const {
     notifications,
     unreadCount,
@@ -127,7 +136,7 @@ export const Navbar = () => {
               size="sm"
               borderRadius="full"
               color={iconSoft}
-              _hover={{ color: "brand.500", bg: "brand.50" }}
+              _hover={{ color: "brand.500", bg: hoverGhostBg }}
               onClick={toggleColorMode}
             />
             {/* NOTIFICACIONES */}
@@ -139,7 +148,7 @@ export const Navbar = () => {
                   borderRadius="full"
                   position="relative"
                   color={iconSoft}
-                  _hover={{ color: "brand.500", bg: "brand.50" }}
+                  _hover={{ color: "brand.500", bg: hoverGhostBg }}
                   aria-label="Notificaciones">
                   <Icon as={FaBell} boxSize={4} />
 
@@ -316,14 +325,14 @@ export const Navbar = () => {
                 <Box px={4} py={3} mb={2}>
                   <Text
                     fontSize="xx-small"
-                    color="gray.400"
+                    color={accountLabel}
                     fontWeight="bold"
                     textTransform="uppercase"
                     letterSpacing="wider"
                     mb={1}>
                     Conectado como
                   </Text>
-                  <Text fontSize="sm" fontWeight="bold" color="gray.800" noOfLines={1}>
+                  <Text fontSize="sm" fontWeight="bold" color={accountEmail} noOfLines={1}>
                     {user?.email}
                   </Text>
                 </Box>
@@ -333,7 +342,7 @@ export const Navbar = () => {
                 <MenuItem
                   as={Link}
                   to={user?.id ? `/users/${user.id}` : "/services"}
-                  _hover={{ bg: "brand.50", color: "brand.700" }}
+                  _hover={{ bg: itemHoverBrandBg, color: itemHoverBrandColor }}
                   borderRadius="lg"
                   py={3}
                   transition="all 0.2s">
@@ -341,7 +350,7 @@ export const Navbar = () => {
                     <Flex
                       w={8}
                       h={8}
-                      bg="brand.100"
+                      bg={itemSoftBgBrand}
                       borderRadius="md"
                       align="center"
                       justify="center"
@@ -357,7 +366,7 @@ export const Navbar = () => {
                 <MenuItem
                   as={Link}
                   to="/trades"
-                  _hover={{ bg: "sand.50", color: "sand.700" }}
+                  _hover={{ bg: itemHoverSandBg, color: itemHoverSandColor }}
                   borderRadius="lg"
                   py={3}
                   transition="all 0.2s">
@@ -365,7 +374,7 @@ export const Navbar = () => {
                     <Flex
                       w={8}
                       h={8}
-                      bg="sand.100"
+                      bg={itemSoftBgSand}
                       borderRadius="md"
                       align="center"
                       justify="center"
@@ -388,7 +397,7 @@ export const Navbar = () => {
                 <MenuItem
                   as={Link}
                   to="/profile/settings"
-                  _hover={{ bg: "brand.50", color: "brand.700" }}
+                  _hover={{ bg: itemHoverBrandBg, color: itemHoverBrandColor }}
                   borderRadius="lg"
                   py={3}
                   transition="all 0.2s"
@@ -397,7 +406,7 @@ export const Navbar = () => {
                     <Flex
                       w={8}
                       h={8}
-                      bg="brand.100"
+                      bg={itemSoftBgBrand}
                       borderRadius="md"
                       align="center"
                       justify="center"
