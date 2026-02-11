@@ -1,4 +1,3 @@
-// frontend/src/pages/LoginPage.tsx
 import { Box, Grid, Heading, Text, VStack, Link as ChakraLink, Image, Flex, useColorModeValue } from '@chakra-ui/react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
@@ -20,7 +19,6 @@ export const LoginPage = () => {
   return (
     <Grid minH="100vh" templateColumns={{ base: "1fr", md: "1fr 1fr" }}>
       
-      {/* Columna Izquierda */}
       <Flex p={{ base: 5, md: 8 }} flexDir="column" align="center" justify="center" bg="surface">
         <Box w="full" maxW="md">
           <VStack spacing={6} align="stretch">
@@ -38,7 +36,6 @@ export const LoginPage = () => {
 
             <Text fontSize="sm" color="gray.600" textAlign="center" mt={4}>
               ¿No tienes cuenta?{' '}
-              {/* 👇 ESTA ES LA LÍNEA QUE ARREGLA EL ERROR DE CONSOLA 👇 */}
               <ChakraLink as={Link} to="/register" color="brand.600" fontWeight="bold">
                 Regístrate gratis
               </ChakraLink>
@@ -47,7 +44,6 @@ export const LoginPage = () => {
         </Box>
       </Flex>
 
-      {/* Columna Derecha */}
       <Box display={{ base: "none", md: "block" }} position="relative">
         <Image 
           src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 

@@ -1,4 +1,3 @@
-// frontend/src/pages/DashboardPage.tsx
 import { useEffect, useRef, useState } from "react"
 import {
   Box,
@@ -25,7 +24,6 @@ import type { ElementType } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { MyServicesSection } from "../components/services/MyServicesSection"
 
-// --- COMPONENTE VISUAL: StatCard ---
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -112,7 +110,6 @@ export const DashboardPage = () => {
   const [completedTradesCount, setCompletedTradesCount] = useState(0)
   const [activeTradesCount, setActiveTradesCount] = useState(0)
 
-  // Evita re-abrir el modal dos veces en dev (React StrictMode monta/desmonta doble)
   const handledNewRouteRef = useRef(false)
 
   const loadServices = async () => {
@@ -120,7 +117,6 @@ export const DashboardPage = () => {
     try {
       const data = await servicesApi.getAll()
 
-      // Mostrar SOLO servicios que NO son del usuario actual
       const othersServices = data.filter((service) => service.owner.id !== user?.id)
 
       setServices(othersServices)
@@ -155,7 +151,6 @@ export const DashboardPage = () => {
       loadServices()
       loadStats()
     } else {
-      // si no hay user (por ejemplo, en transición), evita estado inconsistente
       setServices([])
       setIsLoading(false)
       setIsStatsLoading(false)
@@ -164,11 +159,6 @@ export const DashboardPage = () => {
     }
   }, [user])
 
-  /**
-   * ✅ Manejo correcto de /services/new (crear servicio es MODAL, no página)
-   * - Si el usuario llega a /services/new, abrimos modal
-   * - Normalizamos URL a /services para evitar que quede "new" como un "id"
-   */
   useEffect(() => {
     const isNewRoute = location.pathname === "/services/new"
     if (!isNewRoute) {
@@ -176,18 +166,13 @@ export const DashboardPage = () => {
       return
     }
 
-    // No hagas nada si todavía no hay usuario (rutas protegidas deberían evitarlo, pero por seguridad)
     if (!user) return
 
-    // Guard para StrictMode / doble ejecución en dev
     if (handledNewRouteRef.current) return
     handledNewRouteRef.current = true
 
-    // 1) Abrir modal
     onOpen()
 
-    // 2) Normalizar URL para que no choque con /services/:id
-    // replace = true para que Back no vuelva a /services/new
     navigate("/services", { replace: true })
   }, [location.pathname, navigate, onOpen, user])
 
@@ -195,7 +180,6 @@ export const DashboardPage = () => {
     <Box bg="transparent" minH="calc(100vh - 64px)">
       <CreateServiceModal isOpen={isOpen} onClose={onClose} onSuccess={loadServices} />
 
-      {/* HERO HEADER */}
       <Box
         bg="surface"
         borderBottom="1px solid"
@@ -274,7 +258,6 @@ export const DashboardPage = () => {
         </Container>
       </Box>
 
-      {/* ÁREA DE SERVICIOS */}
       <Container maxW="container.xl" py={12}>
         <HStack mb={8} justify="space-between" align="center">
           <Heading size="lg" color={titleColor} letterSpacing="tight">
@@ -350,7 +333,6 @@ export const DashboardPage = () => {
           </Flex>
         )}
 
-        {/* SPRINT 4: MIS SERVICIOS + EDITAR/ELIMINAR */}
         <MyServicesSection />
       </Container>
     </Box>

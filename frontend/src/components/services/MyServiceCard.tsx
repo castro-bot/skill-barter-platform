@@ -1,4 +1,3 @@
-// frontend/src/components/services/MyServiceCard.tsx
 import {
   Box,
   Badge,
@@ -40,7 +39,6 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
   const edit = useDisclosure()
   const del = useDisclosure()
 
-  // ✅ Compatible con <Button ref=...>
   const cancelRef = useRef<HTMLButtonElement | null>(null)
 
   const toast = useToast()
@@ -132,7 +130,6 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
         </Button>
       </HStack>
 
-      {/* Modal editar */}
       <EditServiceModal
         isOpen={edit.isOpen}
         onClose={edit.onClose}
@@ -140,10 +137,8 @@ export const MyServiceCard = ({ service, onChanged }: Props) => {
         onSuccess={onChanged}
       />
 
-      {/* Confirmación eliminar */}
       <AlertDialog
         isOpen={del.isOpen}
-        // ✅ Sin any. 'unknown' evita la regla no-explicit-any
         leastDestructiveRef={cancelRef as unknown as React.RefObject<HTMLElement>}
         onClose={del.onClose}
         isCentered
