@@ -133,6 +133,7 @@ export const LoginForm = () => {
         {/* MENSAJE DE ERROR */}
         {error && (
           <Box
+            data-testid="error-message"
             p={3}
             bg="red.50"
             border="1px solid"
