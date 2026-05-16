@@ -7,16 +7,13 @@ import theme from "./theme"
 import "./index.css"
 
 import { AuthProvider } from "./context/AuthContext"
-import { NotificationsProvider } from "./context/NotificationsContext"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <AuthProvider>
-        <NotificationsProvider>
-          <App />
-        </NotificationsProvider>
+        <App />
       </AuthProvider>
     </ChakraProvider>
   </React.StrictMode>

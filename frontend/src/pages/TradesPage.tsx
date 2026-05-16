@@ -21,7 +21,6 @@ import {
   Spinner,
   Alert,
   AlertIcon,
-  keyframes,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -36,6 +35,7 @@ import {
   useDisclosure,
   useColorModeValue
 } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { tradesApi, type Trade, type TradesResponse } from "../api/trades";
 import { RatingModal } from "../components/ratings/RatingModal";

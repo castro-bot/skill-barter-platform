@@ -9,11 +9,11 @@ import {
   Icon,
   SimpleGrid,
   HStack,
-  keyframes,
   useDisclosure,
   useColorModeValue,
   Spinner
 } from "@chakra-ui/react"
+import { keyframes } from "@emotion/react"
 import { FaPlus, FaBoxOpen, FaExchangeAlt, FaChartLine, FaCheckCircle } from "react-icons/fa"
 import { useAuth } from "../context/AuthContext"
 import { CreateServiceModal } from "../components/services/CreateServiceModal"
